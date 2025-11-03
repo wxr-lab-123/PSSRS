@@ -1,0 +1,11 @@
+com\hjm\pojo\DTO\PatientDTO.class
+com\hjm\pojo\Entity\AppointmentOrder.class
+com\hjm\pojo\Entity\Department.class
+com\hjm\pojo\Entity\UserRole.class
+com\hjm\pojo\DTO\UserLoginDTO.class
+com\hjm\pojo\VO\UserLoginVO.class
+com\hjm\pojo\Entity\User.class
+com\hjm\pojo\Entity\Patient.class
+com\hjm\pojo\VO\UserLoginVO$UserLoginVOBuilder.class
+com\hjm\pojo\Entity\DoctorProfile.class
+com\hjm\pojo\Entity\Role.class

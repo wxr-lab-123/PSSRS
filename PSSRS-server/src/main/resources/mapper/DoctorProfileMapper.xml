@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hjm.mapper.DoctorProfileMapper">
+    <update id="updateByUserId" parameterType="com.hjm.pojo.Entity.DoctorProfile">
+        UPDATE doctor_profile
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="departmentId != null">department_id = #{departmentId},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="image != null">image = #{image},</if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

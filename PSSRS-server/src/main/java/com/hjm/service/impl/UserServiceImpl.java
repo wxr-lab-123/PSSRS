@@ -8,6 +8,7 @@ import com.hjm.constant.PasswordConstant;
 import com.hjm.constant.StatusConstant;
 import com.hjm.exception.AccountLockedException;
 import com.hjm.exception.PasswordErrorException;
+import com.hjm.mapper.DoctorProfileMapper;
 import com.hjm.mapper.UserMapper;
 import com.hjm.pojo.DTO.AdminDTO;
 import com.hjm.pojo.DTO.DoctorDTO;
@@ -15,8 +16,9 @@ import com.hjm.pojo.DTO.UserLoginDTO;
 import com.hjm.pojo.Entity.DoctorProfile;
 import com.hjm.pojo.Entity.User;
 import com.hjm.pojo.Entity.UserRole;
-import com.hjm.pojo.VO.UserVO;
+import com.hjm.pojo.VO.DoctorVO;
 import com.hjm.result.PageResult;
+import com.hjm.result.Result;
 import com.hjm.service.IDoctorProfileService;
 import com.hjm.service.IUserRoleService;
 import com.hjm.service.IUserService;
@@ -28,7 +30,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.security.auth.login.AccountNotFoundException;
 
-import java.util.List;
 import java.util.Random;
 
 import static com.hjm.constant.MyConstant.*;
@@ -53,6 +54,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private UserMapper baseMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private DoctorProfileMapper doctorProfileMapper;
 
     /**
      * 用户登录功能
@@ -166,10 +169,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      */
     @Override
     public PageResult listDoctors(String name, Integer departmentId, Long page, Long pageSize) {
-        Page<UserVO> pageInfo = new Page<>(page, pageSize);
-        Page<UserVO> list = userMapper.listUsers(pageInfo, name, departmentId);
+        Page<DoctorVO> pageInfo = new Page<>(page, pageSize);
+        Page<DoctorVO> list = userMapper.listUsers(pageInfo, name, departmentId);
         PageResult pageResult = new PageResult(list.getTotal(), list.getRecords());
         return pageResult;
+    }
+
+    @Override
+    @Transactional
+    public Result updateDoctor(Long id, DoctorDTO doctorDTO) {
+        User user = new User();
+        user.setId(id);
+        user.setPhone(doctorDTO.getPhone());
+        user.setGender(doctorDTO.getGender());
+        user.setStatus(doctorDTO.getStatus());
+        updateById(user);
+        DoctorProfile doctorProfile = new DoctorProfile();
+        doctorProfile.setTitle(doctorDTO.getTitle());
+        doctorProfile.setDepartmentId(doctorDTO.getDepartmentId());
+        doctorProfile.setUserId(id);
+        doctorProfile.setDescription(doctorDTO.getDescription());
+        doctorProfile.setImage(doctorDTO.getImage());
+        doctorProfileMapper.updateByUserId(doctorProfile);
+        return Result.success();
     }
 
     /**

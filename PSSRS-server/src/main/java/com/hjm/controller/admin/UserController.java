@@ -1,12 +1,9 @@
 package com.hjm.controller.admin;
 
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.hjm.pojo.DTO.AdminDTO;
 import com.hjm.pojo.DTO.DoctorDTO;
 import com.hjm.pojo.DTO.UserLoginDTO;
 import com.hjm.pojo.Entity.User;
-import com.hjm.pojo.VO.UserVO;
 import com.hjm.properties.JwtProperties;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
@@ -75,7 +72,6 @@ public class UserController {
         userService.registerDoctor(doctorDTO);
         return Result.success();
     }
-
     /**
      * 查询医生列表（分页）
      */
@@ -89,6 +85,25 @@ public class UserController {
         log.info("查询医生列表，当前页：{}，页大小：{}，医生名称={}", page, pageSize, name);
         PageResult result = userService.listDoctors(name, departmentId, page, pageSize);
         return Result.success(result);
+    }
+    /**
+     * 删除医生账号
+     */
+    @DeleteMapping("/doctors/{id}")
+    public Result deleteDoctor(@PathVariable Long id) {
+        log.info("删除医生账号：{}", id);
+        //逻辑删除
+        userService.removeById(id);
+//      doctorProfileService.removeById(id);
+        return Result.success();
+    }
+    /**
+     * 修改医生信息
+     */
+    @PutMapping("/doctors/{id}")
+    public Result updateDoctor(@PathVariable Long id, @RequestBody DoctorDTO doctorDTO) {
+        log.info("修改医生信息：{}", doctorDTO);
+        return userService.updateDoctor(id, doctorDTO);
     }
 
 }

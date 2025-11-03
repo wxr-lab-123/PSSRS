@@ -3,7 +3,8 @@ package com.hjm.pojo.VO;
 import lombok.Data;
 
 @Data
-public class UserVO {
+public class DoctorVO {
+    private Long id;
     private String image;
     private String name;
     private String title;

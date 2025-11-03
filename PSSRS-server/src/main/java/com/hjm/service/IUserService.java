@@ -5,12 +5,11 @@ import com.hjm.pojo.DTO.AdminDTO;
 import com.hjm.pojo.DTO.DoctorDTO;
 import com.hjm.pojo.DTO.UserLoginDTO;
 import com.hjm.pojo.Entity.User;
-import com.hjm.pojo.VO.UserVO;
 import com.hjm.result.PageResult;
+import com.hjm.result.Result;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.List;
 
 /**
  * <p>
@@ -43,4 +42,5 @@ public interface IUserService extends IService<User> {
      */
     PageResult listDoctors(String name, Integer departmentId, Long page, Long pageSize);
 
+    Result updateDoctor(Long id, DoctorDTO doctorDTO);
 }

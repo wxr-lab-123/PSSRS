@@ -17,6 +17,21 @@
       </list>
     </option>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;wxr-lab-123&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:wxr-lab-123/PSSRS.git&quot;,
+    &quot;accountId&quot;: &quot;5c2d79e0-ab25-4d29-b6c5-d7a76c152312&quot;
+  }
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -36,48 +51,57 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;JUnit.PssrsServerApplicationTests.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.PSSRS-server [install].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.PSSRS1 [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.PSSRS1 [install].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;Spring Boot.PssrsServerApplication.executor&quot;: &quot;Run&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/webHD/myMeaven/PSSRS1/PSSRS-common/src/main/java/com/hjm&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;E:/webHD/myMeaven/PSSRS1/PSSRS-pojo/src/main/java/com/hjm/Main.java&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;模块&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.inline.completion&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "JUnit.PssrsServerApplicationTests.executor": "Run",
+    "Maven.PSSRS-server [install].executor": "Run",
+    "Maven.PSSRS1 [clean].executor": "Run",
+    "Maven.PSSRS1 [install].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.PssrsServerApplication.executor": "Run",
+    "git-widget-placeholder": "master",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "E:/webHD/myMeaven/PSSRS1/PSSRS-server/src/main/resources/mapper",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "E:/webHD/myMeaven/PSSRS1/PSSRS-pojo/src/main/java/com/hjm/Main.java",
+    "project.structure.last.edited": "模块",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ],
+    "GitStage.ChangesTree.GroupingKeys": [
+      "directory",
+      "module",
+      "repository"
     ]
   }
-}</component>
+}]]></component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources\mapper" />
+      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources" />
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-common\src\main\java\com\hjm" />
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-pojo\src\main\java\com\hjm" />
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\java\com\hjm" />
-      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-pojo\src\main\java\com\hjm\pojo" />
@@ -131,6 +155,9 @@
       </set>
     </attachedChunks>
   </component>
+  <component name="StructureViewState">
+    <option name="selectedTab" value="逻辑" />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="默认任务">
       <changelist id="0d05ab94-9754-44ed-832a-f4d3a2eb923a" name="更改" comment="" />
@@ -142,11 +169,65 @@
       <workItem from="1761973604145" duration="16233000" />
       <workItem from="1762001297421" duration="3061000" />
       <workItem from="1762052763236" duration="19214000" />
-      <workItem from="1762089250707" duration="1151000" />
+      <workItem from="1762089250707" duration="5413000" />
+      <workItem from="1762130391299" duration="547000" />
     </task>
+    <task id="LOCAL-00001" summary="初始代码且部分后台管理系统">
+      <option name="closed" value="true" />
+      <created>1762091688917</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1762091688917</updated>
+    </task>
+    <task id="LOCAL-00002" summary="初始代码且部分后台管理系统">
+      <option name="closed" value="true" />
+      <created>1762092186687</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1762092186687</updated>
+    </task>
+    <task id="LOCAL-00003" summary="初始代码且部分后台管理系统">
+      <option name="closed" value="true" />
+      <created>1762092411465</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1762092411465</updated>
+    </task>
+    <task id="LOCAL-00004" summary="初始代码且部分后台管理系统">
+      <option name="closed" value="true" />
+      <created>1762092624226</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1762092624226</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
+    <ignored-roots>
+      <path value="$PROJECT_DIR$" />
+    </ignored-roots>
+    <MESSAGE value="初始代码且部分后台管理系统" />
+    <option name="LAST_COMMIT_MESSAGE" value="初始代码且部分后台管理系统" />
   </component>
 </project>

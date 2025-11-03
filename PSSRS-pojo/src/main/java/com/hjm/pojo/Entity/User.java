@@ -1,8 +1,7 @@
 package com.hjm.pojo.Entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -57,6 +56,8 @@ public class User implements Serializable {
     private LocalDateTime updateTime;
 
     @ApiModelProperty(value = "逻辑删除(0正常 1删除)")
+    @TableLogic
+    @TableField("is_deleted")
     private Integer isDeleted;
 
 

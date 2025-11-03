@@ -3,7 +3,7 @@
 <mapper namespace="com.hjm.mapper.UserMapper">
 
     <!-- 查询医生列表（分页） -->
-    <select id="listUsers" resultType="com.hjm.pojo.VO.UserVO">
+    <select id="listUsers" resultType="com.hjm.pojo.VO.DoctorVO">
         SELECT
         u.id,
         u.name,
@@ -36,7 +36,7 @@
 
 
     <!-- 查询管理员列表（分页） -->
-    <select id="listAdmins" resultType="com.hjm.pojo.VO.UserVO">
+    <select id="listAdmins" resultType="com.hjm.pojo.VO.DoctorVO">
         SELECT
             u.id,
             u.name,

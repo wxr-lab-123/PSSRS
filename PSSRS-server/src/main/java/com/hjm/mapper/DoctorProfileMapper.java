@@ -3,6 +3,7 @@ package com.hjm.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hjm.pojo.Entity.DoctorProfile;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Update;
 
 /**
  * <p>
@@ -15,4 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface DoctorProfileMapper extends BaseMapper<DoctorProfile> {
 
+
+    void updateByUserId(DoctorProfile doctorProfile);
 }
