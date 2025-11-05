@@ -53,7 +53,7 @@ public class UserController {
         userInfo.put("roles", roles);
 
 
-        String token = JwtUtil.createJWT(jwtProperties.getUserTokenName(), jwtProperties.getUserTtl(), userInfo);
+        String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), userInfo);
 
         Map<String, Object> data = new HashMap<>();
         data.put("token", token);

@@ -1,8 +1,13 @@
 package com.hjm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hjm.pojo.DTO.PatientLoginDTO;
+import com.hjm.pojo.DTO.PatientRegisterDTO;
 import com.hjm.pojo.Entity.Patient;
+import com.hjm.result.Result;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * <p>
@@ -15,4 +20,9 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IPatientService extends IService<Patient> {
 
+    Result sendCode(String phone);
+
+    Result login(PatientLoginDTO patientLoginDTO);
+
+    Result patientRegister(PatientRegisterDTO patientRegisterDTO);
 }

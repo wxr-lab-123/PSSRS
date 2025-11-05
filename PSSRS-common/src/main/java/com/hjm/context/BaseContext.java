@@ -8,6 +8,7 @@ public class BaseContext {
         threadLocal.set(id);
     }
 
+
     public static Long getCurrentId() {
         return threadLocal.get();
     }
@@ -15,5 +16,6 @@ public class BaseContext {
     public static void removeCurrentId() {
         threadLocal.remove();
     }
+
 
 }

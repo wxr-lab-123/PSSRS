@@ -13,6 +13,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="HTML File" />
         <option value="Class" />
       </list>
     </option>
@@ -53,10 +54,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
     "JUnit.PssrsServerApplicationTests.executor": "Run",
     "Maven.PSSRS-server [install].executor": "Run",
     "Maven.PSSRS1 [clean].executor": "Run",
     "Maven.PSSRS1 [install].executor": "Run",
+    "Maven.PSSRS1 [package].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
@@ -68,7 +71,7 @@
     "Spring Boot.PssrsServerApplication.executor": "Run",
     "git-widget-placeholder": "master",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "E:/webHD/myMeaven/PSSRS1/PSSRS-server/src/main/resources/mapper",
+    "last_opened_file_path": "E:/webHD/myMeaven/PSSRS1/PSSRS-server/src/main/resources/static",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -97,17 +100,19 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources\static" />
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources\mapper" />
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources" />
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-common\src\main\java\com\hjm" />
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-pojo\src\main\java\com\hjm" />
-      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\java\com\hjm" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-pojo\src\main\java\com\hjm\pojo" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.hjm.interceptor" />
       <recent name="com.hjm.utils" />
+      <recent name="com.hjm.constant" />
       <recent name="com.hjm.controller.common" />
     </key>
   </component>
@@ -170,7 +175,14 @@
       <workItem from="1762001297421" duration="3061000" />
       <workItem from="1762052763236" duration="19214000" />
       <workItem from="1762089250707" duration="5413000" />
-      <workItem from="1762130391299" duration="547000" />
+      <workItem from="1762130391299" duration="4386000" />
+      <workItem from="1762155718145" duration="3466000" />
+      <workItem from="1762159722541" duration="1039000" />
+      <workItem from="1762164791909" duration="10275000" />
+      <workItem from="1762222942013" duration="5845000" />
+      <workItem from="1762241220105" duration="3751000" />
+      <workItem from="1762246627610" duration="9831000" />
+      <workItem from="1762303481948" duration="1874000" />
     </task>
     <task id="LOCAL-00001" summary="初始代码且部分后台管理系统">
       <option name="closed" value="true" />
@@ -204,7 +216,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762092624226</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="初始代码且部分后台管理系统">
+      <option name="closed" value="true" />
+      <created>1762131332159</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1762131332159</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -229,5 +249,61 @@
     </ignored-roots>
     <MESSAGE value="初始代码且部分后台管理系统" />
     <option name="LAST_COMMIT_MESSAGE" value="初始代码且部分后台管理系统" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
+          <line>43</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
+          <line>47</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
+          <line>50</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
+          <line>49</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
+          <line>48</line>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
+          <line>63</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/controller/admin/UserController.java</url>
+          <line>59</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/controller/admin/UserController.java</url>
+          <line>58</line>
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/controller/admin/UserController.java</url>
+          <line>61</line>
+          <option name="timeStamp" value="36" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="SpringBootApplicationConfigurationType">
+        <watch expression="((Request)((RequestFacade)request).request).internalDispatcherType" custom="org.apache.catalina.connector.RequestFacade,org.apache.catalina.connector.Request" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
