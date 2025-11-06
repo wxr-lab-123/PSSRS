@@ -30,7 +30,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.security.auth.login.AccountNotFoundException;
 
-import java.util.Random;
+import java.util.*;
 
 import static com.hjm.constant.MyConstant.*;
 
@@ -192,6 +192,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         doctorProfile.setImage(doctorDTO.getImage());
         doctorProfileMapper.updateByUserId(doctorProfile);
         return Result.success();
+    }
+
+    @Override
+    public Result<List<Map<String,Object>>> listDoctorsByDepartmentId(Long departmentId) {
+
+        List<DoctorProfile> doctorProfiles = doctorProfileMapper.getDoctorByDepartmentId(departmentId);
+        List<Map<String,Object>> list = new ArrayList<>();
+        for (DoctorProfile doctorProfile : doctorProfiles) {
+            User userInfo = getById(doctorProfile.getUserId());
+            if (userInfo.getIsDeleted()==0){
+            Map<String,Object> map = new HashMap<>();
+            map.put("id", doctorProfile.getUserId());
+            map.put("username", userInfo.getName());
+            list.add(map);
+            }
+        }
+        return Result.success(list);
     }
 
     /**

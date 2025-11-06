@@ -10,6 +10,8 @@ import com.hjm.result.Result;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -43,4 +45,6 @@ public interface IUserService extends IService<User> {
     PageResult listDoctors(String name, Integer departmentId, Long page, Long pageSize);
 
     Result updateDoctor(Long id, DoctorDTO doctorDTO);
+
+    Result<List<Map<String,Object>>> listDoctorsByDepartmentId(Long departmentId);
 }

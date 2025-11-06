@@ -105,5 +105,14 @@ public class UserController {
         log.info("修改医生信息：{}", doctorDTO);
         return userService.updateDoctor(id, doctorDTO);
     }
+    /**
+     * 根据科室查询医生
+     */
+    @GetMapping("/doctors/department/{departmentId}")
+    public Result<List<Map<String,Object>>> listDoctorsByDepartmentId(@PathVariable Long departmentId) {
+        log.info("根据科室查询医生：{}", departmentId);
+
+        return userService.listDoctorsByDepartmentId(departmentId);
+    }
 
 }

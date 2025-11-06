@@ -17,22 +17,22 @@
         FROM user u
         LEFT JOIN doctor_profile dp ON dp.user_id = u.id
         LEFT JOIN department d ON d.id = dp.department_id
+        JOIN user_role ure ON ure.user_id = u.id
+        JOIN role r ON ure.role_id = r.id
         WHERE u.is_deleted = 0
-        AND EXISTS (
-        SELECT 1
-        FROM user_role ur
-        JOIN role r ON ur.role_id = r.id
-        WHERE ur.user_id = u.id
         AND r.role_name = 'DOCTOR'
-        )
+
         <if test="name != null and name != ''">
             AND u.name LIKE CONCAT('%', #{name}, '%')
         </if>
+
         <if test="departmentId != null">
             AND dp.department_id = #{departmentId}
         </if>
+
         ORDER BY u.create_time DESC
     </select>
+
 
 
     <!-- 查询管理员列表（分页） -->

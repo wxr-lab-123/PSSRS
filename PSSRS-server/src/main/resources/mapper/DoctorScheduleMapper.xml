@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hjm.mapper.DoctorScheduleMapper">
+
+    <select id="listSchedules" resultType="com.hjm.pojo.VO.DoctorScheduleVO">
+        select ds.current_appointments,
+        ds.status,
+        ds.start_time,
+        ds.end_time,
+        ds.schedule_date,
+        ds.time_slot,
+        ds.room_number,
+        ds.notes,
+        u.name as doctorName,
+        d.name as departmentName
+        from doctor_schedule ds
+        join user u on ds.doctor_id = u.id
+        join department d on ds.department_id = d.id
+        <where>
+            <if test="doctorScheduleDTO.doctorId != null">
+                ds.doctor_id = #{doctorScheduleDTO.doctorId}
+            </if>
+            <if test="doctorScheduleDTO.departmentId != null">
+                and ds.department_id = #{doctorScheduleDTO.departmentId}
+            </if>
+            <if test="doctorScheduleDTO.scheduleDate != null">
+                and ds.schedule_date = #{doctorScheduleDTO.scheduleDate}
+            </if>
+            <if test="doctorScheduleDTO.timeSlot != null">
+                and ds.time_slot = #{doctorScheduleDTO.timeSlot}
+            </if>
+            <if test="doctorScheduleDTO.status != null">
+                and ds.status = #{doctorScheduleDTO.status}
+            </if>
+        </where>
+        order by ds.schedule_date, ds.time_slot
+    </select>
+
+</mapper>

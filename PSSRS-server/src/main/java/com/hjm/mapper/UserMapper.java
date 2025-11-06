@@ -2,10 +2,14 @@ package com.hjm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hjm.pojo.DTO.DoctorDTO;
 import com.hjm.pojo.Entity.User;
 import com.hjm.pojo.VO.DoctorVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * <p>
@@ -27,4 +31,9 @@ public interface UserMapper extends BaseMapper<User> {
             @Param("departmentId") Integer departmentId
     );
 
+    /**
+     * 根据部门ID查询医生列表
+     */
+    @Select("SELECT * from user where ")
+    List<DoctorDTO> listDoctorsByDepartmentId(Long departmentId);
 }
