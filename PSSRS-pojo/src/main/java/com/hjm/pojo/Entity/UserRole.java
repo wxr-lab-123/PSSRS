@@ -1,5 +1,6 @@
 package com.hjm.pojo.Entity;
 
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,6 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>
@@ -35,6 +37,10 @@ public class UserRole implements Serializable {
 
     @ApiModelProperty(value = "角色ID")
     private Long roleId;
+
+    @ApiModelProperty(value = "逻辑删除(0正常 1删除)")
+    @TableLogic
+    private Integer isDeleted;
 
 
 }

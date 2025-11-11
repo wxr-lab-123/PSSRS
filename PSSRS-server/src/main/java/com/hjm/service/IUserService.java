@@ -47,4 +47,8 @@ public interface IUserService extends IService<User> {
     Result updateDoctor(Long id, DoctorDTO doctorDTO);
 
     Result<List<Map<String,Object>>> listDoctorsByDepartmentId(Long departmentId);
+
+    PageResult listAdmins(String name, Integer status, Long page, Long pageSize);
+
+    Result updateAdmin(Long id, AdminDTO adminDTO);
 }

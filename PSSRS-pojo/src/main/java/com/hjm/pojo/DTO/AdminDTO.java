@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 管理员注册/更新传输对象
  */
@@ -25,4 +27,6 @@ public class AdminDTO {
 
     @ApiModelProperty(value = "状态(1启用 0禁用)")
     private Integer status;
+
+    private List<String> roles;
 }

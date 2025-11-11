@@ -6,6 +6,8 @@ import com.hjm.pojo.Entity.DoctorSchedule;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hjm.pojo.VO.DoctorScheduleVO;
 
+import java.util.List;
+
 /**
  * <p>
  * 医生排班表 Mapper 接口
@@ -20,4 +22,8 @@ public interface DoctorScheduleMapper extends BaseMapper<DoctorSchedule> {
      * 医生排班列表
      */
     Page<DoctorScheduleVO> listSchedules(Page<DoctorSchedule> page, DoctorScheduleDTO doctorScheduleDTO);
+
+    DoctorScheduleVO getXq(Long id);
+
+    List<DoctorScheduleVO> listScheduleByDid(Long departmentId, String date);
 }

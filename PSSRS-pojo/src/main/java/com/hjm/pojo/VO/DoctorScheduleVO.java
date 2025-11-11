@@ -4,9 +4,11 @@ import lombok.Data;
 
 @Data
 public class DoctorScheduleVO {
+    private Long id;
     private String doctorName;
     private String scheduleDate;
     private String timeSlot;
+    private String image;
     private String startTime;
     private String endTime;
     private Long current_appointments;

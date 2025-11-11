@@ -9,6 +9,9 @@ import java.time.LocalTime;
 
 @Data
 public class DoctorSchedulesDTO {
+
+    @JsonProperty("id")
+    private Long id;
     @JsonProperty("doctor_id")
     private Long doctorId;
 

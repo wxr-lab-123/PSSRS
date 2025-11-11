@@ -1,14 +1,19 @@
 package com.hjm.controller.admin;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hjm.pojo.DTO.AdminDTO;
 import com.hjm.pojo.DTO.DoctorDTO;
 import com.hjm.pojo.DTO.UserLoginDTO;
+import com.hjm.pojo.Entity.DoctorProfile;
 import com.hjm.pojo.Entity.User;
+import com.hjm.pojo.Entity.UserRole;
 import com.hjm.properties.JwtProperties;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.service.IDoctorProfileService;
 import com.hjm.service.IRoleService;
+import com.hjm.service.IUserRoleService;
 import com.hjm.service.IUserService;
 import com.hjm.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +43,7 @@ public class UserController {
     private final IRoleService roleService;
     private final IDoctorProfileService doctorProfileService;
     private final JwtProperties jwtProperties;
+    private final IUserRoleService userRoleService;
 
     @PostMapping("/auth/login")
     public Result login(@RequestBody UserLoginDTO userLoginDTO) throws AccountNotFoundException {
@@ -94,7 +100,8 @@ public class UserController {
         log.info("删除医生账号：{}", id);
         //逻辑删除
         userService.removeById(id);
-//      doctorProfileService.removeById(id);
+        userRoleService.remove(new QueryWrapper<UserRole>().eq("user_id", id));
+        doctorProfileService.remove(new QueryWrapper<DoctorProfile>().eq("user_id", id));
         return Result.success();
     }
     /**
@@ -113,6 +120,39 @@ public class UserController {
         log.info("根据科室查询医生：{}", departmentId);
 
         return userService.listDoctorsByDepartmentId(departmentId);
+    }
+
+    @GetMapping("/admins")
+    public Result<PageResult> listAdmins(
+            @RequestParam(required = false,value = "username") String name,
+            @RequestParam(required = false) Integer status,
+            @RequestParam("page") Long page,
+            @RequestParam("size") Long pageSize
+    ) {
+        log.info("查询管理员列表，当前页：{}，页大小：{}，管理员名称={}", page, pageSize, name);
+        PageResult result = userService.listAdmins(name,status, page, pageSize);
+        return Result.success(result);
+    }
+    @PostMapping("/admins")
+    public Result registerAdmin(@RequestBody AdminDTO adminDTO) {
+        log.info("注册管理员账号：{}", adminDTO);
+        userService.registerAdmin(adminDTO);
+        return Result.success();
+    }
+
+    @PutMapping("/admins/{id}")
+    public Result updateAdmin(@PathVariable Long id, @RequestBody AdminDTO adminDTO) {
+        log.info("修改管理员信息：{}", adminDTO);
+        return userService.updateAdmin(id, adminDTO);
+    }
+
+    @DeleteMapping("/admins/{id}")
+    public Result deleteAdmin(@PathVariable Long id) {
+        log.info("删除管理员账号：{}", id);
+        //逻辑删除
+        userService.removeById(id);
+        userRoleService.remove(new QueryWrapper<UserRole>().eq("user_id", id));
+        return Result.success();
     }
 
 }

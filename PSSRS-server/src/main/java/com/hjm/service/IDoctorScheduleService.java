@@ -1,9 +1,14 @@
 package com.hjm.service;
 
+import com.hjm.pojo.DTO.CopyDSDTO;
 import com.hjm.pojo.DTO.DoctorScheduleDTO;
 import com.hjm.pojo.Entity.DoctorSchedule;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hjm.pojo.VO.DoctorScheduleVO;
 import com.hjm.result.PageResult;
+import com.hjm.result.Result;
+
+import java.util.List;
 
 /**
  * <p>
@@ -16,4 +21,10 @@ import com.hjm.result.PageResult;
 public interface IDoctorScheduleService extends IService<DoctorSchedule> {
 
     PageResult listSchedules(DoctorScheduleDTO doctorScheduleDTO);
+
+    Result<DoctorScheduleVO> getXq(Long id);
+
+    Result copy(CopyDSDTO copyDSDTO);
+
+    List<DoctorScheduleVO> listScheduleByDid(Long departmentId, String date);
 }

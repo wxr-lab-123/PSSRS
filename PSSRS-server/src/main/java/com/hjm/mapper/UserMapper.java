@@ -34,6 +34,6 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * 根据部门ID查询医生列表
      */
-    @Select("SELECT * from user where ")
-    List<DoctorDTO> listDoctorsByDepartmentId(Long departmentId);
+
+    List<User> listAdmins(Page<User> pageInfo, String name, Integer status);
 }

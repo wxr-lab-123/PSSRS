@@ -1,15 +1,19 @@
 package com.hjm.controller.admin;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.hjm.pojo.DTO.CopyDSDTO;
 import com.hjm.pojo.DTO.DoctorScheduleDTO;
 import com.hjm.pojo.DTO.DoctorSchedulesDTO;
 import com.hjm.pojo.Entity.DoctorSchedule;
+import com.hjm.pojo.VO.DoctorScheduleVO;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.service.IDoctorScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Request;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -51,4 +55,43 @@ public class DoctorScheduleController {
         PageResult result = doctorScheduleService.listSchedules(doctorScheduleDTO);
         return Result.success(result);
     }
+
+    @GetMapping("/schedules/{id}")
+    public Result<DoctorScheduleVO> getXq(@PathVariable Long id){
+        return doctorScheduleService.getXq(id);
+    }
+
+    @DeleteMapping("/schedules/{id}")
+    public Result delete(@PathVariable Long id){
+        doctorScheduleService.removeById(id);
+        return Result.success();
+    }
+
+    @PutMapping("/schedules")
+    public Result update(@RequestBody DoctorSchedulesDTO doctorSchedulesDTO){
+        log.info("修改排班：{}", doctorSchedulesDTO);
+        log.debug("{}", doctorSchedulesDTO);
+        doctorScheduleService.updateById(BeanUtil.copyProperties(doctorSchedulesDTO,DoctorSchedule.class));
+        return Result.success();
+    }
+
+    @PostMapping("/schedules/copy")
+    public Result copy(@RequestBody CopyDSDTO copyDSDTO)
+    {
+        return doctorScheduleService.copy(copyDSDTO);
+    }
+
+    @PatchMapping("/schedules/{id}/status")
+    public Result updateStatus(@PathVariable Long id, @RequestParam String status){
+        log.info("修改排班状态：{}", status);
+        DoctorSchedule doctorSchedule = new DoctorSchedule();
+        doctorSchedule.setId(id);
+        doctorSchedule.setStatus(status);
+        doctorScheduleService.updateById(doctorSchedule);
+        return Result.success();
+    }
+
+
+
+
 }

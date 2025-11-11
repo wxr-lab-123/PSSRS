@@ -35,23 +35,50 @@
 
 
 
-    <!-- 查询管理员列表（分页） -->
-    <select id="listAdmins" resultType="com.hjm.pojo.VO.DoctorVO">
+    <!-- 角色名列表（按用户ID） -->
+    <select id="listRoleNamesByUserId" resultType="string">
+        SELECT r.role_name
+        FROM role r
+                 INNER JOIN user_role ur ON ur.role_id = r.id
+        WHERE ur.user_id = #{userId}
+    </select>
+
+    <!-- 带角色数组的用户映射 -->
+    <resultMap id="UserWithRolesMap" type="com.hjm.pojo.VO.AdminVO">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="phone" column="phone"/>
+        <result property="status" column="status"/>
+        <!-- roles 为字符串数组：List<String> -->
+        <collection property="roles"
+                    ofType="string"
+                    column="id"
+                    select="listRoleNamesByUserId"/>
+    </resultMap>
+
+    <!-- 列表查询：用户+角色数组，且用户必须包含 ADMIN 角色 -->
+    <select id="listAdmins" resultMap="UserWithRolesMap">
         SELECT
-            u.id,
-            u.name,
-            u.phone,
-            u.gender,
-            u.status
+        u.id,
+        u.name,
+        u.phone,
+        u.gender,
+        u.status
         FROM user u
-        INNER JOIN user_role ur ON u.id = ur.user_id
-        INNER JOIN role r ON ur.role_id = r.id
-        WHERE r.role_name = 'ADMIN'
-        AND u.is_deleted = 0
+        WHERE u.is_deleted = 0
+        AND EXISTS (
+        SELECT 1
+        FROM user_role ure
+        INNER JOIN role r ON ure.role_id = r.id
+        WHERE ure.user_id = u.id
+        AND r.role_name = 'ADMIN'
+        )
         <if test="name != null and name != ''">
             AND u.name LIKE CONCAT('%', #{name}, '%')
         </if>
+        <if test="status != null">
+            AND u.status = #{status}
+        </if>
         ORDER BY u.create_time DESC
     </select>
-
 </mapper>

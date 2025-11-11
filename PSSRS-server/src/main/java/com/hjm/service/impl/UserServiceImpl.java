@@ -24,9 +24,12 @@ import com.hjm.service.IUserRoleService;
 import com.hjm.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.security.auth.login.AccountNotFoundException;
 
@@ -157,11 +160,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         save(user);
 
         // 2. 分配管理员角色
+
         User savedUser = getOne(new QueryWrapper<User>().eq("username", adminDTO.getUsername()));
-        UserRole userRole = new UserRole();
-        userRole.setUserId(savedUser.getId());
-        userRole.setRoleId(ROLE_ADMIN_ID);
-        userRoleService.save(userRole);
+
+        List<UserRole> userRoleList = new ArrayList<>();
+        List<String> roles = adminDTO.getRoles();
+
+        for (String role : roles) {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(savedUser.getId());
+            if (role.equals("ADMIN")){
+                userRole.setRoleId(ROLE_ADMIN_ID);
+            }
+            if (role.equals("DOCTOR"))
+                userRole.setRoleId(ROLE_DOCTOR_ID);
+            userRoleList.add(userRole);
+        }
+        userRoleService.saveBatch(userRoleList);
     }
 
     /**
@@ -210,6 +225,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         return Result.success(list);
     }
+
+    @Override
+    public PageResult listAdmins(String name, Integer status, Long page, Long pageSize) {
+        Page<User> pageInfo = new Page<>(page, pageSize);
+        List<User> list = userMapper.listAdmins(pageInfo, name, status);
+        return new PageResult(pageInfo.getTotal(), list);
+    }
+
+    @Override
+    @Transactional
+    public Result updateAdmin(Long id, AdminDTO adminDTO) {
+
+        User user = new User();
+        user.setId(id);
+        user.setName(adminDTO.getName());
+        user.setPhone(adminDTO.getPhone());
+        user.setGender(adminDTO.getGender());
+        user.setStatus(adminDTO.getStatus());
+        updateById(user);
+        List<UserRole> userRoleList = new ArrayList<>();
+        List<String> roles = adminDTO.getRoles();
+        userRoleService.remove(new QueryWrapper<UserRole>().eq("user_id", id));
+        for (String role : roles) {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(id);
+            if (role.equals("ADMIN")){
+                userRole.setRoleId(ROLE_ADMIN_ID);
+            }
+            if (role.equals("DOCTOR"))
+                userRole.setRoleId(ROLE_DOCTOR_ID);
+            userRoleList.add(userRole);
+        }
+        userRoleService.saveBatch(userRoleList);
+        return Result.success();
+    }
+
+
 
     /**
      * 生成指定长度的随机字符串

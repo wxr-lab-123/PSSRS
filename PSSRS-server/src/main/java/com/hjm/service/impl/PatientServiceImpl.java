@@ -3,12 +3,15 @@ package com.hjm.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hjm.constant.RedisConstants;
 import com.hjm.mapper.PatientMapper;
 import com.hjm.pojo.DTO.PatientDTO;
 import com.hjm.pojo.DTO.PatientLoginDTO;
 import com.hjm.pojo.DTO.PatientRegisterDTO;
 import com.hjm.pojo.Entity.Patient;
+import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.service.IPatientService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -122,6 +125,17 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         save(patient);
         stringRedisTemplate.delete(RedisConstants.LOGIN_CODE_KEY + patientRegisterDTO.getPhone());
         return Result.success("注册成功");
+    }
+
+    @Override
+    public PageResult list(Integer page, Integer size, String name, String phone, String gender) {
+        Page pageParam = new Page<>(page, size);
+        Page<Patient> pageResult = page(pageParam, new QueryWrapper<Patient>()
+                        .like(name != null, "name", name)
+                        .like(phone != null, "phone", phone)
+                        .like(gender != null, "gender", gender));
+        PageResult pageResult1 = new PageResult(pageResult.getTotal(), pageResult.getRecords());
+        return pageResult1;
     }
 
     public static int getAgeByIdCard(String idCard) {

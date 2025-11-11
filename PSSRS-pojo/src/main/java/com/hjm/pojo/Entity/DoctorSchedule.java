@@ -1,10 +1,8 @@
 package com.hjm.pojo.Entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDate;
-import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.io.Serializable;
@@ -68,7 +66,7 @@ public class DoctorSchedule implements Serializable {
     private Integer currentAppointments;
 
     @ApiModelProperty(value = "剩余号源")
-    @TableField("available_appointments")
+    @TableField(value = "available_appointments",exist = false)
     private Integer availableAppointments;
 
     @ApiModelProperty(value = "状态(AVAILABLE-可用/FULL-已满/CANCELLED-已取消)")
@@ -101,6 +99,7 @@ public class DoctorSchedule implements Serializable {
 
     @ApiModelProperty(value = "逻辑删除")
     @TableField("is_deleted")
+    @TableLogic
     private Integer isDeleted;
 
 
