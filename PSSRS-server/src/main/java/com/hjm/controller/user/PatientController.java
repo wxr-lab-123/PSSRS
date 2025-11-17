@@ -3,9 +3,11 @@ package com.hjm.controller.user;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.hjm.context.PatientContext;
+import com.hjm.exception.PatientException;
 import com.hjm.pojo.DTO.PatientDTO;
 import com.hjm.pojo.DTO.PatientLoginDTO;
 import com.hjm.pojo.DTO.PatientRegisterDTO;
+import com.hjm.pojo.DTO.PatientUpdateDTO;
 import com.hjm.pojo.Entity.Patient;
 import com.hjm.pojo.VO.PatientInfoVO;
 import com.hjm.result.Result;
@@ -14,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>
@@ -45,6 +49,7 @@ public class PatientController {
     @PostMapping("/user/login")
     public Result login(@RequestBody PatientLoginDTO patientLoginDTO){
         //  实现登录功能
+
         return patientService.login(patientLoginDTO);
     }
 
@@ -62,5 +67,37 @@ public class PatientController {
         Long patientId = patient.getId() ;
         Patient patientInfo = patientService.getById(patientId);
         return Result.success(BeanUtil.copyProperties(patientInfo, PatientInfoVO.class));
+    }
+
+    @PutMapping("/user/update")
+    public Result update(@RequestBody PatientUpdateDTO patientUpdateDTO) {
+        Patient patient = BeanUtil.copyProperties(patientUpdateDTO, Patient.class);
+        patient.setId(PatientContext.getPatient().getId());
+        patientService.updateById(patient);
+        return   Result.success();
+    }
+
+    @GetMapping("/user/validate")
+    public Result<Map<String,Boolean>> validate() {
+        Patient patient =patientService.getById(PatientContext.getPatient().getId()) ;
+        if (patient == null) {
+            throw new PatientException("用户不存在");
+        }
+        Boolean isValid = true;
+        Boolean nameFilled = true;
+        Boolean phoneValid = true;
+        if (patient.getName() == null) {
+            isValid = false;
+            nameFilled = false;
+        }
+        if (patient.getPhone()== null){
+            isValid = false;
+            phoneValid = false;
+        }
+        Map<String,Boolean> map = new HashMap<>();
+        map.put("isValid",isValid);
+        map.put("nameFilled",nameFilled);
+        map.put("phoneValid",phoneValid);
+        return Result.success(map);
     }
 }

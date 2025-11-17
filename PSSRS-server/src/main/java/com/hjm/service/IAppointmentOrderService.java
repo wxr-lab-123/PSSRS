@@ -1,7 +1,9 @@
 package com.hjm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hjm.pojo.DTO.RegistrationCreateDTO;
 import com.hjm.pojo.Entity.AppointmentOrder;
+import com.hjm.result.Result;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,4 +17,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IAppointmentOrderService extends IService<AppointmentOrder> {
 
+    Result createRegistration(RegistrationCreateDTO registrationCreateDTO);
 }

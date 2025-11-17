@@ -7,6 +7,7 @@ import com.hjm.result.Result;
 import com.hjm.service.IDoctorScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/doctor")
+@RequestMapping("/api/user/doctor")
 @RequiredArgsConstructor
 @Slf4j
 public class DoctoeScheduleController {
@@ -33,5 +34,15 @@ public class DoctoeScheduleController {
             return Result.error(404, "部门ID不能为空");
         List<DoctorScheduleVO> result = doctorScheduleService.listScheduleByDid(departmentId,date);
         return Result.success(result);
+    }
+    @GetMapping("/schedule/detail")
+    public Result<DoctorScheduleVO> detail(
+            @RequestParam Long id
+    ) throws InterruptedException {
+        log.info("查询医生排班详情：{}", id);
+        if (id == null)
+            return Result.error(404, "排班ID不能为空");
+        Result<DoctorScheduleVO> result = doctorScheduleService.getXq(id);
+        return result;
     }
 }

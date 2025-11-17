@@ -2,7 +2,9 @@ package com.hjm.service.impl;
 
 
 import com.hjm.mapper.AppointmentOrderMapper;
+import com.hjm.pojo.DTO.RegistrationCreateDTO;
 import com.hjm.pojo.Entity.AppointmentOrder;
+import com.hjm.result.Result;
 import com.hjm.service.IAppointmentOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
@@ -18,4 +20,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMapper, AppointmentOrder> implements IAppointmentOrderService {
 
+    @Override
+    public Result createRegistration(RegistrationCreateDTO registrationCreateDTO) {
+
+        return null;
+    }
 }

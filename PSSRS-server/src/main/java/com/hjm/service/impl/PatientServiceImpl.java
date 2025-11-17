@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hjm.constant.RedisConstants;
+import com.hjm.exception.AccountNotFoundException;
 import com.hjm.mapper.PatientMapper;
 import com.hjm.pojo.DTO.PatientDTO;
 import com.hjm.pojo.DTO.PatientLoginDTO;
@@ -64,17 +65,17 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
     @Override
     public Result login(PatientLoginDTO patientLoginDTO) {
         if (patientLoginDTO.getPhone().isEmpty() || patientLoginDTO.getPassword().isEmpty()) {
-            return Result.error("手机号或者密码不能为空");
+            throw new AccountNotFoundException("参数错误");
         }
         if (!patientLoginDTO.getPhone().matches("^1[3-9]\\d{9}$")) {
-            return Result.error("手机号格式错误");
+            throw new AccountNotFoundException("手机号格式错误");
         }
         Patient patient = query().eq("phone", patientLoginDTO.getPhone()).one();
         if (patient == null) {
-            return Result.error("用户不存在");
+            throw new AccountNotFoundException("用户不存在");
         }
         if (!patient.getPassword().equals(DigestUtils.md5DigestAsHex(patientLoginDTO.getPassword().getBytes()))) {
-            return Result.error("密码错误");
+            throw new AccountNotFoundException("密码错误");
         }
         // 保存用户信息到redis
         // 生成token,作为登录凭证

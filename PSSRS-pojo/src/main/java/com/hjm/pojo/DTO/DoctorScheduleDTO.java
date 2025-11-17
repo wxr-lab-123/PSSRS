@@ -13,4 +13,7 @@ public class DoctorScheduleDTO {
     private String timeSlot;
     private String status;
 
+
+    private String scheduleType;
+
 }

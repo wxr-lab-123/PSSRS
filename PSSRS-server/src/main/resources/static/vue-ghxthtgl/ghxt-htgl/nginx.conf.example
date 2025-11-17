@@ -1,0 +1,68 @@
+# Nginx配置示例 - Vue前端应用部署
+
+# 方案1: 部署到根目录 (推荐)
+server {
+    listen 80;
+    server_name localhost;  # 修改为您的域名
+    
+    # 指向dist目录的绝对路径
+    root E:/desktop/qianduan/vue-ghxthtgl/ghxt-htgl/dist;
+    index index.html;
+
+    # 主要配置：处理Vue Router的history模式
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 静态资源缓存配置
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # API代理配置（如果后端在同一服务器）
+    location /api/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 禁止访问隐藏文件
+    location ~ /\. {
+        deny all;
+    }
+}
+
+# 方案2: 部署到子目录 (如 http://localhost/app/)
+# 注意：如果使用此方案，需要修改 vite.config.js 中的 base: '/app/'
+server {
+    listen 80;
+    server_name localhost;
+
+    location /app/ {
+        alias E:/desktop/qianduan/vue-ghxthtgl/ghxt-htgl/dist/;
+        try_files $uri $uri/ /app/index.html;
+        index index.html;
+    }
+
+    location /app/assets/ {
+        alias E:/desktop/qianduan/vue-ghxthtgl/ghxt-htgl/dist/assets/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # API代理
+    location /api/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+# 常见问题排查：
+# 1. 确认nginx有权限访问dist目录
+# 2. 确认dist目录路径正确（使用绝对路径）
+# 3. 重启nginx: nginx -s reload
+# 4. 检查nginx错误日志: nginx日志通常在 /var/log/nginx/error.log

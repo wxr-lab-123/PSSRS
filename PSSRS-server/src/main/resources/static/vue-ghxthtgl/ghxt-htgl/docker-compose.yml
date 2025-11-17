@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # 前端服务
+  frontend:
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  # 后端服务（假设你有后端Dockerfile）
+  backend:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ../backend:/app  # 假设后端代码在上级目录的backend文件夹
+    ports:
+      - "8080:8080"
+    command: npm start
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge

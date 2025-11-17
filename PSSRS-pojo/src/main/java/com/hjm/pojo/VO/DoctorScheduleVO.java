@@ -16,4 +16,6 @@ public class DoctorScheduleVO {
     private String notes;
     private String status;
     private String departmentName;
+    private String scheduleType;
+    private Integer price;
 }

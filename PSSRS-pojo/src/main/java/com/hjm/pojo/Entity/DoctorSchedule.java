@@ -45,6 +45,10 @@ public class DoctorSchedule implements Serializable {
     @TableField("schedule_date")
     private LocalDate scheduleDate;
 
+    @ApiModelProperty(value = "排班类型(专家/普通)")
+    @TableField("schedule_type")
+    private String scheduleType;
+
     @ApiModelProperty(value = "时间段(MORNING/AFTERNOON/EVENING)")
     @TableField("time_slot")
     private String timeSlot;
@@ -97,10 +101,6 @@ public class DoctorSchedule implements Serializable {
     @TableField("updated_by")
     private Long updatedBy;
 
-    @ApiModelProperty(value = "逻辑删除")
-    @TableField("is_deleted")
-    @TableLogic
-    private Integer isDeleted;
 
 
 }

@@ -1,6 +1,7 @@
 package com.hjm.controller.admin;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.hjm.pojo.DTO.BatchAddScheduleDTO;
 import com.hjm.pojo.DTO.CopyDSDTO;
 import com.hjm.pojo.DTO.DoctorScheduleDTO;
 import com.hjm.pojo.DTO.DoctorSchedulesDTO;
@@ -9,14 +10,18 @@ import com.hjm.pojo.VO.DoctorScheduleVO;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.service.IDoctorScheduleService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Request;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+
+import static com.hjm.constant.RedisConstants.SCHEDULE_;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -25,12 +30,15 @@ public class DoctorScheduleController {
 
     @Autowired
     private IDoctorScheduleService doctorScheduleService;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
 
     @PostMapping("/schedules")
     public Result addSchedule(@RequestBody DoctorSchedulesDTO doctorSchedulesDTO) {
         log.info("添加排班：{}", doctorSchedulesDTO);
         //添加排班
         doctorScheduleService.save(BeanUtil.copyProperties(doctorSchedulesDTO, DoctorSchedule.class));
+        stringRedisTemplate.delete(SCHEDULE_+doctorSchedulesDTO.getScheduleDate()+":"+doctorSchedulesDTO.getDepartmentId());
         return Result.success("添加成功");
     }
     @GetMapping("/schedules")
@@ -41,7 +49,8 @@ public class DoctorScheduleController {
             @RequestParam(required = false) String scheduleDate,
             @RequestParam(name="time_slot",required = false) String tiemSlot,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) Long doctorId)
+            @RequestParam(required = false) Long doctorId,
+            @RequestParam(required = false) String scheduleType)
     {
         log.info("查询排班列表，当前页：{}，页大小：{}，医生名称={}", page, limit);
         DoctorScheduleDTO doctorScheduleDTO = new DoctorScheduleDTO();
@@ -52,18 +61,22 @@ public class DoctorScheduleController {
         doctorScheduleDTO.setStatus( status);
         doctorScheduleDTO.setPage(page);
         doctorScheduleDTO.setLimit(limit);
+        doctorScheduleDTO.setScheduleType(scheduleType);
         PageResult result = doctorScheduleService.listSchedules(doctorScheduleDTO);
         return Result.success(result);
     }
 
     @GetMapping("/schedules/{id}")
-    public Result<DoctorScheduleVO> getXq(@PathVariable Long id){
+    public Result<DoctorScheduleVO> getXq(@PathVariable Long id) throws InterruptedException {
         return doctorScheduleService.getXq(id);
     }
 
     @DeleteMapping("/schedules/{id}")
     public Result delete(@PathVariable Long id){
+        log.info("删除排班：{}", id);
+        String key = SCHEDULE_+doctorScheduleService.getById(id).getScheduleDate()+":"+doctorScheduleService.getById(id).getDepartmentId();
         doctorScheduleService.removeById(id);
+        stringRedisTemplate.delete(key);
         return Result.success();
     }
 
@@ -71,7 +84,9 @@ public class DoctorScheduleController {
     public Result update(@RequestBody DoctorSchedulesDTO doctorSchedulesDTO){
         log.info("修改排班：{}", doctorSchedulesDTO);
         log.debug("{}", doctorSchedulesDTO);
+        String key = SCHEDULE_+doctorSchedulesDTO.getScheduleDate()+":"+doctorSchedulesDTO.getDepartmentId();
         doctorScheduleService.updateById(BeanUtil.copyProperties(doctorSchedulesDTO,DoctorSchedule.class));
+        stringRedisTemplate.delete(key);
         return Result.success();
     }
 
@@ -86,12 +101,18 @@ public class DoctorScheduleController {
         log.info("修改排班状态：{}", status);
         DoctorSchedule doctorSchedule = new DoctorSchedule();
         doctorSchedule.setId(id);
+        Long departmentId = doctorScheduleService.getById(id).getDepartmentId();
+        String key = SCHEDULE_+doctorScheduleService.getById(id).getScheduleDate()+":"+departmentId;
         doctorSchedule.setStatus(status);
         doctorScheduleService.updateById(doctorSchedule);
+        stringRedisTemplate.delete(key);
         return Result.success();
     }
 
-
+    @PostMapping("/schedules/batch")
+    public Result batchAdd(@RequestBody BatchAddScheduleDTO batchAddScheduleDTO){
+        return doctorScheduleService.batchAdd(batchAddScheduleDTO);
+    }
 
 
 }

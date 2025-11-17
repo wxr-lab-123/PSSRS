@@ -1,0 +1,61 @@
+# 新nginx目录配置说明
+# nginx位置: E:\desktop\nginx-1.28.0
+
+========================================
+配置步骤：
+========================================
+
+1. 我已经为您打开了配置文件：
+   E:\desktop\nginx-1.28.0\conf\nginx.conf
+
+2. 在 server 块中，找到或添加以下配置：
+
+server {
+    listen       80;
+    server_name  localhost;
+    
+    # 指向您的dist目录（使用正斜杠）
+    root   E:/desktop/qianduan/vue-ghxthtgl/ghxt-htgl/dist;
+    index  index.html index.htm;
+
+    # Vue Router history模式支持
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 静态资源缓存
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # API代理到后端
+    location /api/ {
+        proxy_pass http://localhost:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+3. 保存配置文件
+
+4. 停止旧的nginx进程：
+   taskkill /F /IM nginx.exe
+
+5. 启动新的nginx：
+   cd E:\desktop\nginx-1.28.0
+   start nginx
+
+6. 测试配置：
+   nginx -t
+
+7. 访问：
+   http://localhost
+
+========================================
+关键点：
+========================================
+✅ root路径使用正斜杠: E:/desktop/...
+✅ 必须有 try_files $uri $uri/ /index.html;
+✅ 确保dist目录存在且包含index.html

@@ -40,4 +40,7 @@ public class DoctorSchedulesDTO {
     private Long roomNumber;
 
     private String notes;
+
+    @JsonProperty("schedule_type")
+    private String scheduleType;
 }
