@@ -1,5 +1,7 @@
 # 患者自助挂号系统（PSSRS1）
+## 文档
 
+- [需求说明书](docs/需求说明书.md)
 PSSRS1（Patient Self-Service Registration System）是一套面向医院场景的自助挂号整体解决方案，覆盖患者端挂号/缴费/查询、管理员端科室与医生管理、排班管理等核心业务。项目采用 **Spring Boot + MyBatis-Plus** 构建后端服务，结合 **Vue 3 管理后台** 和 **微信小程序** 前端，辅以 Redis 缓存与 JWT 鉴权，支持快速部署与二次开发。
 
 ## 功能概览
