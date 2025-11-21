@@ -1,0 +1,162 @@
+<!--pages/today-register/today-register.wxml-->
+<navigation-bar title="当日挂号" back="{{true}}" color="white" background="#1890ff"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 日期显示 -->
+    <view class="date-header">
+      <text class="date-text">{{currentDate}}</text>
+    </view>
+
+    <!-- 左右布局 -->
+    <view class="main-content">
+      <!-- 左侧科室列表 -->
+      <view class="left-panel">
+        <view class="panel-title">科室</view>
+        <scroll-view class="department-scroll" scroll-y>
+          <view 
+            class="department-item {{selectedDept === item.id ? 'active' : ''}}" 
+            wx:for="{{departments}}" 
+            wx:key="id"
+            bindtap="selectDepartment"
+            data-id="{{item.id}}"
+            data-name="{{item.name}}">
+            <text class="dept-name">{{item.name}}</text>
+          </view>
+        </scroll-view>
+      </view>
+
+      <!-- 右侧医生列表 -->
+      <view class="right-panel">
+        <view class="panel-title">医生排班</view>
+        <scroll-view class="doctor-scroll" scroll-y wx:if="{{selectedDept}}">
+          <view class="doctor-list">
+            <view 
+              class="doctor-item" 
+              wx:for="{{doctors}}" 
+              wx:key="id"
+              bindtap="selectDoctor"
+              data-doctor="{{item}}">
+              <view class="doctor-info">
+                <view class="doctor-avatar">
+                  <image wx:if="{{item.image}}" class="avatar-image" src="{{item.image}}" mode="aspectFill"></image>
+                  <text wx:else class="avatar-text">{{item.doctorName.substr(0,1)}}</text>
+                </view>
+                <view class="doctor-detail">
+                  <view class="doctor-name">{{item.doctorName}}</view>
+                  <view class="doctor-type">
+                    <text class="tag {{(item.scheduleType==='expert' || item.schedule_type==='expert') ? 'tag-expert' : 'tag-normal'}}">{{(item.scheduleType==='expert' || item.schedule_type==='expert') ? '专家号' : '普通号'}}</text>
+                  </view>
+                  <view class="doctor-specialty">诊室：{{item.roomNumber}}号</view>
+                  <view class="doctor-time">
+                    <text class="time-label">出诊：</text>
+                    <text>{{item.timeSlot}} {{item.startTime}}-{{item.endTime}}</text>
+                  </view>
+                </view>
+              </view>
+              <view class="doctor-action">
+                <view class="available">{{item.status === 'AVAILABLE' ? '可预约' : '已满'}}</view>
+                <button class="register-btn" size="mini" disabled="{{item.status !== 'AVAILABLE'}}" bindtap="selectDoctor" data-doctor="{{item}}">挂号</button>
+              </view>
+            </view>
+          </view>
+        </scroll-view>
+        <view class="empty-state" wx:if="{{selectedDept && doctors.length === 0}}">
+          <text class="empty-text">暂无医生排班</text>
+        </view>
+        <!-- 空状态 -->
+        <view class="empty-state" wx:if="{{!selectedDept}}">
+          <text class="empty-text">请选择科室查看医生信息</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>
+
+<!-- 排班详情弹窗 -->
+<view class="modal-overlay" wx:if="{{showModal}}" bindtap="closeModal">
+  <view class="modal-content" catchtap="stopPropagation">
+    <view class="modal-header">
+      <text class="modal-title">排班详情</text>
+      <text class="modal-close" bindtap="closeModal">✕</text>
+    </view>
+    
+    <view class="modal-body" wx:if="{{selectedDoctor}}">
+      <!-- 医生信息 -->
+      <view class="detail-section">
+        <view class="detail-doctor">
+          <view class="detail-avatar">
+            <image wx:if="{{selectedDoctor.image}}" class="avatar-img" src="{{selectedDoctor.image}}" mode="aspectFill"></image>
+            <text wx:else class="avatar-txt">{{selectedDoctor.doctorName.substr(0,1)}}</text>
+          </view>
+          <view class="detail-info">
+            <view class="detail-name">
+              {{selectedDoctor.doctorName}}
+              <text wx:if="{{selectedDoctor.title}}" class="doctor-title-tag">{{selectedDoctor.title}}</text>
+            </view>
+            <view class="detail-dept">{{selectedDeptName || selectedDoctor.departmentName}}</view>
+            <view wx:if="{{selectedDoctor.specialty}}" class="detail-specialty">擅长：{{selectedDoctor.specialty}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 排班信息 -->
+      <view class="detail-section">
+        <view class="detail-title">排班信息</view>
+        <view class="detail-item">
+          <text class="item-label">就诊日期</text>
+          <text class="item-value">{{selectedDoctor.scheduleDate}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="item-label">出诊时段</text>
+          <text class="item-value">{{selectedDoctor.timeSlot}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="item-label">出诊时间</text>
+          <text class="item-value">{{selectedDoctor.startTime}} - {{selectedDoctor.endTime}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="item-label">诊室位置</text>
+          <text class="item-value">{{selectedDoctor.roomNumber}}号诊室</text>
+        </view>
+        <view class="detail-item">
+          <text class="item-label">号源类型</text>
+          <view class="item-value">
+            <text class="tag {{(selectedDoctor.scheduleType==='expert' || selectedDoctor.schedule_type==='expert') ? 'tag-expert' : 'tag-normal'}}">{{(selectedDoctor.scheduleType==='expert' || selectedDoctor.schedule_type==='expert') ? '专家号' : '普通号'}}</text>
+          </view>
+        </view>
+        <view class="detail-item" wx:if="{{selectedDoctor.price}}">
+          <text class="item-label">挂号费用</text>
+          <text class="item-value price-value">¥{{selectedDoctor.price}}</text>
+        </view>
+        <view class="detail-item" wx:if="{{selectedDoctor.maxAppointments}}">
+          <text class="item-label">剩余号源</text>
+          <text class="item-value">{{selectedDoctor.maxAppointments - selectedDoctor.currentAppointments}}/{{selectedDoctor.maxAppointments}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="item-label">预约状态</text>
+          <text class="item-value {{selectedDoctor.status === 'AVAILABLE' ? 'status-available' : 'status-full'}}">{{selectedDoctor.status === 'AVAILABLE' ? '可预约' : '已满'}}</text>
+        </view>
+      </view>
+
+      <!-- 温馨提示 -->
+      <view class="detail-section">
+        <view class="detail-title">温馨提示</view>
+        <view class="tips-list">
+          <text class="tip-text">• 请提前15分钟到达医院</text>
+          <text class="tip-text">• 请携带身份证和就诊卡</text>
+          <text class="tip-text">• 如需取消请提前1小时操作</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="modal-footer">
+      <button class="btn-cancel" bindtap="closeModal">取消</button>
+      <button 
+        class="btn-confirm" 
+        bindtap="confirmRegister"
+        disabled="{{selectedDoctor.status !== 'AVAILABLE'}}">
+        确认挂号
+      </button>
+    </view>
+  </view>
+</view>

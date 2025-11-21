@@ -1,0 +1,50 @@
+<!--pages/payment/payment.wxml-->
+<view class="container">
+  <view class="payment-card">
+    <view class="card-header">
+      <text class="title">订单信息</text>
+    </view>
+    
+    <!-- 订单信息 -->
+    <view class="order-info" wx:if="{{orderInfo}}">
+      <view class="info-item">
+        <text class="label">订单号</text>
+        <text class="value">{{orderInfo.orderNo}}</text>
+      </view>
+      <view class="info-item">
+        <text class="label">就诊人</text>
+        <text class="value">{{orderInfo.patientName}}</text>
+      </view>
+      <view class="info-item">
+        <text class="label">医生</text>
+        <text class="value">{{orderInfo.doctorName}}</text>
+      </view>
+      <view class="info-item">
+        <text class="label">科室</text>
+        <text class="value">{{orderInfo.departmentName}}</text>
+      </view>
+      <view class="info-item">
+        <text class="label">就诊日期</text>
+        <text class="value">{{orderInfo.registrationDate}}</text>
+      </view>
+      <view class="info-item">
+        <text class="label">就诊时段</text>
+        <text class="value">{{orderInfo.timeSlot}}</text>
+      </view>
+      <view class="info-item total">
+        <text class="label">应付金额</text>
+        <text class="value price">¥{{orderInfo.price}}</text>
+      </view>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <text>订单信息加载失败</text>
+    </view>
+  </view>
+  
+  <view class="action-area" wx:if="{{orderInfo}}">
+    <button class="btn-cancel" bindtap="goBack">取消支付</button>
+    <button class="btn-pay" bindtap="handlePay">立即支付</button>
+  </view>
+</view>

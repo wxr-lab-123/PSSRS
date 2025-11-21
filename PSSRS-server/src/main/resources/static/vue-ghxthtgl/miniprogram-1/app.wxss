@@ -1,0 +1,246 @@
+/**app.wxss**/
+/* 全局样式重置 */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+               'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #333333;
+  background-color: #f8f8f8;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+/* 通用容器 */
+.container {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 按钮样式重置 */
+button {
+  margin: 0;
+  padding: 0;
+  line-height: normal;
+  font-family: inherit;
+}
+
+button::after {
+  border: none;
+}
+
+/* 自定义按钮样式 */
+.btn-primary {
+  background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+  color: white;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  padding: 24rpx 0;
+  box-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:active {
+  opacity: 0.8;
+  transform: translateY(2rpx);
+}
+
+.btn-secondary {
+  background: white;
+  color: #1890ff;
+  border: 2rpx solid #1890ff;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  padding: 24rpx 0;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:active {
+  background: #f0f0f0;
+}
+
+/* 输入框样式重置 */
+input, textarea {
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 28rpx;
+}
+
+/* 自定义输入框 */
+.input-custom {
+  background: white;
+  border: 2rpx solid #d9d9d9;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+  transition: all 0.3s ease;
+}
+
+.input-custom:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 4rpx rgba(24, 144, 255, 0.1);
+}
+
+/* 通用工具类 */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+/* 阴影效果 */
+.shadow-sm {
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.shadow-md {
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.shadow-lg {
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+}
+
+/* 圆角 */
+.rounded-sm {
+  border-radius: 8rpx;
+}
+
+.rounded-md {
+  border-radius: 16rpx;
+}
+
+.rounded-lg {
+  border-radius: 24rpx;
+}
+
+.rounded-full {
+  border-radius: 50%;
+}
+
+/* 颜色工具类 */
+.text-primary {
+  color: #1890ff;
+}
+
+.text-secondary {
+  color: #666666;
+}
+
+.text-muted {
+  color: #999999;
+}
+
+.text-success {
+  color: #52c41a;
+}
+
+.text-warning {
+  color: #faad14;
+}
+
+.text-error {
+  color: #ff4d4f;
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.bg-gray {
+  background-color: #f5f5f5;
+}
+
+/* 间距工具类 */
+/* 外边距 */
+.mt-10 { margin-top: 10rpx; }
+.mt-20 { margin-top: 20rpx; }
+.mt-30 { margin-top: 30rpx; }
+.mt-40 { margin-top: 40rpx; }
+
+.mb-10 { margin-bottom: 10rpx; }
+.mb-20 { margin-bottom: 20rpx; }
+.mb-30 { margin-bottom: 30rpx; }
+.mb-40 { margin-bottom: 40rpx; }
+
+.ml-10 { margin-left: 10rpx; }
+.ml-20 { margin-left: 20rpx; }
+.ml-30 { margin-left: 30rpx; }
+
+.mr-10 { margin-right: 10rpx; }
+.mr-20 { margin-right: 20rpx; }
+.mr-30 { margin-right: 30rpx; }
+
+/* 内边距 */
+.p-10 { padding: 10rpx; }
+.p-20 { padding: 20rpx; }
+.p-30 { padding: 30rpx; }
+.p-40 { padding: 40rpx; }
+
+/* 字体大小 */
+.fs-24 { font-size: 24rpx; }
+.fs-28 { font-size: 28rpx; }
+.fs-32 { font-size: 32rpx; }
+.fs-36 { font-size: 36rpx; }
+.fs-40 { font-size: 40rpx; }
+
+/* 字体粗细 */
+.fw-normal { font-weight: normal; }
+.fw-medium { font-weight: 500; }
+.fw-bold { font-weight: bold; }
+
+/* 动画效果 */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

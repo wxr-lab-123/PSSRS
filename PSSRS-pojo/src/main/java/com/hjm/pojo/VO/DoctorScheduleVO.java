@@ -17,5 +17,6 @@ public class DoctorScheduleVO {
     private String status;
     private String departmentName;
     private String scheduleType;
+    private Long doctorId;
     private Integer price;
 }

@@ -1,0 +1,161 @@
+<!--pages/login/login.wxml-->
+<navigation-bar title="登录" back="{{true}}" color="white" background="transparent"></navigation-bar>
+
+<view class="login-container">
+  <!-- Logo区域 -->
+  <view class="logo-section">
+    <view class="logo-icon">🏥</view>
+    <text class="app-name">患者自助挂号</text>
+    <text class="app-desc">便捷就医 · 智慧医疗</text>
+  </view>
+
+  <!-- Tab切换 -->
+  <view class="tab-section">
+    <view class="tab-item {{activeTab === 'login' ? 'active' : ''}}" bindtap="switchTab" data-tab="login">
+      <text>登录</text>
+    </view>
+    <view class="tab-item {{activeTab === 'register' ? 'active' : ''}}" bindtap="switchTab" data-tab="register">
+      <text>注册</text>
+    </view>
+    <view class="tab-item {{activeTab === 'reset' ? 'active' : ''}}" bindtap="switchTab" data-tab="reset">
+      <text>忘记密码</text>
+    </view>
+  </view>
+
+  <!-- 登录表单 -->
+  <view class="form-container" wx:if="{{activeTab === 'login'}}">
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">📱</text>
+        <input class="input" type="number" placeholder="请输入手机号" value="{{loginPhone}}" bindinput="onLoginPhoneInput" maxlength="11"/>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">🔒</text>
+        <input class="input" type="password" placeholder="请输入密码" value="{{loginPassword}}" bindinput="onLoginPasswordInput"/>
+      </view>
+    </view>
+
+    <view class="forgot-section">
+      <text class="forgot-text" bindtap="forgotPassword">忘记密码？</text>
+    </view>
+
+    <button class="submit-btn login-btn" bindtap="handleLogin">登录</button>
+
+    <view class="divider">
+      <text class="divider-text">或</text>
+    </view>
+
+    <button class="wechat-login-btn" bindtap="wechatLogin">
+      <text class="wechat-icon">💬</text>
+      <text>微信快捷登录</text>
+    </button>
+  </view>
+
+  <!-- 注册表单 -->
+  <view class="form-container" wx:if="{{activeTab === 'register'}}">
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">👤</text>
+        <input class="input" placeholder="请输入姓名" value="{{registerName}}" bindinput="onRegisterNameInput"/>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">📱</text>
+        <input class="input" type="number" placeholder="请输入手机号" value="{{registerPhone}}" bindinput="onRegisterPhoneInput" maxlength="11"/>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="input-wrapper code-wrapper">
+        <text class="icon">🔢</text>
+        <input class="input code-input" type="number" placeholder="请输入验证码" value="{{registerCode}}" bindinput="onRegisterCodeInput" maxlength="6"/>
+        <button class="code-btn {{codeSending || codeCountdown > 0 ? 'disabled' : ''}}" bindtap="sendRegisterCode" disabled="{{codeSending || codeCountdown > 0}}">
+          {{codeCountdown > 0 ? codeCountdown + 's' : '获取验证码'}}
+        </button>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">💳</text>
+        <input class="input" placeholder="请输入身份证号" value="{{registerIdCard}}" bindinput="onRegisterIdCardInput" maxlength="18"/>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">🔒</text>
+        <input class="input" type="password" placeholder="请设置密码（6-16位）" value="{{registerPassword}}" bindinput="onRegisterPasswordInput"/>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">✅</text>
+        <input class="input" type="password" placeholder="请确认密码" value="{{registerConfirmPassword}}" bindinput="onRegisterConfirmPasswordInput"/>
+      </view>
+    </view>
+
+    <view class="agreement-section">
+      <checkbox-group bindchange="onAgreementChange">
+        <label class="agreement-label">
+          <checkbox value="agree" checked="{{agreed}}"/>
+          <text class="agreement-text">我已阅读并同意</text>
+          <text class="agreement-link" bindtap="viewAgreement">《用户协议》</text>
+          <text class="agreement-text">和</text>
+          <text class="agreement-link" bindtap="viewPrivacy">《隐私政策》</text>
+        </label>
+      </checkbox-group>
+    </view>
+
+    <button class="submit-btn register-btn" bindtap="handleRegister">注册</button>
+  </view>
+
+  <!-- 底部提示 -->
+  <view class="footer-tips">
+    <text class="tip-text">首次使用请先注册账号</text>
+  </view>
+
+  <!-- 重置密码表单 -->
+  <view class="form-container" wx:if="{{activeTab === 'reset'}}">
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">📱</text>
+        <input class="input" type="number" placeholder="请输入手机号" value="{{resetPhone}}" bindinput="onResetPhoneInput" maxlength="11"/>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="input-wrapper code-wrapper">
+        <text class="icon">🔢</text>
+        <input class="input code-input" type="number" placeholder="请输入验证码" value="{{resetCode}}" bindinput="onResetCodeInput" maxlength="6"/>
+        <button class="code-btn {{resetCodeSending || resetCodeCountdown > 0 ? 'disabled' : ''}}" 
+                bindtap="sendResetCode" 
+                disabled="{{resetCodeSending || resetCodeCountdown > 0}}">
+          {{resetCodeCountdown > 0 ? resetCodeCountdown + 's' : '获取验证码'}}
+        </button>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">🔒</text>
+        <input class="input" type="password" placeholder="请设置新密码（6-16位）" value="{{resetPassword}}" bindinput="onResetPasswordInput"/>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="input-wrapper">
+        <text class="icon">✅</text>
+        <input class="input" type="password" placeholder="请确认新密码" value="{{resetConfirmPassword}}" bindinput="onResetConfirmPasswordInput"/>
+      </view>
+    </view>
+
+    <button class="submit-btn" bindtap="handleResetPassword">确认修改</button>
+  </view>
+</view>

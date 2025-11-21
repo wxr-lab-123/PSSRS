@@ -70,5 +70,14 @@ public class AppointmentOrder implements Serializable {
     @ApiModelProperty(value = "逻辑删除(0正常 1删除)")
     private Integer isDeleted;
 
+    private String scheduleType;
+    @ApiModelProperty(value = "手机号")
+    private String patientPhone;
+
+    @ApiModelProperty(value = "排班ID")
+    private Long scheduleId;
+
+    @ApiModelProperty(value = "就诊号")
+    private String visitNumber;
 
 }

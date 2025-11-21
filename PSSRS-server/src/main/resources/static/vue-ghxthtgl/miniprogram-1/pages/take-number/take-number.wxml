@@ -1,0 +1,45 @@
+<!--pages/take-number/take-number.wxml-->
+<navigation-bar title="预约取号" back="{{true}}" color="white" background="#fa709a"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+
+    <view class="loading-state" wx:if="{{loading}}">
+      <text class="loading-text">查询中...</text>
+    </view>
+
+    <view class="appointment-list" wx:if="{{appointments.length > 0}}">
+      <view class="appointment-item" wx:for="{{appointments}}" wx:key="id">
+        <view class="item-header">
+          <text class="order-no">预约单号：{{item.orderNo}}</text>
+          <text class="status {{item.status}}">{{item.statusText}}</text>
+        </view>
+        <view class="item-info">
+          <view class="info-row">
+            <text class="label">患者姓名：</text>
+            <text class="value">{{item.patientName}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">就诊科室：</text>
+            <text class="value">{{item.department}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">就诊医生：</text>
+            <text class="value">{{item.doctorName}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">就诊时间：</text>
+            <text class="value">{{item.appointmentTime}}</text>
+          </view>
+        </view>
+        <button class="take-btn" wx:if="{{item.status === 'paid'}}" bindtap="takeNumber" data-item="{{item}}">
+          立即取号
+        </button>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无预约记录</text>
+    </view>
+  </view>
+</scroll-view>

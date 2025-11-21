@@ -11,6 +11,7 @@ import com.hjm.mapper.PatientMapper;
 import com.hjm.pojo.DTO.PatientDTO;
 import com.hjm.pojo.DTO.PatientLoginDTO;
 import com.hjm.pojo.DTO.PatientRegisterDTO;
+import com.hjm.pojo.DTO.PatientResetPwdDTO;
 import com.hjm.pojo.Entity.Patient;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
@@ -137,6 +138,33 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
                         .like(gender != null, "gender", gender));
         PageResult pageResult1 = new PageResult(pageResult.getTotal(), pageResult.getRecords());
         return pageResult1;
+    }
+
+    @Override
+    public Result resetPwd(PatientResetPwdDTO patientResetPwdDTO) {
+        if (patientResetPwdDTO == null) {
+            return Result.error("参数错误");
+        }
+        if (patientResetPwdDTO.getPhone().isEmpty() || patientResetPwdDTO.getCode().isEmpty() || patientResetPwdDTO.getNewPassword().isEmpty() || patientResetPwdDTO.getConfirmPassword().isEmpty()) {
+            return Result.error("参数错误");
+        }
+        if (!patientResetPwdDTO.getPhone().matches("^1[3-9]\\d{9}$")) {
+            return Result.error("手机号格式错误");
+        }
+        if (!patientResetPwdDTO.getNewPassword().equals(patientResetPwdDTO.getConfirmPassword())){
+            return Result.error("密码不一致");
+        }
+        if (!patientResetPwdDTO.getCode().equals(stringRedisTemplate.opsForValue().get(RedisConstants.LOGIN_CODE_KEY + patientResetPwdDTO.getPhone()))) {
+            return Result.error("验证码错误");
+        }
+        Patient patient = query().eq("phone", patientResetPwdDTO.getPhone()).one();
+        if (patient == null) {
+            return Result.error("用户不存在");
+        }
+        patient.setPassword(DigestUtils.md5DigestAsHex(patientResetPwdDTO.getNewPassword().getBytes()));
+        updateById(patient);
+        stringRedisTemplate.delete(RedisConstants.LOGIN_CODE_KEY + patientResetPwdDTO.getPhone());
+        return Result.success();
     }
 
     public static int getAgeByIdCard(String idCard) {

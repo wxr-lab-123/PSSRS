@@ -2,7 +2,12 @@ package com.hjm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hjm.pojo.Entity.AppointmentOrder;
+
+import com.hjm.pojo.VO.RegistrationVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 /**
  * <p>
@@ -15,4 +20,26 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface AppointmentOrderMapper extends BaseMapper<AppointmentOrder> {
 
+    /**
+     * 获取挂号费
+     * @param scheduleType
+     * @return
+     */
+    @Select("select fee from registration_fee where type = #{scheduleType}")
+    Long getFee(String scheduleType);
+
+    /**
+     * 根据订单编号查询挂号信息
+     * @param orderNo
+     * @return
+     */
+    @Select("select * from appointment_order where order_no = #{orderNo}")
+    AppointmentOrder getByOrderNo(String orderNo);
+
+    /**
+     * 根据患者ID查询挂号信息
+     * @param patientId
+     * @return
+     */
+    List<RegistrationVO> listByPId(Long patientId);
 }

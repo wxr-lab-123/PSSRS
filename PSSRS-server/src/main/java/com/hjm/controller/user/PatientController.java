@@ -4,10 +4,7 @@ package com.hjm.controller.user;
 import cn.hutool.core.bean.BeanUtil;
 import com.hjm.context.PatientContext;
 import com.hjm.exception.PatientException;
-import com.hjm.pojo.DTO.PatientDTO;
-import com.hjm.pojo.DTO.PatientLoginDTO;
-import com.hjm.pojo.DTO.PatientRegisterDTO;
-import com.hjm.pojo.DTO.PatientUpdateDTO;
+import com.hjm.pojo.DTO.*;
 import com.hjm.pojo.Entity.Patient;
 import com.hjm.pojo.VO.PatientInfoVO;
 import com.hjm.result.Result;
@@ -100,4 +97,21 @@ public class PatientController {
         map.put("phoneValid",phoneValid);
         return Result.success(map);
     }
+
+    @PostMapping("/user/logout")
+    public Result logout() {
+        PatientContext.removePatient();
+        return Result.success("登出成功");
+    }
+
+    @PostMapping("/sms/sendResetPwdCode")
+    public Result sendResetPwdCode(@RequestParam String phone) {
+        // 发送短信验证码并保存验证码
+        return patientService.sendCode(phone);
+    }
+    @PostMapping("/user/resetPassword")
+    public Result resetPwd(@RequestBody PatientResetPwdDTO patientResetPwdDTO) {
+        return patientService.resetPwd(patientResetPwdDTO);
+    }
+
 }

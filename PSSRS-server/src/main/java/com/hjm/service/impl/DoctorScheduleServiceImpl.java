@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -164,8 +165,13 @@ public class DoctorScheduleServiceImpl extends ServiceImpl<DoctorScheduleMapper,
             // 使用 JSONUtil.parseArray 来确保正确解析
             return JSONUtil.toList(JSONUtil.parseArray(value), DoctorScheduleVO.class);
         }
-
-        List<DoctorScheduleVO> result = baseMapper.listScheduleByDid(departmentId, date);
+        Boolean flag = false;
+        LocalTime now = LocalTime.now();
+        LocalDate localDate = LocalDate.parse(date);
+        if (localDate.equals(LocalDate.now())) {
+            flag = true;
+        }
+        List<DoctorScheduleVO> result = baseMapper.listScheduleByDid(departmentId, date,now,flag);
 
         long expireSeconds = Duration.between(
                 LocalDateTime.now(),

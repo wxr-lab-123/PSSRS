@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hjm.mapper.DoctorScheduleMapper">
 
+
     <select id="listSchedules" resultType="com.hjm.pojo.VO.DoctorScheduleVO">
         select
         ds.id,
@@ -54,12 +55,15 @@
         ds.time_slot,
         ds.room_number,
         ds.notes,
+        ds.doctor_id as doctorId,
         u.name as doctorName,
+        rf.fee as price,
         d.name as departmentName
         from doctor_schedule ds
         join user u on ds.doctor_id = u.id
         join department d on ds.department_id = d.id
         join doctor_profile dp on u.id = dp.user_id
+        join registration_fee rf on ds.schedule_type = rf.type
         <where>
              ds.id = #{id}
         </where>
@@ -70,6 +74,7 @@
         ds.id,
         ds.current_appointments,
         ds.status,
+        ds.doctor_id as doctorId,
         ds.start_time,
         ds.end_time,
         dp.image,
@@ -90,6 +95,9 @@
             ds.department_id = #{departmentId}
             <if test="date != null">
                 and ds.schedule_date = #{date}
+            </if>
+            <if test="flag == true">
+                and ds.end_time > #{now}
             </if>
         </where>
     </select>

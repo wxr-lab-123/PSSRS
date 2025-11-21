@@ -1,0 +1,80 @@
+<!--pages/mine/mine.wxml-->
+<navigation-bar title="我的" back="{{false}}" color="white" background="#1890ff"></navigation-bar>
+
+<view class="container">
+  <!-- 未登录状态 -->
+  <view class="not-login" wx:if="{{!isLogin}}">
+    <text class="login-hint">登录后查看个人信息</text>
+    <button class="login-btn" bindtap="goLogin">立即登录</button>
+  </view>
+
+  <!-- 已登录状态 -->
+  <view class="user-section" wx:if="{{isLogin}}">
+    <view class="user-header" bindtap="goToUserInfo">
+      <view class="user-info">
+        <text class="user-name">{{userInfo.name}}</text>
+        <text class="user-phone">{{userInfo.phone}}</text>
+      </view>
+      <text class="user-arrow">›</text>
+    </view>
+
+    <!-- 功能菜单 -->
+    <view class="menu-section">
+      <view class="menu-item" bindtap="navigateTo" data-url="/pages/inquiry/inquiry">
+        <view class="menu-left">
+          <text class="menu-icon">📋</text>
+          <text class="menu-title">我的挂号</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item" bindtap="navigateTo" data-url="/pages/take-number/take-number">
+        <view class="menu-left">
+          <text class="menu-icon">📅</text>
+          <text class="menu-title">我的预约</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item" bindtap="changePassword">
+        <view class="menu-left">
+          <text class="menu-icon">🔒</text>
+          <text class="menu-title">修改密码</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item" bindtap="showComingSoon">
+        <view class="menu-left">
+          <text class="menu-icon">📄</text>
+          <text class="menu-title">检查报告</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 设置菜单 -->
+    <view class="menu-section">
+      <view class="menu-item" bindtap="showComingSoon">
+        <view class="menu-left">
+          <text class="menu-icon">⚙️</text>
+          <text class="menu-title">设置</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item" bindtap="showAbout">
+        <view class="menu-left">
+          <text class="menu-icon">ℹ️</text>
+          <text class="menu-title">关于</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 退出登录按钮 -->
+    <view class="logout-section">
+      <button class="logout-btn" bindtap="logout">退出登录</button>
+    </view>
+  </view>
+</view>

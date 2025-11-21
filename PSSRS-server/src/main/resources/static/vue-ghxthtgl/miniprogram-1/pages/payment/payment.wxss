@@ -1,0 +1,115 @@
+/* pages/payment/payment.wxss */
+.container {
+  padding: 20rpx;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.payment-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 40rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.08);
+  width: 90%;
+  max-width: 700rpx;
+}
+
+.card-header {
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 80rpx 0;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.order-info {
+  
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item.total {
+  margin-top: 20rpx;
+  padding-top: 30rpx;
+  border-top: 2rpx solid #eee;
+}
+
+.label {
+  font-size: 30rpx;
+  color: #666;
+}
+
+.value {
+  font-size: 30rpx;
+  color: #333;
+  max-width: 400rpx;
+  text-align: right;
+}
+
+.price {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #ff4d4f;
+}
+
+.action-area {
+  display: flex;
+  gap: 20rpx;
+  padding: 0 20rpx;
+  width: 90%;
+  max-width: 700rpx;
+}
+
+.btn-cancel,
+.btn-pay {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  text-align: center;
+}
+
+.btn-cancel {
+  background: #f5f5f5;
+  color: #666;
+  border: 1rpx solid #ddd;
+}
+
+.btn-pay {
+  background: #1890ff;
+  color: #fff;
+  border: none;
+}
+
+.btn-pay:active {
+  background: #1677ff;
+}

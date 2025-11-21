@@ -10,4 +10,5 @@ public class RegistrationCreateDTO {
     private String timeSlot;
     private String scheduleType;
     private String patientPhone;
+    private String scheduleId;
 }

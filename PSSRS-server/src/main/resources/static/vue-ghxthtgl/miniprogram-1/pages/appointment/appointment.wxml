@@ -1,0 +1,96 @@
+<!--pages/appointment/appointment.wxml-->
+<navigation-bar title="挂号预约" back="{{true}}" color="white" background="#4e54c8"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y type="list">
+  <view class="container">
+    <!-- 日期选择 -->
+    <view class="section">
+      <view class="section-title">选择日期</view>
+      <scroll-view class="date-scroll" scroll-x>
+        <view class="date-list">
+          <view 
+            class="date-item {{selectedDate === item.date ? 'active' : ''}}" 
+            wx:for="{{dateList}}" 
+            wx:key="date"
+            bindtap="selectDate"
+            data-date="{{item.date}}"
+            data-hasslot="{{item.hasSlot}}">
+            <text class="date-week">{{item.week}}</text>
+            <text class="date-day">{{item.day}}</text>
+            <text class="date-month">{{item.month}}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 科室选择 -->
+    <view class="section">
+      <view class="section-title">选择科室</view>
+      <view class="department-grid">
+        <view 
+          class="dept-card {{selectedDept === item.id ? 'active' : ''}}" 
+          wx:for="{{departments}}" 
+          wx:key="id"
+          bindtap="selectDepartment"
+          data-id="{{item.id}}">
+          <text class="dept-icon">{{item.icon}}</text>
+          <text class="dept-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 医生列表 -->
+    <view class="section" wx:if="{{selectedDept && selectedDate}}">
+      <view class="section-title">可预约医生</view>
+      <view class="doctor-list">
+        <view 
+          class="doctor-card" 
+          wx:for="{{doctors}}" 
+          wx:key="id">
+          <view class="doctor-header">
+            <view class="doctor-info">
+              <view class="doctor-avatar">
+                <image wx:if="{{item.image}}" class="avatar-image" src="{{item.image}}" mode="aspectFill"></image>
+                <text wx:else class="avatar-text">{{item.name.substr(0,1)}}</text>
+              </view>
+              <view class="doctor-info-main">
+                <view class="doctor-name">{{item.name}}</view>
+                <view class="doctor-tags">
+                  <text wx:if="{{item.title}}" class="doctor-title">{{item.title}}</text>
+                  <text class="doctor-type-tag {{item.scheduleType === 'expert' ? 'tag-expert' : 'tag-normal'}}">
+                    {{item.scheduleType === 'expert' ? '专家号' : '普通号'}}
+                  </text>
+                </view>
+              </view>
+            </view>
+            <view class="doctor-price">¥{{item.price}}</view>
+          </view>
+          <view class="doctor-specialty">注：{{item.specialty}}</view>
+          <view class="time-slots">
+            <view 
+              class="time-slot {{slot.available ? '' : 'disabled'}}" 
+              wx:for="{{item.timeSlots}}" 
+              wx:for-item="slot"
+              wx:key="time"
+              bindtap="bookAppointment"
+              data-doctor="{{item}}"
+              data-slot="{{slot}}">
+              <text class="slot-time">{{slot.time}}</text>
+              <text class="slot-status">{{slot.available ? '可约' : '已满'}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 提示信息 -->
+    <view class="tips-section">
+      <view class="tips-title">预约须知</view>
+      <view class="tips-content">
+        <text class="tip-item">• 预约时间为1-14天内</text>
+        <text class="tip-item">• 请提前15分钟到达医院</text>
+        <text class="tip-item">• 预约成功后请按时就诊</text>
+        <text class="tip-item">• 如需取消请提前1天操作</text>
+      </view>
+    </view>
+  </view>
+</scroll-view>
