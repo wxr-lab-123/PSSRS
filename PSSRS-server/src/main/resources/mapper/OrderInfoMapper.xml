@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hjm.mapper.OrderInfoMapper">
+
+    <select id="existsUnpaidOrder" resultType="java.lang.Boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM order_info
+            WHERE patient_id = #{patientId}
+            AND schedule_id = #{scheduleId}
+            AND status = 0
+        )
+    </select>
+    <select id="listByPId" resultType="com.hjm.pojo.Entity.OrderInfo">
+        SELECT *
+        FROM order_info
+        <where>
+            <if test="patientId != null">
+                patient_id = #{patientId}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="startDate != null">
+                AND create_time >= #{startDate}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+    <select id="listByPage" resultType="com.hjm.pojo.VO.OrderPageVO">
+        SELECT
+            order_info.order_no AS orderNo,
+            patient.name AS patientName,
+            order_info.amount AS amount,
+            order_info.status AS status,
+            order_info.pay_time AS payTime,
+            order_info.pay_way AS payWay
+        FROM
+            order_info
+            LEFT JOIN patient ON order_info.patient_id = patient.id
+        <where>
+        <if test="orderNo != null">
+            order_info.order_no LIKE CONCAT('%', #{orderNo}, '%')
+        </if>
+        <if test="status != null">
+            AND order_info.status = #{status}
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND order_info.create_time between #{startDate} AND #{endDate}
+        </if>
+        <if test="patientName != null">
+            AND patient.name LIKE CONCAT('%', #{patientName}, '%')
+        </if>
+        ORDER BY order_info.create_time DESC
+        </where>
+    </select>
+</mapper>

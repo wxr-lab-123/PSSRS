@@ -34,8 +34,8 @@ public class AppointmentOrder implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty(value = "订单号")
-    private String orderNo;
+    @ApiModelProperty(value = "挂号号")
+    private String registrationNo;
 
     @ApiModelProperty(value = "患者ID（patient表）")
     private Long patientId;
@@ -79,5 +79,8 @@ public class AppointmentOrder implements Serializable {
 
     @ApiModelProperty(value = "就诊号")
     private String visitNumber;
+
+    @ApiModelProperty(value = "取消原因")
+    private String cancelReason;
 
 }

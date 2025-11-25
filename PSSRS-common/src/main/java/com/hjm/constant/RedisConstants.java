@@ -12,5 +12,8 @@ public class RedisConstants {
     public static final String LOCK_SCH_KEY = "lock:schedule:";
     public static final Long LOCK_SCH_TTL = 10L;
 
+    public static final String USER_PERMS_KEY = "perm:user:";
+    public static final Long USER_PERMS_TTL = 60L;
+
 
 }

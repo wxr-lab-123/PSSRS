@@ -1,8 +1,7 @@
 package com.hjm.service.impl;
 
-
-import com.hjm.mapper.UserRoleMapper;
 import com.hjm.pojo.Entity.UserRole;
+import com.hjm.mapper.UserRoleMapper;
 import com.hjm.service.IUserRoleService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author hjm
- * @since 2025-10-31
+ * @since 2025-11-24
  */
 @Service
 public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> implements IUserRoleService {

@@ -1,8 +1,7 @@
 package com.hjm.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.hjm.pojo.Entity.UserRole;
-import org.springframework.stereotype.Service;
+import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * <p>
@@ -10,9 +9,8 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author hjm
- * @since 2025-10-31
+ * @since 2025-11-24
  */
-@Service
 public interface IUserRoleService extends IService<UserRole> {
 
 }

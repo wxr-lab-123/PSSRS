@@ -16,7 +16,7 @@ import lombok.experimental.Accessors;
  * </p>
  *
  * @author hjm
- * @since 2025-10-31
+ * @since 2025-11-24
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -36,6 +36,18 @@ public class Role implements Serializable {
 
     @ApiModelProperty(value = "角色说明")
     private String description;
+
+    @ApiModelProperty(value = "角色唯一编码")
+    private String roleKey;
+
+    @ApiModelProperty(value = "父角色ID")
+    private Long parentId;
+
+    @ApiModelProperty(value = "角色层级")
+    private Integer level;
+
+    @ApiModelProperty(value = "启用=1,禁用=0")
+    private Integer status;
 
 
 }

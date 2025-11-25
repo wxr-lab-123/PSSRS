@@ -1,6 +1,7 @@
 package com.hjm.controller.admin;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -11,10 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
  * </p>
  *
  * @author hjm
- * @since 2025-10-31
+ * @since 2025-11-24
  */
-@RestController
-@RequestMapping("/role")
-public class RoleController {
+// java: api/admin/PermissionController.java
 
+@RestController
+@RequestMapping("/api/admin/roles")
+@RequiredArgsConstructor
+public class RoleController {
 }

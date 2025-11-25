@@ -2,18 +2,26 @@ package com.hjm.service.impl;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hjm.constant.OrderConstant;
 import com.hjm.context.PatientContext;
 import com.hjm.exception.AppiontmentOrderException;
 import com.hjm.mapper.AppointmentOrderMapper;
 import com.hjm.mapper.DoctorScheduleMapper;
+import com.hjm.pojo.DTO.AppointmentOrderPageDTO;
+import com.hjm.pojo.DTO.PaymentDTO;
 import com.hjm.pojo.DTO.RegistrationCreateDTO;
 import com.hjm.pojo.Entity.AppointmentOrder;
 import com.hjm.pojo.Entity.DoctorSchedule;
+import com.hjm.pojo.Entity.OrderInfo;
+import com.hjm.pojo.VO.AppointmentOrderPageVO;
 import com.hjm.pojo.VO.RegistrationVO;
+import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.service.IAppointmentOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hjm.service.IDoctorScheduleService;
+import com.hjm.service.IOrderInfoService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.aop.framework.AopContext;
@@ -47,6 +55,7 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
     private final AppointmentOrderMapper appointmentOrderMapper;
     private final DoctorScheduleMapper doctorScheduleMapper;
     private final IDoctorScheduleService doctorScheduleService;
+    private final IOrderInfoService orderInfoService;
 //    @Override
 //    @Transactional
 //    public Result<Map<String,Object>> createRegistration(RegistrationCreateDTO registrationCreateDTO) {
@@ -171,6 +180,50 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
         return appointmentOrderMapper.listByPId(patientId);
     }
 
+    @Override
+    public Result<PageResult> listByPage(AppointmentOrderPageDTO appointmentOrderPageDTO) {
+
+        Page<AppointmentOrder> page = new Page<>(appointmentOrderPageDTO.getPage(), appointmentOrderPageDTO.getSize());
+        Page<AppointmentOrderPageVO> pageResult = appointmentOrderMapper.getByPage(page, appointmentOrderPageDTO);
+        return Result.success(new PageResult(pageResult.getTotal(),pageResult.getRecords() ));
+    }
+
+    @Override
+    @Transactional
+    public Result createPayment(PaymentDTO paymentDTO) {
+        OrderInfo orderInfo = orderInfoService.getByOrderNo(paymentDTO.getOrderNo());
+        if (orderInfo == null) {
+            throw new AppiontmentOrderException("订单不存在");
+        }
+        if (orderInfo.getStatus() != 0) {
+            throw new AppiontmentOrderException("订单已支付");
+        }
+        orderInfo.setStatus(1);
+        orderInfo.setPayTime(LocalDateTime.now());
+        if (paymentDTO.getPayWay().equals("WECHAT")){
+            orderInfo.setPayWay(0);
+        }
+        else if (paymentDTO.getPayWay().equals("ALIPAY")){
+            orderInfo.setPayWay(1);
+        }
+        orderInfo.setAmount(orderInfo.getAmount());
+        orderInfo.setRemark(OrderConstant.ORDER_PAID_REMARK);
+        boolean update = orderInfoService.updateById(orderInfo);
+        if (!update) {
+            throw new AppiontmentOrderException("支付失败");
+        }
+        DoctorSchedule schedule = doctorScheduleService.getById(orderInfo.getScheduleId());
+        RegistrationCreateDTO registrationCreateDTO = new RegistrationCreateDTO();
+        registrationCreateDTO.setScheduleId(orderInfo.getScheduleId());
+        registrationCreateDTO.setPatientPhone(PatientContext.getPatient().getPhone());
+        registrationCreateDTO.setScheduleType(schedule.getScheduleType());
+        registrationCreateDTO.setRegistrationDate(schedule.getScheduleDate());
+        registrationCreateDTO.setTimeSlot(schedule.getTimeSlot()+" "+schedule.getStartTime()+" "+schedule.getEndTime());
+        registrationCreateDTO.setDepartmentId(schedule.getDepartmentId());
+        registrationCreateDTO.setDoctorId(schedule.getDoctorId());
+        return createRegistration(registrationCreateDTO);
+    }
+
 
     /**
      * 创建挂号订单（事务方法）
@@ -181,27 +234,27 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
 
         Long patientId = PatientContext.getPatient().getId();
 
-        Long count = query().eq("patient_id", patientId).eq("schedule_id", dto.getScheduleId()).count();
+        Long count = query().eq("patient_id", patientId).eq("schedule_id", dto.getScheduleId()).eq("status", 0).count();
 
         // 若已存在订单则返回失败
         if (count > 0) {
-           throw new AppiontmentOrderException ("用户已经购买过一次!!!");
+           throw new AppiontmentOrderException ("挂过该号!!!");
         }
 
         // 1. 构造订单对象
         AppointmentOrder order = new AppointmentOrder();
         BeanUtil.copyProperties(dto, order);
         order.setPatientId(patientId);
-        order.setAppointmentDate(LocalDate.parse(dto.getRegistrationDate()));
+        order.setAppointmentDate(dto.getRegistrationDate());
 
 
 
-        // 2. 生成订单号
+        // 2. 生成挂号号
         String prefix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        String redisKey = "order:" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String redisKey = "registration:" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         Long incr = stringRedisTemplate.opsForValue().increment(redisKey);
-        String orderNo = prefix + String.format("%06d", incr);
-        order.setOrderNo(orderNo);
+        String registrationNo = prefix + String.format("%06d", incr);
+        order.setRegistrationNo(registrationNo);
 
         // 3. 查询费用
         Long fee = appointmentOrderMapper.getFee(dto.getScheduleType());
@@ -227,7 +280,7 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
 
         // 6. 返回结果
         Map<String, Object> map = new HashMap<>();
-        map.put("orderNo", orderNo);
+        map.put("registrationNo", order.getRegistrationNo());
         map.put("message", "挂号成功");
 
         return Result.success(map);

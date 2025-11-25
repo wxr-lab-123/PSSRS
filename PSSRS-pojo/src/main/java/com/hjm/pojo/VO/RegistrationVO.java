@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 @Data
 public class RegistrationVO {
-    private String orderNo;
+    private String registrationNo;
     private String scheduleId;
     private String patientId;
     private String doctorId;

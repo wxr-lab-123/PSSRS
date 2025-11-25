@@ -1,10 +1,13 @@
 package com.hjm.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hjm.pojo.DTO.AppointmentOrderPageDTO;
+import com.hjm.pojo.DTO.PaymentDTO;
 import com.hjm.pojo.DTO.RegistrationCreateDTO;
 import com.hjm.pojo.Entity.AppointmentOrder;
 
 import com.hjm.pojo.VO.RegistrationVO;
+import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import org.springframework.stereotype.Service;
 
@@ -29,4 +32,8 @@ public interface IAppointmentOrderService extends IService<AppointmentOrder> {
     AppointmentOrder getByOrderNo(String orderNo);
 
     List<RegistrationVO> listByPId(Long patientId);
+
+    Result<PageResult> listByPage(AppointmentOrderPageDTO appointmentOrderPageDTO);
+
+    Result createPayment(PaymentDTO paymentDTO);
 }

@@ -1,8 +1,7 @@
 package com.hjm.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hjm.pojo.Entity.UserRole;
-import org.apache.ibatis.annotations.Mapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * <p>
@@ -10,9 +9,8 @@ import org.apache.ibatis.annotations.Mapper;
  * </p>
  *
  * @author hjm
- * @since 2025-10-31
+ * @since 2025-11-24
  */
-@Mapper
 public interface UserRoleMapper extends BaseMapper<UserRole> {
 
 }

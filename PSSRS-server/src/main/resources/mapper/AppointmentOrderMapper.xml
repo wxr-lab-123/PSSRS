@@ -4,7 +4,7 @@
 
     <select id="listByPId" resultType="com.hjm.pojo.VO.RegistrationVO">
         SELECT
-            a.order_no AS orderNo,
+            a.registration_no AS registrationNo,
             a.schedule_id AS scheduleId,
             a.patient_id AS patientId,
             a.doctor_id AS doctorId,
@@ -28,6 +28,54 @@
         LEFT JOIN registration_fee r ON ds.schedule_type = r.type
         join department dp on ds.department_id = dp.id
         WHERE a.patient_id = #{patientId}
+        ORDER BY a.update_time DESC
+    </select>
+    <select id="getByPage" resultType="com.hjm.pojo.VO.AppointmentOrderPageVO">
+        SELECT
+        a.id,
+        a.registration_no AS registrationNo,
+        a.schedule_id AS scheduleId,
+        a.patient_id AS patientId,
+        a.doctor_id AS doctorId,
+        a.department_id AS departmentId,
+        a.status,
+        a.create_time AS createTime,
+        a.update_time AS updateTime,
+        a.appointment_date AS appointmentDate,
+        a.visit_number AS visitNumber,
+        a.time_slot AS timeSlot,
+        d.name AS doctorName,
+        p.name AS patientName,
+        dp.name AS departmentName,
+        p.phone AS patientPhone,
+        ds.schedule_type AS scheduleType,
+        r.fee
+        FROM appointment_order a
+        LEFT JOIN user d ON a.doctor_id = d.id
+        LEFT JOIN patient p ON a.patient_id = p.id
+        LEFT JOIN pssrs.doctor_schedule ds ON a.schedule_id = ds.id
+        LEFT JOIN registration_fee r ON ds.schedule_type = r.type
+        JOIN department dp ON ds.department_id = dp.id
+        <where>
+            <if test="appointmentOrderPageDTO.patientName != null and appointmentOrderPageDTO.patientName != ''">
+                AND p.name LIKE CONCAT('%', #{appointmentOrderPageDTO.patientName}, '%')
+            </if>
+            <if test="appointmentOrderPageDTO.doctorName != null and appointmentOrderPageDTO.doctorName != ''">
+                AND d.name LIKE CONCAT('%', #{appointmentOrderPageDTO.doctorName}, '%')
+            </if>
+
+            <if test="appointmentOrderPageDTO.departmentName != null and appointmentOrderPageDTO.departmentName != ''">
+                AND dp.name LIKE CONCAT('%', #{appointmentOrderPageDTO.departmentName}, '%')
+            </if>
+
+            <if test="appointmentOrderPageDTO.status != null and appointmentOrderPageDTO.status != ''">
+                AND a.status = #{appointmentOrderPageDTO.status}
+            </if>
+
+            <if test="appointmentOrderPageDTO.startDate != null and appointmentOrderPageDTO.endDate != null">
+                AND a.appointment_date BETWEEN #{appointmentOrderPageDTO.startDate} AND #{appointmentOrderPageDTO.endDate}
+            </if>
+        </where>
         ORDER BY a.update_time DESC
     </select>
 </mapper>

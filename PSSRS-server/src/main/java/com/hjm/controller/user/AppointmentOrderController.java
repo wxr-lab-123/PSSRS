@@ -1,17 +1,24 @@
 package com.hjm.controller.user;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hjm.context.PatientContext;
 import com.hjm.exception.AppiontmentOrderException;
 import com.hjm.pojo.DTO.PaymentDTO;
 import com.hjm.pojo.DTO.RegistrationCreateDTO;
+import com.hjm.pojo.DTO.RegistrationDTO;
 import com.hjm.pojo.Entity.AppointmentOrder;
+import com.hjm.pojo.Entity.DoctorSchedule;
+import com.hjm.pojo.Entity.OrderInfo;
 import com.hjm.pojo.VO.RegistrationVO;
 import com.hjm.result.Result;
 import com.hjm.service.IAppointmentOrderService;
+import com.hjm.service.IDoctorScheduleService;
+import com.hjm.service.IOrderInfoService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,27 +34,17 @@ public class AppointmentOrderController {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     private final IAppointmentOrderService appointmentOrderService;
-    @PostMapping("/registration/create")
-    public Result<Map<String,Object>> list(@RequestBody RegistrationCreateDTO registrationCreateDTO) {
-        log.info("创建挂号信息:  {}", registrationCreateDTO);
-        return appointmentOrderService.createRegistration(registrationCreateDTO);
-    }
+    private final IOrderInfoService orderInfoService;
+    private final IDoctorScheduleService doctorScheduleService;
+//    @PostMapping("/registration/create")
+//    public Result<Map<String,Object>> list(@RequestBody RegistrationCreateDTO registrationCreateDTO) {
+//        log.info("创建挂号信息:  {}", registrationCreateDTO);
+//        return appointmentOrderService.createRegistration(registrationCreateDTO);
+//    }
     @PostMapping("/payment/create")
     public Result createPayment(@RequestBody PaymentDTO paymentDTO) {
         log.info("创建支付信息:  {}", paymentDTO);
-        AppointmentOrder appointmentOrder = appointmentOrderService.getByOrderNo(paymentDTO.getOrderNo());
-        if (appointmentOrder == null) {
-            throw new AppiontmentOrderException("订单不存在");
-        }
-        if (appointmentOrder.getStatus() != 0) {
-            throw new AppiontmentOrderException("订单已支付");
-        }
-        appointmentOrder.setStatus(1);
-        boolean update = appointmentOrderService.updateById(appointmentOrder);
-        if (!update) {
-            throw new AppiontmentOrderException("支付失败");
-        }
-        return Result.success("支付完成");
+        return appointmentOrderService.createPayment(paymentDTO);
     }
 
     @GetMapping("/query/registrations")
@@ -59,24 +56,25 @@ public class AppointmentOrderController {
     }
 
     @PostMapping("/appointment/takeNumber")
-    public Result takeNumber(@RequestBody PaymentDTO paymentDTO) {
-        log.info("取号:  {}", paymentDTO);
+    public Result takeNumber(@RequestBody RegistrationDTO registrationDTO) {
+        log.info("取号:  {}", registrationDTO);
         Long patientId = PatientContext.getPatient().getId();
-        AppointmentOrder appointmentOrder = appointmentOrderService.getByOrderNo(paymentDTO.getOrderNo());
+        //AppointmentOrder appointmentOrder = appointmentOrderService.getByOrderNo(paymentDTO.getOrderNo());
+        AppointmentOrder appointmentOrder = appointmentOrderService.getOne(new QueryWrapper<AppointmentOrder>().eq("registration_no", registrationDTO.getRegistrationNo()));
         if (appointmentOrder == null) {
-            throw new AppiontmentOrderException("订单不存在");
+            throw new AppiontmentOrderException("挂号单不存在");
         }
         if (appointmentOrder.getPatientId() != patientId) {
-            throw new AppiontmentOrderException("订单不属于当前用户");
+            throw new AppiontmentOrderException("这个号单不属于当前用户");
         }
-        if (appointmentOrder.getStatus() != 1) {
-            throw new AppiontmentOrderException("订单未支付");
+        if (appointmentOrder.getStatus() != 0) {
+            throw new AppiontmentOrderException("这个号不能取");
         }
         LocalDate today = LocalDate.now();
         if (!appointmentOrder.getAppointmentDate().equals(today)) {
             throw new AppiontmentOrderException("不是今天");
         }
-        appointmentOrder.setStatus(2);
+        appointmentOrder.setStatus(1);
 
         String prefix = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         Long seq = stringRedisTemplate.opsForValue().increment("visitNo:" + prefix);
@@ -91,28 +89,33 @@ public class AppointmentOrderController {
     }
 
     @PostMapping("/registration/cancel")
-    public Result cancel(@RequestBody PaymentDTO paymentDTO) {
-        log.info("取消挂号:  {}", paymentDTO);
-        Long patientId = PatientContext.getPatient().getId();
-        AppointmentOrder appointmentOrder = appointmentOrderService.getByOrderNo(paymentDTO.getOrderNo());
-        if (appointmentOrder == null) {
-            throw new AppiontmentOrderException("订单不存在");
-        }
-        if (appointmentOrder.getPatientId() != patientId) {
-            throw new AppiontmentOrderException("订单不属于当前用户");
-        }
-        if (appointmentOrder.getStatus() != 1) {
-            throw new AppiontmentOrderException("订单未支付");
-        }
-        boolean update = appointmentOrderService.update()
-                .set("status", 3)
-                .eq("id", appointmentOrder.getId())
-                .update();
-                if (!update) {
-                    throw new AppiontmentOrderException("取消失败");
-                }
-        return Result.success();
+    @Transactional
+    public Result cancel(@RequestBody RegistrationDTO registrationDTO) {
+    log.info("取消挂号:  {}", registrationDTO);
+    Long patientId = PatientContext.getPatient().getId();
+    AppointmentOrder appointmentOrder = appointmentOrderService.getByOrderNo(registrationDTO.getRegistrationNo());
+    log.info("取消挂号:  {}", appointmentOrder);
+    if (appointmentOrder == null) {
+        throw new AppiontmentOrderException("号源不存在");
     }
-
-
+    if (appointmentOrder.getPatientId() != patientId) {
+        throw new AppiontmentOrderException("号源不属于当前用户");
+    }
+    if (appointmentOrder.getStatus() != 0) {
+        throw new AppiontmentOrderException("号源状态异常");
+    }
+    boolean update = appointmentOrderService.update()
+            .set("status", 2)
+            .eq("id", appointmentOrder.getId())
+            .update();
+    DoctorSchedule doctorSchedule = doctorScheduleService.getById(appointmentOrder.getScheduleId());
+    Integer currentAppointments = doctorSchedule.getCurrentAppointments();
+    currentAppointments--;
+    doctorSchedule.setCurrentAppointments(currentAppointments);
+    doctorScheduleService.updateById(doctorSchedule);
+            if (!update) {
+                throw new AppiontmentOrderException("取消失败");
+            }
+    return Result.success();
+}
 }

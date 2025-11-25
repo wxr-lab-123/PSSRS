@@ -1,8 +1,11 @@
 package com.hjm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hjm.pojo.DTO.AppointmentOrderPageDTO;
 import com.hjm.pojo.Entity.AppointmentOrder;
 
+import com.hjm.pojo.VO.AppointmentOrderPageVO;
 import com.hjm.pojo.VO.RegistrationVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -33,7 +36,7 @@ public interface AppointmentOrderMapper extends BaseMapper<AppointmentOrder> {
      * @param orderNo
      * @return
      */
-    @Select("select * from appointment_order where order_no = #{orderNo}")
+    @Select("select * from appointment_order where registration_no = #{orderNo}")
     AppointmentOrder getByOrderNo(String orderNo);
 
     /**
@@ -42,4 +45,6 @@ public interface AppointmentOrderMapper extends BaseMapper<AppointmentOrder> {
      * @return
      */
     List<RegistrationVO> listByPId(Long patientId);
+
+    Page<AppointmentOrderPageVO> getByPage(Page<AppointmentOrder> page, AppointmentOrderPageDTO appointmentOrderPageDTO);
 }
