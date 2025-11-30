@@ -46,5 +46,14 @@ Page({
         }
       }
     })
+  },
+
+  // 下拉刷新
+  onPullDownRefresh() {
+    // 这里可以根据需要重新请求首页数据
+    // 模拟刷新 800ms 后结束
+    setTimeout(() => {
+      wx.stopPullDownRefresh()
+    }, 800)
   }
 })

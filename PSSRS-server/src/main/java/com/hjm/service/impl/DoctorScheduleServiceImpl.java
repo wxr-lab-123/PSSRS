@@ -242,6 +242,11 @@ public class DoctorScheduleServiceImpl extends ServiceImpl<DoctorScheduleMapper,
         return Result.success();
     }
 
+    @Override
+    public Result<List<DoctorScheduleVO>> getDoctorScheduleCalender(Long id, LocalDate startDate, LocalDate endDate) {
+        return Result.success(baseMapper.getDoctorScheduleCalender(id, startDate, endDate));
+    }
+
     public void saveSchedule2Redis(Long id, Long expireSeconds) throws InterruptedException {
         DoctorScheduleVO result = baseMapper.getXq(id);
         RedisData redisData = new RedisData();

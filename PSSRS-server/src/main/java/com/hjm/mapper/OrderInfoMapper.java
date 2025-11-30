@@ -26,8 +26,9 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
     OrderInfo getByOrderNo(String orderNo);
 
 //    @Select("select * from order_info where patient_id = #{patientId} and status = #{status} and create_time >= #{startDate}")
-    List<OrderInfo> listByPId(Long patientId, Integer status, java.time.LocalDate startDate);
+    List<OrderInfo> listByPId(Long patientId, Integer status, LocalDate startDate);
 
+    Long countRefundRequests();
     Page<OrderPageVO> listByPage(Page<OrderInfo> pageParam, String orderNo, Integer status, LocalDate startDate, LocalDate endDate, String patientName);
     //boolean existsUnpaidOrder();
 }

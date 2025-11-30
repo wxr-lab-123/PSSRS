@@ -10,6 +10,20 @@ function validatePhone(phone) {
   return /^1[3-9]\d{9}$/.test(normalized)
 }
 
+function validatePhoneIntl(phone) {
+  if (!phone) return false
+  const s = String(phone).replace(/\s+/g, '')
+  return /^\+?[1-9]\d{1,14}$/.test(s)
+}
+
+function validatePassport(passport) {
+  if (!passport) return false
+  const s = String(passport).trim().toUpperCase()
+  if (/^[A-Z0-9]{6,20}$/.test(s)) return true
+  if (/^[A-Z]{2}\d{7,9}$/.test(s)) return true
+  return false
+}
+
 function validateIdCard(idCard) {
   if (!idCard) return false
   const normalized = String(idCard).toUpperCase().replace(/\s+/g, '')
@@ -74,5 +88,7 @@ function validateUserInfo(data = {}) {
 }
 
 module.exports = {
-  validateUserInfo
+  validateUserInfo,
+  validatePhoneIntl,
+  validatePassport
 }

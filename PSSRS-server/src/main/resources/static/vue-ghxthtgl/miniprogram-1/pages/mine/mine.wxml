@@ -36,6 +36,14 @@
         <text class="menu-arrow">›</text>
       </view>
 
+      <view class="menu-item" bindtap="navigateTo" data-url="/pages/orders/orders">
+        <view class="menu-left">
+          <text class="menu-icon">📋</text>
+          <text class="menu-title">订单查询</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
       <view class="menu-item" bindtap="changePassword">
         <view class="menu-left">
           <text class="menu-icon">🔒</text>

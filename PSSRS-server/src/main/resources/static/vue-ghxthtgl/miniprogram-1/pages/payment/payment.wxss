@@ -31,7 +31,10 @@
   color: #333;
   text-align: center;
 }
-
+.section-title { font-size: 30rpx; font-weight: 600; color: #333; margin: 20rpx 0 10rpx; }
+.method-group { display: flex; gap: 20rpx; align-items: center; }
+.method-item { display: flex; align-items: center; gap: 10rpx; font-size: 28rpx; color: #333; }
+.password-input { margin-top: 20rpx; height: 80rpx; border: 1rpx solid #ddd; border-radius: 8rpx; padding: 0 20rpx; font-size: 28rpx; }
 .loading-state,
 .empty-state {
   text-align: center;

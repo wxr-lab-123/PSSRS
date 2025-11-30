@@ -43,7 +43,7 @@
       </div>
     </template>
 
-    <el-table :data="rows" :loading="loading" style="width:100%">
+    <el-table v-if="!isCardView" :data="rows" :loading="loading" style="width:100%">
       <el-table-column prop="schedule_date" label="日期" width="120" />
       <el-table-column prop="time_slot" label="时间段" width="100">
         <template #default="{ row }">
@@ -98,22 +98,35 @@
             v-if="row.status !== 'CANCELLED'" 
             type="danger" 
             link 
-            @click="onCancel(row)"
+            @click="onDelete(row)"
           >
             取消
           </el-button>
-          <el-button 
-            v-else 
-            type="success" 
-            link 
-            @click="onEnable(row)"
-          >
-            启用
-          </el-button>
-          <el-button type="danger" link @click="onDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
+
+    <div v-else class="cards-grid">
+      <el-card v-for="row in rows" :key="row.id" class="schedule-card" shadow="hover" @click="onEdit(row)">
+        <template #header>
+          <div class="card-header">{{ row.schedule_date }} · {{ row.time_slot }}</div>
+        </template>
+        <div class="card-content">
+          <div>医生：{{ row.doctor_name }}</div>
+          <div>科室：{{ row.department_name }}</div>
+          <div>诊室：{{ row.room_number || '-' }}</div>
+          <div>时间：{{ row.start_time }} - {{ row.end_time }}</div>
+          <div>号源：{{ getScheduleTypeLabel(row.schedule_type) }}</div>
+          <div>预约：{{ row.current_appointments || 0 }}/{{ row.max_appointments }}</div>
+          <div>状态：{{ getStatusLabel(row.status) }}</div>
+        </div>
+        <div class="card-actions" @click.stop>
+          <el-button type="primary" size="small" @click="onEdit(row)">编辑</el-button>
+          <el-button size="small" @click="onCopy(row)">复制</el-button>
+          <el-button v-if="row.status !== 'CANCELLED'" type="danger" size="small" @click="onDelete(row)">取消</el-button>
+        </div>
+      </el-card>
+    </div>
 
     <div style="display:flex;justify-content:flex-end;margin-top:12px">
       <el-pagination
@@ -134,13 +147,14 @@
       :title="editForm.id ? '编辑排班' : '新增排班'" 
       width="600px"
     >
-      <el-form ref="editFormRef" :model="editForm" :rules="rules" label-width="100px">
+      <el-form ref="editFormRef" :model="editForm" :rules="rules" label-width="100px" v-loading="editLoading">
         <el-form-item label="科室" prop="department_id">
           <el-select 
             v-model="editForm.department_id" 
             placeholder="请选择科室" 
             style="width:100%"
             @change="onDepartmentChange"
+            :disabled="editLoading"
           >
             <el-option v-for="d in departments" :key="d.id" :label="d.name" :value="d.id" />
           </el-select>
@@ -150,7 +164,7 @@
             v-model="editForm.doctor_id" 
             placeholder="请选择医生" 
             style="width:100%"
-            :disabled="!editForm.department_id"
+            :disabled="!editForm.department_id || editLoading"
           >
             <el-option 
               v-for="doc in filteredDoctors" 
@@ -210,6 +224,7 @@
             :min="1" 
             :max="100" 
             style="width:100%"
+            :disabled="editLoading"
           />
         </el-form-item>
         <el-form-item label="诊室号" prop="room_number">
@@ -368,20 +383,21 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick, inject, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Calendar } from '@element-plus/icons-vue'
 import { 
   fetchSchedules, 
+  fetchScheduleById,
   createSchedule, 
   updateSchedule, 
-  deleteSchedule,
-  updateScheduleStatus,
+  deleteSchedule, 
   batchCreateSchedules,
-  copySchedule,
-  fetchScheduleById
+  updateScheduleStatus,
+  copySchedule
 } from '../api/schedules'
-import { fetchDepartmentsList } from '../api/departments'
 import { fetchDoctors, fetchDoctorsByDepartment } from '../api/doctors'
+import { fetchDepartmentsList } from '../api/departments'
 
 const loading = ref(false)
 const rows = ref([])
@@ -406,6 +422,7 @@ const batchFilteredDoctorsList = ref([])
 const editVisible = ref(false)
 const editSubmitting = ref(false)
 const editFormRef = ref()
+const editLoading = ref(false)
 const editForm = reactive({
   id: null,
   doctor_id: null,
@@ -490,6 +507,7 @@ function normalizeSchedules(list) {
       end_time: r.end_time ?? r.endTime,
       room_number: r.room_number ?? r.roomNumber,
       current_appointments: r.current_appointments ?? r.currentAppointments ?? r.currentAppointmentsCount,
+      max_appointments: r.max_appointments ?? r.maxAppointments ?? 20,
       schedule_type: r.schedule_type ?? r.scheduleType ?? 'normal'
     }
     return normalized
@@ -637,6 +655,7 @@ function onAdd() {
 
 async function onEdit(row) {
   editVisible.value = true
+  editLoading.value = true
 
   if (!Array.isArray(departments.value) || departments.value.length === 0) {
     await loadDepartments()
@@ -647,15 +666,21 @@ async function onEdit(row) {
     if (!Number.isFinite(idNum)) throw new Error('invalid id')
     const resp = await fetchScheduleById(idNum)
     const d = (resp && (resp.data ?? resp)) || {}
+    const deptName = d.department_name ?? d.departmentName ?? row.department_name
+    const deptIdFromName = (() => {
+      if (!deptName) return null
+      const found = (departments.value || []).find(x => x.name === deptName)
+      return found ? found.id : null
+    })()
     Object.assign(editForm, {
       id: d.id ?? row.id ?? row.schedule_id ?? row.scheduleId,
       doctor_id: toNumber(d.doctor_id ?? d.doctorId ?? row.doctor_id),
-      department_id: toNumber(d.department_id ?? d.departmentId ?? row.department_id),
+      department_id: toNumber(d.department_id ?? d.departmentId ?? row.department_id ?? deptIdFromName),
       schedule_date: d.schedule_date ?? d.scheduleDate ?? row.schedule_date,
       time_slot: toChineseTimeSlot(d.time_slot ?? d.timeSlot ?? row.time_slot),
       start_time: d.start_time ?? d.startTime ?? row.start_time,
       end_time: d.end_time ?? d.endTime ?? row.end_time,
-      max_appointments: d.max_appointments ?? d.maxAppointments ?? row.max_appointments,
+      max_appointments: toNumber(d.max_appointments ?? d.maxAppointments ?? row.max_appointments ?? 20),
       room_number: (d.room_number ?? d.roomNumber ?? row.room_number) || '',
       notes: (d.notes ?? row.notes) || '',
       schedule_type: (d.schedule_type ?? d.scheduleType ?? row.schedule_type) || 'normal'
@@ -669,7 +694,7 @@ async function onEdit(row) {
       time_slot: row.time_slot,
       start_time: row.start_time,
       end_time: row.end_time,
-      max_appointments: row.max_appointments,
+      max_appointments: toNumber(row.max_appointments ?? 20),
       room_number: row.room_number || '',
       notes: row.notes || '',
       schedule_type: row.schedule_type || 'normal'
@@ -689,6 +714,13 @@ async function onEdit(row) {
       filteredDoctorsList.value = []
     }
   }
+
+  await nextTick()
+  if (editFormRef.value) {
+    editFormRef.value.clearValidate()
+    editFormRef.value.validate()
+  }
+  editLoading.value = false
 }
 
 async function onDepartmentChange(departmentId) {
@@ -890,12 +922,29 @@ function onDelete(row) {
 }
 
 // 工具函数
+function getTimeSlotClass(timeSlot) {
+  const map = {
+    '上午': 'status-success',
+    '下午': 'status-warning'
+  }
+  return map[timeSlot] || 'status-info'
+}
+
 function getTimeSlotType(timeSlot) {
   const map = {
     '上午': 'success',
     '下午': 'warning'
   }
   return map[timeSlot] || ''
+}
+
+function getStatusClass(status) {
+  const map = {
+    'AVAILABLE': 'status-success',
+    'FULL': 'status-warning',
+    'CANCELLED': 'status-danger'
+  }
+  return map[status] || 'status-info'
 }
 
 function getStatusType(status) {
@@ -905,6 +954,14 @@ function getStatusType(status) {
     'CANCELLED': 'info'
   }
   return map[status] || ''
+}
+
+function getScheduleTypeClass(v) {
+  const map = {
+    'normal': 'status-info',
+    'expert': 'status-warning'
+  }
+  return map[v] || 'status-info'
 }
 
 function getScheduleTypeType(v) {
@@ -944,6 +1001,9 @@ function getProgressColor(row) {
   return '#67C23A'
 }
 
+const uiViewMode = inject('ui_view_mode', ref('card'))
+const isCardView = computed(() => (uiViewMode?.value || 'card') === 'card')
+
 onMounted(() => {
   loadDepartments()
   fetchList()
@@ -965,6 +1025,15 @@ onMounted(() => {
    display: flex;
    justify-content: flex-end;
  }
-</style>
 
+ .cards-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px }
+ @media (max-width:1200px){ .cards-grid{ grid-template-columns:repeat(3,minmax(0,1fr)) } }
+ @media (max-width:900px){ .cards-grid{ grid-template-columns:repeat(2,minmax(0,1fr)) } }
+ @media (max-width:600px){ .cards-grid{ grid-template-columns:1fr } }
+ .schedule-card { border-radius:8px; transition: all .2s ease }
+ .schedule-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.15) }
+ .card-header { font-weight:600; font-size:16px }
+ .card-content { font-size:14px; line-height:1.6; padding: 0 16px; display:flex; flex-direction:column; gap:12px }
+ .card-actions { display:flex; justify-content:flex-end; gap:8px; padding: 8px 16px }
+</style>
 

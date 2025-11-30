@@ -2,6 +2,7 @@
 const departmentApi = require('../../api/department.js')
 const doctorApi = require('../../api/doctor.js')
 const registrationApi = require('../../api/registration.js')
+const orderApi = require('../../api/order.js')
 const { validateUserInfo } = require('../../utils/validators.js')
 const userApi = require('../../api/user.js')
 
@@ -191,24 +192,15 @@ Page({
         console.log('doctor_id字段值:', doctorData.doctor_id)
 
         wx.showLoading({ title: '挂号中...' })
-        // 确保使用正确的医生ID
-        const doctorId = doctorData.doctorId
-        console.log('最终使用的doctorId:', doctorId, '类型:', typeof doctorId)
-        if (!doctorId && doctorId !== 0) {
-          console.error('医生ID缺失，当前值:', doctorId)
-          throw new Error('医生ID缺失')
+
+        // 只传 scheduleId，由后端根据排班和登录用户创建订单并计算金额
+        const scheduleId = doctorData.id
+        if (!scheduleId && scheduleId !== 0) {
+          console.error('排班ID缺失，当前值:', scheduleId)
+          throw new Error('排班ID缺失')
         }
 
-        return registrationApi.createRegistration({
-          doctorId: doctorId,
-          departmentId: this.data.selectedDept,
-          registrationDate: doctorData.scheduleDate,
-          timeSlot: `${doctorData.timeSlot} ${doctorData.startTime}-${doctorData.endTime}`,
-          scheduleType: doctorData.scheduleType || doctorData.schedule_type,
-          scheduleId: doctorData.id,
-          patientName,
-          patientPhone
-        })
+        return orderApi.createOrder(scheduleId)
       })
       .then(res => {
         console.log('挂号接口成功返回，准备显示Toast', res)
@@ -226,21 +218,28 @@ Page({
           })
         }, 300)
 
-        // 构建订单数据（挂号记录本身就是订单）
+        // 构建订单数据，使用后端返回的订单信息
         const rawUserInfo = wx.getStorageSync('userInfo') || {}
         const local = validateUserInfo({
           name: rawUserInfo.name,
           phone: rawUserInfo.phone
         })
+        const data = res.data || {}
         const orderData = {
-          orderNo: res.orderNo || res.data?.orderNo || `ORD${Date.now()}`,
-          registrationId: res.registrationId || res.id, // 挂号记录ID
+          orderNo: data.orderNo,
+          scheduleId: data.scheduleId,
+          amount: data.amount,
+          status: data.status,
+          expireTime: data.expireTime,
+          createTime: data.createTime,
           patientName: local.normalized.name,
-          doctorName: doctorData.doctorName,
-          departmentName: this.data.selectedDeptName,
+          doctorName: data.doctorName || doctorData.doctorName,
+          departmentName: data.departmentName || this.data.selectedDeptName,
           registrationDate: doctorData.scheduleDate,
           timeSlot: `${doctorData.timeSlot} ${doctorData.startTime}-${doctorData.endTime}`,
-          price: doctorData.price || 0
+          // 兼容支付页使用的 price 字段，实际金额来自后端 amount
+          price: data.amount,
+          remark: data.remark
         }
         
         console.log('构建的订单数据:', orderData)

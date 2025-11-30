@@ -11,7 +11,9 @@ import com.hjm.pojo.Entity.UserRole;
 import com.hjm.properties.JwtProperties;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
+import com.hjm.security.RequiresPermissions;
 import com.hjm.service.IDoctorProfileService;
+import com.hjm.service.IPermissionService;
 import com.hjm.service.IRoleService;
 import com.hjm.service.IUserRoleService;
 import com.hjm.service.IUserService;
@@ -44,6 +46,7 @@ public class UserController {
     private final IDoctorProfileService doctorProfileService;
     private final JwtProperties jwtProperties;
     private final IUserRoleService userRoleService;
+    private final IPermissionService permissionService;
 
     @PostMapping("/auth/login")
     public Result login(@RequestBody UserLoginDTO userLoginDTO) throws AccountNotFoundException {
@@ -67,6 +70,21 @@ public class UserController {
 
         return Result.success(data);
     }
+
+    @GetMapping("/auth/me")
+    public Result me() {
+        Long userId = com.hjm.context.BaseContext.getCurrentId();
+        User user = userService.getById(userId);
+        List<String> roles = roleService.getRoleNamesByUserId(userId);
+        List<String> perms = permissionService.getUserPermissionCodes(userId);
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("id", user.getId());
+        userInfo.put("username", user.getUsername());
+        userInfo.put("name", user.getName());
+        userInfo.put("roles", roles);
+        userInfo.put("permissions", perms);
+        return Result.success(userInfo);
+    }
     // ==================== 医生管理接口 ====================
     
     /**
@@ -82,6 +100,7 @@ public class UserController {
      * 查询医生列表（分页）
      */
     @GetMapping("/doctors")
+    @RequiresPermissions({"doctors:view"})
     public Result<PageResult> listDoctors(
             @RequestParam(required = false,value = "username") String name,
             @RequestParam(required = false) Integer departmentId,
@@ -95,6 +114,7 @@ public class UserController {
     /**
      * 删除医生账号
      */
+    @RequiresPermissions({"doctors:delete"})
     @DeleteMapping("/doctors/{id}")
     public Result deleteDoctor(@PathVariable Long id) {
         log.info("删除医生账号：{}", id);
@@ -107,6 +127,7 @@ public class UserController {
     /**
      * 修改医生信息
      */
+    @RequiresPermissions({"doctors:update"})
     @PutMapping("/doctors/{id}")
     public Result updateDoctor(@PathVariable Long id, @RequestBody DoctorDTO doctorDTO) {
         log.info("修改医生信息：{}", doctorDTO);
@@ -115,14 +136,15 @@ public class UserController {
     /**
      * 根据科室查询医生
      */
+    @RequiresPermissions({"doctors:view"})
     @GetMapping("/doctors/department/{departmentId}")
     public Result<List<Map<String,Object>>> listDoctorsByDepartmentId(@PathVariable Long departmentId) {
         log.info("根据科室查询医生：{}", departmentId);
 
         return userService.listDoctorsByDepartmentId(departmentId);
     }
-
     @GetMapping("/admins")
+    @RequiresPermissions({"admins:view"})
     public Result<PageResult> listAdmins(
             @RequestParam(required = false,value = "username") String name,
             @RequestParam(required = false) Integer status,
@@ -133,7 +155,9 @@ public class UserController {
         PageResult result = userService.listAdmins(name,status, page, pageSize);
         return Result.success(result);
     }
+
     @PostMapping("/admins")
+    @RequiresPermissions({"admins:create"})
     public Result registerAdmin(@RequestBody AdminDTO adminDTO) {
         log.info("注册管理员账号：{}", adminDTO);
         userService.registerAdmin(adminDTO);
@@ -141,12 +165,14 @@ public class UserController {
     }
 
     @PutMapping("/admins/{id}")
+    @RequiresPermissions({"admins:update"})
     public Result updateAdmin(@PathVariable Long id, @RequestBody AdminDTO adminDTO) {
         log.info("修改管理员信息：{}", adminDTO);
         return userService.updateAdmin(id, adminDTO);
     }
 
     @DeleteMapping("/admins/{id}")
+    @RequiresPermissions({"admins:delete"})
     public Result deleteAdmin(@PathVariable Long id) {
         log.info("删除管理员账号：{}", id);
         //逻辑删除

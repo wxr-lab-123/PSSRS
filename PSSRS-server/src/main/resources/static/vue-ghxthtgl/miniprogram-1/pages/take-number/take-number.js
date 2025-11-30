@@ -26,27 +26,25 @@ Page({
         
         // 过滤和格式化数据
         const appointments = records.map(item => {
-          let status = 'pending'
-          let statusText = '待支付'
+          let status = 'paid'
+          let statusText = '待就诊'
           
-          // 根据实际状态码判断：0-待支付, 1-待就诊, 2-已就诊, 3-已取消
-          if (item.status === '1') {
+          // 根据实际状态码判断：0-待就诊, 1-已就诊, 2-已取消
+          if (item.status === '0') {
             status = 'paid'
             statusText = '待就诊'
-          } else if (item.status === '2') {
+          } else if (item.status === '1') {
             status = 'taken'
             statusText = '已就诊'
-          } else if (item.status === '3') {
+          } else if (item.status === '2') {
             status = 'cancelled'
             statusText = '已取消'
-          } else if (item.status === '0') {
-            status = 'pending'
-            statusText = '待支付'
           }
 
           return {
             id: item.id,
             orderNo: item.orderNo,
+            registrationNo: item.registrationNo,
             patientName: item.patientName,
             department: item.departmentName,
             doctorName: item.doctorName,
@@ -101,7 +99,7 @@ Page({
           wx.showLoading({ title: '取号中...' })
           
           // 调用取号API
-          appointmentApi.takeNumber(item.id, item.orderNo)
+          appointmentApi.takeNumber(item.registrationNo)
             .then(res => {
               wx.hideLoading()
               wx.showToast({

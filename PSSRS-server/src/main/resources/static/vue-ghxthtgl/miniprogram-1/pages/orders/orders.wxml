@@ -1,0 +1,68 @@
+<!--pages/orders/orders.wxml-->
+<navigation-bar title="{{i18n.orders.title}}" back="{{true}}" color="white" background="#1890ff"></navigation-bar>
+<scroll-view class="scrollarea" scroll-y refresher-enabled="true" bindrefresherrefresh="onScrollRefresh" refresher-triggered="{{refresherTriggered}}" refresher-default-style="white" refresher-background="#f5f5f5">
+  <view class="container">
+
+
+    <!-- 筛选标签 -->
+    <view class="filter-tabs">
+      <view class="tab-item {{currentTab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">{{i18n.orders.filter.all}}</view>
+      <view class="tab-item {{currentTab === '0' ? 'active' : ''}}" bindtap="switchTab" data-tab="0">{{i18n.orders.filter.pending}}</view>
+      <view class="tab-item {{currentTab === '1' ? 'active' : ''}}" bindtap="switchTab" data-tab="1">{{i18n.orders.filter.paid}}</view>
+      <view class="tab-item {{currentTab === '2' ? 'active' : ''}}" bindtap="switchTab" data-tab="2">{{i18n.orders.filter.cancelled}}</view>
+      <view class="tab-item {{currentTab === '3' ? 'active' : ''}}" bindtap="switchTab" data-tab="3">{{i18n.orders.filter.refunding}}</view>
+      <view class="tab-item {{currentTab === '4' ? 'active' : ''}}" bindtap="switchTab" data-tab="4">{{i18n.orders.filter.refunded}}</view>
+    </view>
+    <!-- 搜索栏 -->
+    <view class="search-bar">
+      <picker mode="date" value="{{search.date}}" bindchange="onDateChange">
+        <view class="date-picker">{{search.date || i18n.orders.selectDate}}</view>
+      </picker>
+      <button class="search-btn" bindtap="doSearch">{{i18n.orders.search}}</button>
+      <picker class="lang-picker" mode="selector" range="{{langs}}" value="{{langIndex}}" bindchange="onLangPick"></picker>
+    </view>
+
+    <view class="section-title">订单记录</view>
+
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <text class="loading-text">查询中...</text>
+    </view>
+
+    <!-- 订单列表 -->
+    <view class="order-list" wx:if="{{filteredOrders.length > 0}}">
+      <view class="order-item" wx:for="{{filteredOrders}}" wx:key="id">
+        <view class="item-header">
+          <text class="order-title">{{i18n.orders.fields.orderNo}}：{{item.orderNo}}</text>
+          <text class="status {{item.statusClass}}">{{item.statusText}}</text>
+        </view>
+        <view class="item-info">
+          <view class="info-row">
+            <text class="label">{{i18n.orders.fields.createTime}}：</text>
+            <text class="value">{{item.createTime}}</text>
+          </view>
+          <view class="info-row">
+            <text class="label">{{i18n.orders.fields.amount}}：</text>
+            <text class="value price">¥{{item.amount}}</text>
+          </view>
+          <view class="info-row" wx:if="{{item.remark}}">
+            <text class="label">{{i18n.orders.fields.remark}}：</text>
+            <text class="value remark">{{item.remark}}</text>
+          </view>
+        </view>
+        <view class="item-actions">
+          <button class="action-btn detail-btn full-width" bindtap="viewDetail" data-item="{{item}}">{{i18n.orders.buttons.detail}}</button>
+          <button class="action-btn pay-btn" wx:if="{{item.status === '0'}}" bindtap="payNow" data-item="{{item}}">{{i18n.orders.buttons.pay}}</button>
+          <button class="action-btn refund-btn" wx:if="{{item.status === '1'}}" bindtap="applyRefund" data-item="{{item}}">{{i18n.orders.buttons.refund}}</button>
+          <text class="progress-tip" wx:if="{{item.status === '3'}}">{{i18n.orders.tips.refunding}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <text class="empty-text">{{i18n.orders.empty}}</text>
+    </view>
+
+  </view>
+</scroll-view>

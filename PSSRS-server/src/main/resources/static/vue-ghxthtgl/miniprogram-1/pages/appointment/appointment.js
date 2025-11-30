@@ -2,6 +2,7 @@
 const departmentApi = require('../../api/department.js')
 const doctorApi = require('../../api/doctor.js')
 const registrationApi = require('../../api/registration.js')
+const orderApi = require('../../api/order.js')
 const userApi = require('../../api/user.js')
 const { validateUserInfo } = require('../../utils/validators.js')
 
@@ -255,32 +256,15 @@ Page({
 
         wx.showLoading({ title: '挂号中...' })
 
-        console.log('appointment.js: 准备发起挂号，doctor对象:', doctor)
-        console.log('appointment.js: doctor.raw 对象:', doctor.raw)
-        console.log('appointment.js: doctor.raw 的所有字段:', Object.keys(doctor.raw || {}))
-        console.log('appointment.js: doctor 的所有字段:', Object.keys(doctor || {}))
-        console.log('appointment.js: doctor.raw.doctorId 字段值:', (doctor.raw || {}).doctorId)
-        console.log('appointment.js: doctor.raw.doctor_id 字段值:', (doctor.raw || {}).doctor_id)
-        console.log('appointment.js: doctor.doctorId 字段值:', doctor.doctorId)
-        console.log('appointment.js: doctor.doctor_id 字段值:', doctor.doctor_id)
+        console.log('appointment.js: 准备创建订单，doctor.raw 对象:', doctor.raw)
 
-        // 确保使用正确的医生ID
-        const doctorId = doctor.raw.doctorId
-        if (!doctorId) {
-          throw new Error('医生ID缺失')
+        // 只传 scheduleId，由后端根据排班和登录用户创建订单并计算金额
+        const scheduleId = doctor.raw.id || doctor.id
+        if (!scheduleId && scheduleId !== 0) {
+          throw new Error('排班ID缺失')
         }
 
-        // 复用今日挂号的接口，使用相同的参数格式
-        return registrationApi.createRegistration({
-          doctorId: doctorId,
-          departmentId: this.data.selectedDept,
-          registrationDate: doctor.raw.scheduleDate || this.data.selectedDate,
-          timeSlot: slot.time,
-          scheduleType: doctor.raw.scheduleType || doctor.scheduleType,
-          scheduleId: doctor.raw.id || doctor.id,
-          patientName,
-          patientPhone
-        })
+        return orderApi.createOrder(scheduleId)
       })
       .then(res => {
         wx.hideLoading()
@@ -294,21 +278,28 @@ Page({
           })
         }, 300)
 
-        // 构建订单数据（挂号记录本身就是订单）
+        // 构建订单数据，使用后端返回的订单信息
         const rawUserInfo = wx.getStorageSync('userInfo') || {}
         const local = validateUserInfo({
           name: rawUserInfo.name,
           phone: rawUserInfo.phone
         })
+        const data = res.data || {}
         const orderData = {
-          orderNo: res.orderNo || res.data?.orderNo || `ORD${Date.now()}`,
-          registrationId: res.registrationId || res.id, // 挂号记录ID
+          orderNo: data.orderNo,
+          scheduleId: data.scheduleId,
+          amount: data.amount,
+          status: data.status,
+          expireTime: data.expireTime,
+          createTime: data.createTime,
           patientName: local.normalized.name,
-          doctorName: doctor.name,
-          departmentName: this.data.departments.find(d => d.id === this.data.selectedDept)?.name || '',
+          doctorName: data.doctorName || doctor.name,
+          departmentName: data.departmentName || this.data.departments.find(d => d.id === this.data.selectedDept)?.name || '',
           registrationDate: doctor.raw.scheduleDate || this.data.selectedDate,
           timeSlot: slot.time,
-          price: doctor.price || 0
+          // 兼容支付页使用的 price 字段，实际金额来自后端 amount
+          price: data.amount,
+          remark: data.remark
         }
         
         console.log('构建的订单数据:', orderData)

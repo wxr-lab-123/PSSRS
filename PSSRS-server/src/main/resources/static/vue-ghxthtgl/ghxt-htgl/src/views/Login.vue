@@ -24,7 +24,7 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../stores/auth'
-import { loginApi } from '../api/auth'
+import { loginApi, meApi } from '../api/auth'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -65,7 +65,14 @@ async function onSubmit() {
     console.log('解析出的用户角色:', roles)
     
     auth.setToken(data.token)
-    auth.setUser({ ...data.user, roles })
+    try {
+      const me = await meApi()
+      const perms = Array.isArray(me?.permissions) ? me.permissions : []
+      auth.setUser({ ...data.user, roles, permissions: perms })
+    } catch (e) {
+      console.warn('获取用户权限失败，后续导航将仅基于角色', e)
+      auth.setUser({ ...data.user, roles })
+    }
     ElMessage.success('登录成功')
     await new Promise(resolve => setTimeout(resolve, 100))
     if (roles.length > 1) {

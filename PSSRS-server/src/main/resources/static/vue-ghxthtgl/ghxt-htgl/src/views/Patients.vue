@@ -111,8 +111,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, inject, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { User } from '@element-plus/icons-vue'
 import { fetchPatients, createPatient, updatePatient, deletePatient } from '../api/patients'
 
 const loading = ref(false)
@@ -215,6 +216,9 @@ function onCreateSubmit() {
     }
   })
 }
+
+const uiViewMode = inject('ui_view_mode', ref('card'))
+const isCardView = computed(() => (uiViewMode?.value || 'card') === 'card')
 
 onMounted(fetchList)
 

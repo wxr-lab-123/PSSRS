@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hjm.mapper.LeaveRequestMapper">
+
+    <select id="getLeaveList" resultType="com.hjm.pojo.VO.LeaveRequestVO">
+        select
+            lr.id,
+            lr.doctor_id,
+            u.username as doctor_name,
+            lr.schedule_id,
+            lr.date,
+            lr.time_slot,
+            lr.reason,
+            lr.status,
+            lr.start_time,
+            lr.end_time,
+            lr.leave_type,
+            lr.approver_id,
+            lr.approval_time,
+            lr.attachments,
+            A.name as approver_name
+            from leave_request lr left join pssrs.user u on lr.doctor_id = u.id
+                 left join user A on lr.approver_id = A.id
+        where lr.doctor_id = #{doctorId}
+    </select>
+    <select id="listAllLeaveRequests" resultType="com.hjm.pojo.VO.LeaveRequestVO">
+        select
+            lr.id,
+            lr.doctor_id,
+            u.username as doctor_name,
+            lr.schedule_id,
+            lr.date,
+            lr.time_slot,
+            lr.reason,
+            lr.status,
+            lr.start_time,
+            lr.end_time,
+            lr.leave_type,
+            lr.approver_id,
+            lr.approval_time,
+            lr.attachments,
+            A.name as approver_name
+        from leave_request lr left join pssrs.user u on lr.doctor_id = u.id
+                              left join user A on lr.approver_id = A.id
+        where lr.status in ('PENDING', 'APPROVED')
+        order by lr.create_time desc
+    </select>
+</mapper>

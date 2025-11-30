@@ -2,6 +2,8 @@
 // HTTP请求封装
 
 const config = require('./config.js')
+const i18n = require('./i18n.js')
+const T = (k) => (i18n && typeof i18n.t === 'function') ? i18n.t(k) : k
 
 /**
  * 封装的HTTP请求方法
@@ -30,7 +32,7 @@ function request(options) {
     // 显示loading
     if (options.showLoading !== false) {
       wx.showLoading({
-        title: options.loadingText || '加载中...',
+        title: options.loadingText || T('common.loading'),
         mask: true
       })
     }
@@ -78,7 +80,7 @@ function request(options) {
  * 处理业务错误
  */
 function handleError(data) {
-  const message = data.message || data.msg || '请求失败'
+  const message = data.message || data.msg || T('common.requestFailed')
   wx.showToast({
     title: message,
     icon: 'none',
@@ -92,7 +94,7 @@ function handleError(data) {
 function handleNetworkError(err) {
   console.error('网络请求失败:', err)
   wx.showToast({
-    title: '网络连接失败，请检查网络',
+    title: T('common.networkError'),
     icon: 'none',
     duration: 2000
   })
@@ -103,7 +105,7 @@ function handleNetworkError(err) {
  */
 function handleUnauthorized() {
   wx.showToast({
-    title: '请先登录',
+    title: T('common.unauthorized'),
     icon: 'none',
     duration: 2000
   })

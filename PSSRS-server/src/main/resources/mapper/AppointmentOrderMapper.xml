@@ -78,4 +78,24 @@
         </where>
         ORDER BY a.update_time DESC
     </select>
+    <select id="listPatientIdsByScheduleId" resultType="java.lang.Long">
+        SELECT DISTINCT a.patient_id
+        FROM appointment_order a
+        WHERE a.schedule_id = #{scheduleId}
+          AND a.is_deleted = 0
+          AND a.status = 0
+    </select>
+    <select id="countTodayRegistrations" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM appointment_order a
+        WHERE a.is_deleted = 0
+          AND a.appointment_date = CURRENT_DATE
+    </select>
+    <select id="countTodayPendingVisits" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM appointment_order a
+        WHERE a.is_deleted = 0
+          AND a.appointment_date = CURRENT_DATE
+          AND a.status = 0
+    </select>
 </mapper>

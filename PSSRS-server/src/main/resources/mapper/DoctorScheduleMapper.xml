@@ -101,5 +101,36 @@
             </if>
         </where>
     </select>
+    <select id="getDoctorScheduleCalender" resultType="com.hjm.pojo.VO.DoctorScheduleVO">
+        select
+            ds.id,
+            ds.current_appointments,
+            ds.status,
+            ds.doctor_id as doctorId,
+            ds.start_time,
+            ds.end_time,
+            ds.schedule_type,
+            ds.schedule_date,
+            ds.time_slot,
+            ds.room_number,
+            ds.notes,
+            rf.fee as price,
+            u.name as doctorName,
+            d.name as departmentName
+        from doctor_schedule ds
+        join user u on ds.doctor_id = u.id
+        join department d on ds.department_id = d.id
+        join doctor_profile dp on u.id = dp.user_id
+        join registration_fee rf on ds.schedule_type = rf.type
+        <where>
+            <if test="startDate != null and endDate !=null">
+                and ds.schedule_date between #{startDate} and #{endDate}
+            </if>
+            <if test="id != null">
+                and ds.doctor_id = #{id}
+            </if>
+        </where>
+        order by ds.schedule_date, ds.time_slot
+    </select>
 
 </mapper>

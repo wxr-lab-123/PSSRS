@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hjm.pojo.DTO.DepartmentDTO;
 import com.hjm.pojo.Entity.Department;
 import com.hjm.result.Result;
+import com.hjm.security.RequiresPermissions;
 import com.hjm.service.IDepartmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import java.util.List;
 public class DepartmentController {
     private final IDepartmentService departmentService;
     @GetMapping
+    @RequiresPermissions({"departments:view"})
     public Result<Page<Department>> list(
             @RequestParam(required = false) String name,  // 查询条件，可选
             @RequestParam Long page,
@@ -53,6 +55,7 @@ public class DepartmentController {
 
 
     @PostMapping
+    @RequiresPermissions({"departments:create"})
     public Result save(@RequestBody DepartmentDTO departmentDTO) {
 
         log.info("添加科室：{}", departmentDTO);
@@ -62,6 +65,7 @@ public class DepartmentController {
     }
 
     @PutMapping("/{id}")
+    @RequiresPermissions({"departments:update"})
     public Result update(@PathVariable Long id, @RequestBody DepartmentDTO departmentDTO) {
         log.info("修改科室：{}", departmentDTO);
         Department department = BeanUtil.copyProperties(departmentDTO, Department.class);
@@ -70,6 +74,7 @@ public class DepartmentController {
         return Result.success();
     }
     @DeleteMapping("/{id}")
+    @RequiresPermissions({"departments:delete"})
     public Result delete(@PathVariable Long id) {
         log.info("删除科室：{}", id);
         departmentService.removeById(id);

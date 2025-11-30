@@ -8,7 +8,9 @@ page {
 }
 
 .scrollarea {
+  /* 让 scroll-view 占满可视区域，确保可以上下滑动 */
   flex: 1;
+  height: 100vh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }

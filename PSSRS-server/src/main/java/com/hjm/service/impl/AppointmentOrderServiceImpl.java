@@ -224,6 +224,11 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
         return createRegistration(registrationCreateDTO);
     }
 
+    @Override
+    public List<Long> listPatientIdsByScheduleId(Long scheduleId) {
+        return appointmentOrderMapper.listPatientIdsByScheduleId(scheduleId);
+    }
+
 
     /**
      * 创建挂号订单（事务方法）
@@ -269,6 +274,10 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
                 .update();
 
         if (!success) {
+            doctorScheduleService.update()
+                    .setSql("status = FULL")
+                    .eq("id", dto.getScheduleId())
+                    .update();
             throw new AppiontmentOrderException("挂号已满");
         }
 

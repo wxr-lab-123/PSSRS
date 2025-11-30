@@ -36,4 +36,6 @@ public interface IAppointmentOrderService extends IService<AppointmentOrder> {
     Result<PageResult> listByPage(AppointmentOrderPageDTO appointmentOrderPageDTO);
 
     Result createPayment(PaymentDTO paymentDTO);
+
+    List<Long> listPatientIdsByScheduleId(Long scheduleId);
 }

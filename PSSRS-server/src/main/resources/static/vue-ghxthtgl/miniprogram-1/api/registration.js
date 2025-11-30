@@ -44,13 +44,11 @@ function getRegistrationInfo(id) {
 
 /**
  * 取消挂号
- * @param {Number} id 预约ID
- * @param {String} orderNo 订单号
+ * @param {String} registrationNo 挂号单号
  */
-function cancelRegistration(id, orderNo) {
+function cancelRegistration(registrationNo) {
   const data = {
-    id,
-    orderNo
+    registrationNo
   }
   console.log('取消挂号参数:', data)
   return request.post(config.API.CANCEL_REGISTRATION, data)

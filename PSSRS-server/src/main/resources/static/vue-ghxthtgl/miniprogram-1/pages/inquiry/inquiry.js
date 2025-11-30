@@ -13,7 +13,7 @@ Page({
   cancelAppointment(e) {
     const { id } = e.currentTarget.dataset
     
-    // 查找对应的挂号记录获取orderNo
+    // 查找对应的挂号记录
     let record = null
     for (let i = 0; i < this.data.pendingRecords.length; i++) {
       if (this.data.pendingRecords[i].id === id) {
@@ -37,8 +37,8 @@ Page({
         if (res.confirm) {
           wx.showLoading({ title: '处理中...' })
           
-          // 参考取号功能的实现，传递id和orderNo
-              registrationApi.cancelRegistration(record.id, record.orderNo)
+          // 按 registrationNo 取消挂号
+              registrationApi.cancelRegistration(record.registrationNo)
                 .then(() => {
                   wx.hideLoading()
                   wx.showToast({ title: '取消成功' })
@@ -163,16 +163,32 @@ Page({
         const cancelledRecords = []
         
         records.forEach(item => {
-          // 根据状态码判断：0-待支付, 1-待就诊, 2-已就诊, 3-已取消
+          // 根据新的状态码判断：0-待就诊, 1-已就诊, 2-已取消
           let status = 'pending'
           let statusText = '待就诊'
-          
-          if (item.status === '1') {
+
+          if (item.status === '0') {
             status = 'pending'
             statusText = '待就诊'
             pendingRecords.push({
               id: item.id,
-              orderNo: item.orderNo, // 保存订单号
+              orderNo: item.orderNo,
+              registrationNo: item.registrationNo,
+              department: item.departmentName,
+              doctor: item.doctorName,
+              time: `${item.appointmentDate} ${item.timeSlot}`,
+              fee: item.fee || 0,
+              number: item.visitNumber || '',
+              status: status,
+              statusText: statusText
+            })
+          } else if (item.status === '1') {
+            status = 'completed'
+            statusText = '已就诊'
+            completedRecords.push({
+              id: item.id,
+              orderNo: item.orderNo,
+              registrationNo: item.registrationNo,
               department: item.departmentName,
               doctor: item.doctorName,
               time: `${item.appointmentDate} ${item.timeSlot}`,
@@ -182,26 +198,13 @@ Page({
               statusText: statusText
             })
           } else if (item.status === '2') {
-            status = 'completed'
-            statusText = '已就诊'
-            completedRecords.push({
-              id: item.id,
-              orderNo: item.orderNo, // 保存订单号
-              department: item.departmentName,
-              doctor: item.doctorName,
-              time: `${item.appointmentDate} ${item.timeSlot}`,
-              fee: item.fee || 0,
-              number: item.visitNumber || '',
-              status: status,
-              statusText: statusText
-            })
-          } else if (item.status === '3') {
-            // 添加对已取消状态的处理，单独存放
+            // 已取消状态
             status = 'cancelled'
             statusText = '已取消'
             cancelledRecords.push({
               id: item.id,
-              orderNo: item.orderNo, // 保存订单号
+              orderNo: item.orderNo,
+              registrationNo: item.registrationNo,
               department: item.departmentName,
               doctor: item.doctorName,
               time: `${item.appointmentDate} ${item.timeSlot}`,

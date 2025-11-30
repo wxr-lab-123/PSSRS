@@ -63,7 +63,9 @@ public class PatientController {
         PatientDTO patient = PatientContext.getPatient();
         Long patientId = patient.getId() ;
         Patient patientInfo = patientService.getById(patientId);
-        return Result.success(BeanUtil.copyProperties(patientInfo, PatientInfoVO.class));
+        PatientInfoVO patientInfoVO = BeanUtil.copyProperties(patientInfo, PatientInfoVO.class);
+        patientInfoVO.setPatientId(patientId); // Fixed method name
+        return Result.success(patientInfoVO);
     }
 
     @PutMapping("/user/update")

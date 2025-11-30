@@ -17,7 +17,7 @@
         </el-space>
       </div>
     </template>
-    <el-table :data="rows" :loading="loading" style="width:100%">
+    <el-table v-if="!isCardView" :data="rows" :loading="loading" style="width:100%">
       <el-table-column label="头像" width="80">
         <template #default="{ row }">
           <el-avatar 
@@ -37,7 +37,13 @@
       <el-table-column prop="title" label="职称" />
       <el-table-column prop="departmentName" label="所属科室" />
       <el-table-column prop="phone" label="手机号" />
-      <el-table-column prop="status" label="状态" width="100" />
+      <el-table-column prop="status" label="状态" width="120">
+        <template #default="{ row }">
+          <el-tag :type="(row.status === 1 || row.status === '1') ? 'success' : 'info'">
+            {{ (row.status === 1 || row.status === '1') ? '启用' : (row.status === 2 || row.status === '2') ? '禁用' : row.status }}
+          </el-tag>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
           <el-button type="primary" link @click="onEdit(row)">编辑</el-button>
@@ -45,6 +51,32 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <div v-else class="cards-grid">
+      <el-card v-for="row in rows" :key="row.id" class="doctor-card" shadow="hover" @click="onEdit(row)">
+        <template #header>
+          <div class="card-header">{{ row.username }}</div>
+        </template>
+        <div class="card-body">
+          <div class="card-image">
+            <el-avatar :src="row.image || row.avatar" :size="72" fit="cover">
+              <el-icon><User /></el-icon>
+            </el-avatar>
+          </div>
+          <div class="card-content">
+            <div>职称：{{ row.title || '-' }}</div>
+            <div>科室：{{ row.departmentName || '-' }}</div>
+            <div>电话：{{ row.phone || '-' }}</div>
+            <div>状态：{{ (row.status === 1 || row.status === '1') ? '启用' : (row.status === 2 || row.status === '2') ? '禁用' : row.status }}</div>
+          </div>
+        </div>
+        <div class="card-actions" @click.stop>
+          <el-button type="primary" size="small" @click="onEdit(row)">编辑</el-button>
+          <el-button type="danger" size="small" @click="onDelete(row)">删除</el-button>
+        </div>
+      </el-card>
+    </div>
+
     <div style="display:flex;justify-content:flex-end;margin-top:12px">
       <el-pagination
         background
@@ -120,7 +152,7 @@
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="editForm.status">
             <el-radio :label="1">启用</el-radio>
-            <el-radio :label="0">禁用</el-radio>
+            <el-radio :label="2">禁用</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -148,7 +180,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, nextTick, inject, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { User } from '@element-plus/icons-vue'
 import { fetchDoctors, createDoctor, updateDoctor, deleteDoctor } from '../api/doctors'
@@ -231,7 +263,25 @@ function handleSizeChange(size) {
   fetchList()
 }
 function onAdd() { Object.assign(editForm, { id: null, username: '', phone: '', gender: '0', title: '', departmentId: null, description: '', status: 1, image: '' }); editVisible.value = true }
-function onEdit(row) { Object.assign(editForm, { id: row.id, username: row.username || row.name, phone: row.phone, gender: row.gender || '0', title: row.title, departmentId: row.departmentId || null, description: row.description, status: row.status ?? 1, image: row.image || row.avatar || '' }); editVisible.value = true }
+function onEdit(row) {
+  const deptId = row.departmentId ?? (() => {
+    const name = row.departmentName || row.department?.name
+    const found = (flatDepts.value || []).find(d => d.name === name)
+    return found ? found.id : null
+  })()
+  Object.assign(editForm, {
+    id: row.id,
+    username: row.username || row.name,
+    phone: row.phone,
+    gender: row.gender || '0',
+    title: row.title,
+    departmentId: deptId,
+    description: row.description,
+    status: row.status ?? 1,
+    image: row.image || row.avatar || ''
+  })
+  editVisible.value = true
+}
 
 // 头像上传
 function beforeAvatarUpload(file) {
@@ -311,10 +361,22 @@ function onDelete(row) {
     .then(async () => { try { await deleteDoctor(doctorId); ElMessage.success('删除成功'); fetchList() } catch (e) { ElMessage.error(e?.msg || e?.message || '删除失败') } })
 }
 
+const uiViewMode = inject('ui_view_mode', ref('card'))
+const isCardView = computed(() => (uiViewMode?.value || 'card') === 'card')
+
 onMounted(() => { loadDepartments(); fetchList() })
 </script>
 
 <style scoped>
+.cards-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px }
+@media (max-width:1200px){ .cards-grid{ grid-template-columns:repeat(3,minmax(0,1fr)) } }
+@media (max-width:900px){ .cards-grid{ grid-template-columns:repeat(2,minmax(0,1fr)) } }
+@media (max-width:600px){ .cards-grid{ grid-template-columns:1fr } }
+.doctor-card { border-radius:8px; transition: all .2s ease }
+.doctor-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.15) }
+.card-header { font-weight:600; font-size:16px }
+.card-body { display:flex; gap:12px; padding: 0 16px }
+.card-image { display:flex; align-items:center }
+.card-content { font-size:14px; line-height:1.6; flex:1; display:flex; flex-direction:column; gap:12px }
+.card-actions { display:flex; justify-content:flex-end; gap:8px; padding: 8px 16px }
 </style>
-
-

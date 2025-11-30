@@ -5,6 +5,7 @@ import com.hjm.pojo.DTO.PatientAdminSaveDTO;
 import com.hjm.pojo.Entity.Patient;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
+import com.hjm.security.RequiresPermissions;
 import com.hjm.service.IPatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.DigestUtils;
@@ -20,6 +21,7 @@ public class PatientController {
 
     private final IPatientService patientService;
 
+    @RequiresPermissions({"patients:view"})
     @RequestMapping("/patients")
     public PageResult list(
             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
@@ -32,6 +34,7 @@ public class PatientController {
         return pageResult;
     }
     @PostMapping("/patients")
+    @RequiresPermissions({"patients:create"})
     public Result save(@RequestBody PatientAdminSaveDTO patientAdminSaveDTO) {
         Patient patient = BeanUtil.copyProperties(patientAdminSaveDTO, Patient.class);
         //md5加密
@@ -40,6 +43,7 @@ public class PatientController {
         return Result.success();
     }
 
+    @RequiresPermissions({"patients:update"})
     @PutMapping("/patients/{id}")
     public Result update(@RequestBody PatientAdminSaveDTO patientAdminSaveDTO,
                          @PathVariable("id") Long id ) {

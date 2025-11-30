@@ -9,6 +9,7 @@ import com.hjm.pojo.VO.DoctorScheduleVO;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,4 +32,6 @@ public interface IDoctorScheduleService extends IService<DoctorSchedule> {
     List<DoctorScheduleVO> listScheduleByDid(Long departmentId, String date);
 
     Result batchAdd(BatchAddScheduleDTO batchAddScheduleDTO);
+
+    Result<List<DoctorScheduleVO>> getDoctorScheduleCalender(Long id, LocalDate startDate, LocalDate endDate);
 }

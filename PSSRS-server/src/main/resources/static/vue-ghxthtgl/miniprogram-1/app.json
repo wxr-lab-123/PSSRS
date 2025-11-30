@@ -2,6 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/mine/mine",
+    "pages/message/message",
     "pages/login/login",
     "pages/today-register/today-register",
     "pages/appointment/appointment",
@@ -9,7 +10,8 @@
     "pages/inquiry/inquiry",
     "pages/user-info/user-info",
     "pages/edit-info/edit-info",
-    "pages/payment/payment"
+    "pages/payment/payment",
+    "pages/orders/orders"
   ],
   "window": {
     "navigationBarTextStyle": "white",
@@ -28,6 +30,13 @@
         "iconPath": "images/tabbar/home.png",
         "selectedIconPath": "images/tabbar/home.png",
         "text": "首页",
+        "iconSize": "64rpx"
+      },
+      {
+        "pagePath": "pages/message/message",
+        "iconPath": "images/tabbar/message.png",
+        "selectedIconPath": "images/tabbar/message.png",
+        "text": "消息",
         "iconSize": "64rpx"
       },
       {

@@ -54,4 +54,9 @@
         ORDER BY order_info.create_time DESC
         </where>
     </select>
+    <select id="countRefundRequests" resultType="java.lang.Long">
+        SELECT COUNT(1)
+        FROM order_info
+        WHERE status = 3
+    </select>
 </mapper>

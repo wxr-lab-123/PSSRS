@@ -192,6 +192,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public Result updateDoctor(Long id, DoctorDTO doctorDTO) {
         User user = new User();
         user.setId(id);
+        user.setName(doctorDTO.getUsername());
         user.setPhone(doctorDTO.getPhone());
         user.setGender(doctorDTO.getGender());
         user.setStatus(doctorDTO.getStatus());

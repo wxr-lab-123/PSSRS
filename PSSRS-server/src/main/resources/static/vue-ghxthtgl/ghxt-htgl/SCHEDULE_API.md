@@ -272,7 +272,100 @@ PATCH /api/admin/admins/12/status?status=0
 
 # 订单/挂号
 
-- 医生订单列表：`GET /api/admin/orders`（按需携带查询参数）
+## 管理员挂号列表
+
+- **接口地址**: `GET /api/admin/registrations`
+
+**查询参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| page | number | 否 | 页码，默认 1 |
+| size | number | 否 | 每页数量，默认 10 |
+| patientName | string | 否 | 患者姓名，模糊匹配 |
+| doctorName | string | 否 | 医生姓名，模糊匹配 |
+| departmentName | string | 否 | 科室名称，模糊匹配 |
+| status | string/number | 否 | 挂号状态：0=待就诊，1=已完成，2=已取消 |
+| startDate | string | 否 | 开始日期，格式：YYYY-MM-DD |
+| endDate | string | 否 | 结束日期，格式：YYYY-MM-DD |
+
+**响应示例**:
+
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "records": [
+      {
+        "orderNo": "GH202511210001",
+        "patientName": "张三",
+        "doctorName": "李医生",
+        "departmentName": "内科",
+        "appointmentDate": "2025-11-21",
+        "timeSlot": "上午",
+        "fee": 20.0,
+        "status": 0
+      }
+    ],
+    "total": 100,
+    "page": 1,
+    "size": 10
+  }
+}
+```
+
+> 服务端可根据需要扩展字段，如就诊卡号、挂号来源（线上/线下）、创建时间等。
+
+---
+
+## 管理员订单列表
+
+- **接口地址**: `GET /api/admin/orders/list`
+
+**查询参数**:
+
+| 参数名 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| page | number | 否 | 页码，默认 1 |
+| size | number | 否 | 每页数量，默认 10 |
+| orderNo | string | 否 | 订单号，精确或模糊匹配（视实现而定） |
+| patientName | string | 否 | 患者姓名，模糊匹配 |
+| status | string/number | 否 | 支付状态：0=待支付，1=已支付，2=已退款 |
+| startDate | string | 否 | 开始日期（支付时间范围），格式：YYYY-MM-DD |
+| endDate | string | 否 | 结束日期（支付时间范围），格式：YYYY-MM-DD |
+
+**响应示例**:
+
+```json
+{
+  "code": 0,
+  "msg": "success",
+  "data": {
+    "records": [
+      {
+        "orderNo": "DD202511210001",
+        "patientName": "张三",
+        "amount": 20.0,
+        "payMethod": "微信支付",
+        "payTime": "2025-11-21 09:30:00",
+        "status": 1
+      }
+    ],
+    "total": 80,
+    "page": 1,
+    "size": 10
+  }
+}
+```
+
+> 建议 `status` 与前端显示文案的映射保持一致：0=待支付，1=已支付，2=已退款。如需支持更多支付状态，可在前后端共同扩展。
+
+---
+
+## 医生订单列表
+
+- 医生订单列表：`GET /api/admin/orders`（按需携带查询参数，如医生 ID、日期、状态等）
 
 ---
 

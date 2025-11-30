@@ -76,7 +76,13 @@ module.exports = {
     GET_REPORT_DETAIL: '/api/query/report/detail',        // 查询报告详情
     
     // 订单相关
-    GET_ORDER_DETAIL: '/api/order/detail',                // 查询订单详情
-    CREATE_PAYMENT: '/api/payment/create'                 // 创建支付订单
+    GET_ORDER_LIST: '/api/order/list',                   // 获取订单列表（支持查询）
+    GET_ORDER_DETAIL: '/api/order/detail',               // 查询订单详情
+    CREATE_ORDER: '/api/order/create',                   // 创建挂号订单
+    CREATE_PAYMENT: '/api/payment/create',               // 创建支付订单
+    APPLY_REFUND: '/api/order/refund/apply'              // 申请退款
+    ,GET_MESSAGES: '/api/user/messages'
+    ,UNREAD_COUNT: '/api/user/messages/unread-count'
+    ,MARK_MESSAGE_READ: (id) => `/api/user/messages/${id}/read`
   }
 }

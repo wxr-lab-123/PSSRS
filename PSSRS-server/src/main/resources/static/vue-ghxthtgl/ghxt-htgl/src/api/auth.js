@@ -8,4 +8,8 @@ export function logoutApi() {
   return request.post('/auth/logout')
 }
 
+export function meApi() {
+  return request.get('/auth/me')
+}
+
 

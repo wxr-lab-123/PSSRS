@@ -3,21 +3,22 @@ import RoleSelect from '../views/RoleSelect.vue'
 import AdminLayout from '../layouts/AdminLayout.vue'
 import DoctorLayout from '../layouts/DoctorLayout.vue'
 
-const Login = () => import('../views/Login.vue')
-const Dashboard = () => import('../views/Dashboard.vue')
-const Patients = () => import('../views/Patients.vue')
-const Departments = () => import('../views/Departments.vue')
-const Doctors = () => import('../views/Doctors.vue')
-const Admins = () => import('../views/Admins.vue')
-const Schedules = () => import('../views/Schedules.vue')
-const Registrations = () => import('../views/Registrations.vue')
-const Orders = () => import('../views/Orders.vue')
-const Roles = () => import('../views/Roles.vue')
-const Settings = () => import('../views/Settings.vue')
-// 布局改为静态导入，避免生产环境分片加载失败
-const DoctorMySchedules = () => import('../views/doctor/MySchedules.vue')
-const DoctorMyRegistrations = () => import('../views/doctor/MyRegistrations.vue')
-const DoctorProfile = () => import('../views/doctor/Profile.vue')
+import Login from '../views/Login.vue'
+import Dashboard from '../views/Dashboard.vue'
+import Patients from '../views/Patients.vue'
+import Departments from '../views/Departments.vue'
+import Doctors from '../views/Doctors.vue'
+import Admins from '../views/Admins.vue'
+import Schedules from '../views/Schedules.vue'
+import Registrations from '../views/Registrations.vue'
+import Orders from '../views/Orders.vue'
+import LeaveApprovals from '../views/LeaveApprovals.vue'
+import Roles from '../views/Roles.vue'
+import Permissions from '../views/Permissions.vue'
+import Settings from '../views/Settings.vue'
+import DoctorMySchedules from '../views/doctor/MySchedules.vue'
+import DoctorMyRegistrations from '../views/doctor/MyRegistrations.vue'
+import DoctorProfile from '../views/doctor/Profile.vue'
 
 export const routes = [
   { path: '/login', name: 'login', component: Login, meta: { public: true, title: '登录' } },
@@ -29,14 +30,16 @@ export const routes = [
     meta: { roles: ['ADMIN'] },
     children: [
       { path: '', name: 'dashboard', component: Dashboard, meta: { title: '仪表盘', roles: ['ADMIN'] } },
-      { path: 'patients', name: 'patients', component: Patients, meta: { title: '患者管理', roles: ['ADMIN'] } },
-      { path: 'admins', name: 'admins', component: Admins, meta: { title: '管理员管理', roles: ['ADMIN'] } },
-      { path: 'departments', name: 'departments', component: Departments, meta: { title: '科室管理', roles: ['ADMIN'] } },
-      { path: 'doctors', name: 'doctors', component: Doctors, meta: { title: '医生管理', roles: ['ADMIN'] } },
-      { path: 'schedules', name: 'schedules', component: Schedules, meta: { title: '排班管理', roles: ['ADMIN'] } },
-      { path: 'registrations', name: 'registrations', component: Registrations, meta: { title: '挂号管理', roles: ['ADMIN'] } },
-      { path: 'orders', name: 'orders', component: Orders, meta: { title: '订单管理', roles: ['ADMIN'] } },
-      { path: 'roles', name: 'roles', component: Roles, meta: { title: '角色权限', roles: ['ADMIN'] } },
+      { path: 'patients', name: 'patients', component: Patients, meta: { title: '患者管理', roles: ['ADMIN'], permissions: ['patients:view'] } },
+      { path: 'admins', name: 'admins', component: Admins, meta: { title: '管理员管理', roles: ['ADMIN'], permissions: ['admins:view'] } },
+      { path: 'departments', name: 'departments', component: Departments, meta: { title: '科室管理', roles: ['ADMIN'], permissions: ['departments:view'] } },
+      { path: 'doctors', name: 'doctors', component: Doctors, meta: { title: '医生管理', roles: ['ADMIN'], permissions: ['doctors:view'] } },
+      { path: 'schedules', name: 'schedules', component: Schedules, meta: { title: '排班管理', roles: ['ADMIN'], permissions: ['schedules:view'] } },
+      { path: 'registrations', name: 'registrations', component: Registrations, meta: { title: '挂号管理', roles: ['ADMIN'], permissions: ['registrations:view'] } },
+      { path: 'leave-approvals', name: 'leaveApprovals', component: LeaveApprovals, meta: { title: '请假审批', roles: ['ADMIN'] } },
+      { path: 'orders', name: 'orders', component: Orders, meta: { title: '订单管理', roles: ['ADMIN'], permissions: ['orders:view'] } },
+      { path: 'roles', name: 'roles', component: Roles, meta: { title: '角色权限', roles: ['ADMIN'], permissions: ['roles:view'] } },
+      { path: 'permissions', name: 'permissions', component: Permissions, meta: { title: '权限管理', roles: ['ADMIN'], permissions: ['permissions:view'] } },
       { path: 'settings', name: 'settings', component: Settings, meta: { title: '个人信息设置', roles: ['ADMIN'] } }
     ]
   },
@@ -59,22 +62,19 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.meta.public) return next()
-  const token = localStorage.getItem('auth_token')
+  const token = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('auth_token') : null) || localStorage.getItem('auth_token')
   if (!token) {
-    console.log('未找到 token，跳转登录页')
     return next({ path: '/login', replace: true })
   }
-  // 基于角色的简单校验
-  const rawUser = localStorage.getItem('auth_user')
+  const rawUser = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('auth_user') : null) || localStorage.getItem('auth_user')
   let roles = []
-  try { 
+  let permissions = []
+  try {
     const user = JSON.parse(rawUser || 'null')
     roles = user?.roles || []
-    console.log('路由守卫 - 当前用户角色:', roles, '目标路由需要:', to.meta.roles)
-  } catch (e) {
-    console.warn('解析用户信息失败:', e)
-  }
-  const activeRole = localStorage.getItem('auth_active_role') || ''
+    permissions = user?.permissions || []
+  } catch {}
+  const activeRole = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('auth_active_role') : null) || localStorage.getItem('auth_active_role') || ''
   if (roles.length > 1 && !activeRole && to.path !== '/role-select') {
     return next('/role-select')
   }
@@ -82,16 +82,20 @@ router.beforeEach((to, from, next) => {
   if (needRoles && needRoles.length) {
     const ok = activeRole ? needRoles.includes(activeRole) : needRoles.some(r => roles.includes(r))
     if (!ok) {
-      console.log('权限不足，跳转到对应角色首页')
-      // 无权限：根据已有角色跳转首页
       if (roles.includes('ADMIN')) return next('/admin')
       if (roles.includes('DOCTOR')) return next('/doctor')
       return next('/login')
+    }
+  }
+  const needPerms = to.meta.permissions
+  if (needPerms && needPerms.length) {
+    const isAdmin = roles.includes('ADMIN')
+    const hasAll = isAdmin || needPerms.every(p => permissions.includes(p))
+    if (!hasAll) {
+      return next('/admin')
     }
   }
   next()
 })
 
 export default router
-
-

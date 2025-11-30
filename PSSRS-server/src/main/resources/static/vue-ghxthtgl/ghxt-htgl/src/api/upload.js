@@ -14,7 +14,7 @@ export function uploadToOSS(file, folder = 'doctors') {
       formData.append('folder', folder)
     }
 
-    const token = localStorage.getItem('auth_token')
+    const token = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('auth_token') : null) || localStorage.getItem('auth_token')
     const headers = {
       'Content-Type': 'multipart/form-data'
     }

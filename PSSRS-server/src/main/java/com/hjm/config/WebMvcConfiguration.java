@@ -1,6 +1,7 @@
 package com.hjm.config;
 
 import com.hjm.interceptor.JwtTokenUserInterceptor;
+import com.hjm.interceptor.PermissionInterceptor;
 import com.hjm.interceptor.LoginInterceptor;
 import com.hjm.interceptor.ReflsahInterceptor;
 import jakarta.annotation.Resource;
@@ -20,6 +21,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Autowired
     private JwtTokenUserInterceptor jwtTokenUserInterceptor;
+    @Autowired
+    private PermissionInterceptor permissionInterceptor;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -30,6 +33,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         registry.addInterceptor(jwtTokenUserInterceptor)
                 .addPathPatterns("/api/admin/**")
                 .excludePathPatterns("/api/admin/auth/login");
+
+        registry.addInterceptor(permissionInterceptor)
+                .addPathPatterns("/api/admin/**");
 
     }
 }

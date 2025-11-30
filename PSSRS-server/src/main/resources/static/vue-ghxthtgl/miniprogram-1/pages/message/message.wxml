@@ -1,0 +1,21 @@
+<navigation-bar title="消息" back="{{false}}" color="white" background="#1890ff"></navigation-bar>
+
+<view class="container">
+  <view wx:if="{{messages.length===0}}" class="empty">暂无消息</view>
+  <scroll-view wx:else scroll-y class="list" refresher-enabled="true" refresher-triggered="{{refresherTriggered}}" bindrefresherrefresh="onRefresh">
+    <block wx:for="{{messages}}" wx:key="id">
+      <view class="item" bindtap="openMsg" data-item="{{item}}">
+        <view class="row">
+          <text class="title">{{item.title}}</text>
+          <text class="status {{item.statusClass}}">{{item.statusText}}</text>
+        </view>
+        <view class="sub">{{item.subtitle}}</view>
+        <view class="time">{{item.timeText}}</view>
+      </view>
+    </block>
+  </scroll-view>
+
+  <view class="actions" wx:if="{{messages.length>0}}">
+    <button class="clear-btn" bindtap="clearAll">清空</button>
+  </view>
+</view>

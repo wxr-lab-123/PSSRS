@@ -31,6 +31,26 @@ CREATE TABLE IF NOT EXISTS doctor_schedule (
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='医生排班表';
 
+CREATE TABLE IF NOT EXISTS leave_request (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    doctor_id BIGINT NOT NULL,
+    schedule_id BIGINT NOT NULL,
+    date DATE NOT NULL,
+    start_time DATETIME NOT NULL,
+    end_time DATETIME NOT NULL,
+    time_slot VARCHAR(20) NOT NULL,
+    reason TEXT,
+    leave_type VARCHAR(20),
+    attachments TEXT,
+    status VARCHAR(20) DEFAULT 'PENDING',
+    approver_id BIGINT,
+    approval_time DATETIME,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_schedule (schedule_id),
+    INDEX idx_doctor (doctor_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='医生请假申请表';
+
 -- ============================================
 -- 扩展表（建议添加）
 -- ============================================

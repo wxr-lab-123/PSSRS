@@ -50,13 +50,11 @@ function cancelAppointment(id) {
 
 /**
  * 预约取号
- * @param {Number} id 预约ID
- * @param {String} orderNo 预约单号
+ * @param {String} registrationNo 挂号单号
  */
-function takeNumber(id, orderNo) {
+function takeNumber(registrationNo) {
   return request.post(config.API.TAKE_NUMBER, {
-    id,
-    orderNo
+    registrationNo
   })
 }
 

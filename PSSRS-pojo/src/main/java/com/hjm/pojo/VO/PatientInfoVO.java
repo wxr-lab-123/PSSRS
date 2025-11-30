@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class PatientInfoVO {
+    private Long patientId;
     private String name;
     private String phone;
     private String idCard;

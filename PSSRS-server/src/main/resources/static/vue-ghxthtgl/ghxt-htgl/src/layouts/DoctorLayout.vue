@@ -25,16 +25,24 @@
         </div>
       </el-header>
       <el-main>
-        <div class="content">
+        <div class="content" :class="viewMode">
           <router-view />
         </div>
       </el-main>
+      <el-button
+        class="view-toggle"
+        circle
+        :title="viewMode === 'card' ? '切换为列表视图' : '切换为卡片视图'"
+        @click="toggleViewMode"
+      >
+        {{ viewMode === 'card' ? '卡' : '表' }}
+      </el-button>
     </el-container>
   </el-container>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted, provide } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useAuthStore } from '../stores/auth'
@@ -43,6 +51,17 @@ const route = useRoute()
 const router = useRouter()
 const active = computed(() => route.path)
 const auth = useAuthStore()
+
+const viewMode = ref(localStorage.getItem('ui_view_mode') || 'card')
+function toggleViewMode() {
+  viewMode.value = viewMode.value === 'card' ? 'list' : 'card'
+  localStorage.setItem('ui_view_mode', viewMode.value)
+}
+onMounted(() => {
+  const saved = localStorage.getItem('ui_view_mode')
+  if (saved) viewMode.value = saved
+})
+provide('ui_view_mode', viewMode)
 
 function logout() {
   auth.logout()
@@ -71,7 +90,16 @@ function goProfile() {
   border-bottom: 1px solid var(--el-border-color)
 }
 .route-title { font-size: 16px; font-weight: 600 }
-.content { max-width: 1200px; margin: 0 auto; padding: 16px; width: 100% }
+.content { max-width: 1200px; margin: 0 auto; padding: 16px; width: 100%; transition: all .3s ease }
+.view-toggle {
+  position: fixed; top: 72px; right: 24px; z-index: 3000; width: 40px; height: 40px;
+  border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.1); background: #fff; transition: all .3s ease
+}
+.view-toggle:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.15) }
+:global(:root) { --ui-card-radius: 8px; --ui-card-shadow: 0 2px 8px rgba(0,0,0,.1); --ui-card-padding: 16px; --ui-gap: 12px }
+:deep(.el-card) { border-radius: var(--ui-card-radius); box-shadow: var(--ui-card-shadow) }
+:deep(.el-card__header) { padding: 16px 16px 8px }
+:deep(.el-card__body) { padding: var(--ui-card-padding) }
 </style>
 
 

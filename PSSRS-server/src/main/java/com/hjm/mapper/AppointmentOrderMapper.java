@@ -46,5 +46,11 @@ public interface AppointmentOrderMapper extends BaseMapper<AppointmentOrder> {
      */
     List<RegistrationVO> listByPId(Long patientId);
 
+    Long countTodayRegistrations();
+
+    Long countTodayPendingVisits();
+
     Page<AppointmentOrderPageVO> getByPage(Page<AppointmentOrder> page, AppointmentOrderPageDTO appointmentOrderPageDTO);
+
+    List<Long> listPatientIdsByScheduleId(Long scheduleId);
 }

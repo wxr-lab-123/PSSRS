@@ -4,7 +4,9 @@ const orderApi = require('../../api/order.js')
 Page({
   data: {
     orderInfo: null,
-    loading: false
+    loading: false,
+    selectedMethod: 'WECHAT',
+    payPassword: ''
   },
 
   onLoad(options) {
@@ -30,42 +32,34 @@ Page({
 
   // 立即支付
   handlePay() {
-    if (!this.data.orderInfo) {
-      wx.showToast({
-        title: '订单信息异常',
-        icon: 'none'
-      })
+    const { orderInfo, selectedMethod } = this.data
+    if (!orderInfo) {
+      wx.showToast({ title: '订单信息异常', icon: 'none' })
       return
     }
-
-    wx.showLoading({ title: '支付中...' })
-    
-    // 调用后端创建支付订单（只传订单号）
-    orderApi.createPayment(this.data.orderInfo.orderNo)
-    .then(res => {
-      wx.hideLoading()
-      wx.showModal({
-        title: '支付成功',
-        content: '您已成功支付挂号费用',
-        showCancel: false,
-        confirmText: '返回首页',
-        success: () => {
-          wx.switchTab({ url: '/pages/index/index' })
-        }
-      })
-    })
-    .catch(err => {
-      wx.hideLoading()
-      console.error('支付失败:', err)
-      wx.showToast({
-        title: '支付失败，请重试',
-        icon: 'none'
-      })
+    wx.showModal({
+      title: '确认支付',
+      content: `确认使用${selectedMethod==='WECHAT'?'微信支付':'支付宝'}支付 ¥${orderInfo.price}？`,
+      confirmColor: '#1890ff',
+      success: (res) => {
+        if (!res.confirm) return
+        wx.showLoading({ title: '支付中...' })
+        orderApi.createPayment(orderInfo.orderNo, selectedMethod)
+          .then(() => {
+            wx.hideLoading()
+            wx.showToast({ title: '支付成功', icon: 'success' })
+            setTimeout(() => { wx.navigateBack({ delta: 1 }) }, 800)
+          })
+          .catch(err => {
+            wx.hideLoading()
+            wx.showModal({ title: '支付失败', content: err?.msg || err?.message || '支付失败，请重试', showCancel: true })
+          })
+      }
     })
   },
 
+  onMethodChange(e) { this.setData({ selectedMethod: e.detail.value }) },
+  onPasswordInput(e) { this.setData({ payPassword: e.detail.value }) },
   // 返回上一页
-  goBack() {
-    wx.navigateBack()
-  }
+  goBack() { wx.navigateBack() }
 })

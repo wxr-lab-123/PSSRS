@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserRoleMapper extends BaseMapper<UserRole> {
 
+    @org.apache.ibatis.annotations.Select("SELECT role_id FROM user_role WHERE user_id = #{userId}")
+    java.util.List<Long> selectRoleIdsByUserId(Long userId);
 }

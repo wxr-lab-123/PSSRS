@@ -6,6 +6,7 @@ import com.hjm.pojo.Entity.DoctorSchedule;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hjm.pojo.VO.DoctorScheduleVO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -29,4 +30,5 @@ public interface DoctorScheduleMapper extends BaseMapper<DoctorSchedule> {
 
     List<DoctorScheduleVO> listScheduleByDid(Long departmentId, String date, LocalTime now,Boolean flag);
 
+    List<DoctorScheduleVO> getDoctorScheduleCalender(Long id, LocalDate startDate, LocalDate endDate);
 }
