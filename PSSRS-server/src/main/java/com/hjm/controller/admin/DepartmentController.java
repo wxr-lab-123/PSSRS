@@ -4,13 +4,18 @@ package com.hjm.controller.admin;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hjm.mapper.DoctorProfileMapper;
 import com.hjm.pojo.DTO.DepartmentDTO;
 import com.hjm.pojo.Entity.Department;
 import com.hjm.result.Result;
 import com.hjm.security.RequiresPermissions;
 import com.hjm.service.IDepartmentService;
+import com.hjm.service.IDoctorProfileService;
+import com.hjm.service.IDoctorScheduleService;
+import com.hjm.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,6 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DepartmentController {
     private final IDepartmentService departmentService;
+    private final DoctorProfileMapper doctorMapper; // Changed from private final IDoctorScheduleService doctorScheduleService;
     @GetMapping
     @RequiresPermissions({"departments:view"})
     public Result<Page<Department>> list(
@@ -75,8 +81,13 @@ public class DepartmentController {
     }
     @DeleteMapping("/{id}")
     @RequiresPermissions({"departments:delete"})
+    @Transactional
     public Result delete(@PathVariable Long id) {
         log.info("删除科室：{}", id);
+        doctorMapper.getDoctorByDepartmentId( id);
+        if (doctorMapper.getDoctorByDepartmentId( id) != null) {
+            return Result.error("科室下有医生，无法删除");
+        }
         departmentService.removeById(id);
         return Result.success();
     }
