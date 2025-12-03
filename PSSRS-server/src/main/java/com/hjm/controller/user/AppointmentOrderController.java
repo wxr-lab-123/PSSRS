@@ -56,9 +56,11 @@ public class AppointmentOrderController {
     }
 
     @PostMapping("/appointment/takeNumber")
+    @Transactional
     public Result takeNumber(@RequestBody RegistrationDTO registrationDTO) {
         log.info("取号:  {}", registrationDTO);
         Long patientId = PatientContext.getPatient().getId();
+        String patientName = PatientContext.getPatient().getName();
         //AppointmentOrder appointmentOrder = appointmentOrderService.getByOrderNo(paymentDTO.getOrderNo());
         AppointmentOrder appointmentOrder = appointmentOrderService.getOne(new QueryWrapper<AppointmentOrder>().eq("registration_no", registrationDTO.getRegistrationNo()));
         if (appointmentOrder == null) {
@@ -84,6 +86,28 @@ public class AppointmentOrderController {
         boolean update = appointmentOrderService.updateById(appointmentOrder);
         if (!update) {
             throw new AppiontmentOrderException("取号失败");
+        }
+        try {
+            String title = "取号通知";
+            String content = "患者[" + patientName + "]于[" + java.time.LocalDateTime.now().toString() + "]成功取号，就诊序号：" + visitNumber + "，挂号号：" + appointmentOrder.getRegistrationNo();
+            com.hjm.service.IStaffMessageService sms = com.hjm.utils.SpringUtils.getBean(com.hjm.service.IStaffMessageService.class);
+            sms.saveForDoctor(appointmentOrder.getDoctorId(), patientId, "TAKE_NUMBER_NOTICE", title, content, 2, true);
+            String payload = "{"+
+                    "\"type\":\"TAKE_NUMBER_NOTICE\","+
+                    "\"patientName\":\"" + patientName + "\","+
+                    "\"visitNumber\":\"" + visitNumber + "\","+
+                    "\"registrationNo\":\"" + appointmentOrder.getRegistrationNo() + "\","+
+                    "\"timestamp\":" + System.currentTimeMillis() +
+                    "}";
+            com.hjm.WebSocket.WebSocketServer wss = com.hjm.utils.SpringUtils.getBean(com.hjm.WebSocket.WebSocketServer.class);
+            try {
+                wss.sendMessage(String.valueOf(appointmentOrder.getDoctorId()), payload, "doctor");
+            } catch (Exception e) {
+                try { Thread.sleep(500); wss.sendMessage(String.valueOf(appointmentOrder.getDoctorId()), payload, "doctor"); } catch (Exception ignored) {}
+                org.slf4j.LoggerFactory.getLogger(AppointmentOrderController.class).error("取号通知推送失败", e);
+            }
+        } catch (Exception ex) {
+            org.slf4j.LoggerFactory.getLogger(AppointmentOrderController.class).error("取号通知处理异常", ex);
         }
         return Result.success("取号成功");
     }

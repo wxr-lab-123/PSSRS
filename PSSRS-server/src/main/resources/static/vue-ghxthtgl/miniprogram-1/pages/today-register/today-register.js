@@ -3,6 +3,7 @@ const departmentApi = require('../../api/department.js')
 const doctorApi = require('../../api/doctor.js')
 const registrationApi = require('../../api/registration.js')
 const orderApi = require('../../api/order.js')
+const request = require('../../utils/request.js')
 const { validateUserInfo } = require('../../utils/validators.js')
 const userApi = require('../../api/user.js')
 
@@ -224,8 +225,8 @@ Page({
           name: rawUserInfo.name,
           phone: rawUserInfo.phone
         })
-        const data = res.data || {}
-        const orderData = {
+      const data = res.data || {}
+      const orderData = {
           orderNo: data.orderNo,
           scheduleId: data.scheduleId,
           amount: data.amount,
@@ -249,6 +250,7 @@ Page({
             url: `/pages/payment/payment?orderData=${encodeURIComponent(JSON.stringify(orderData))}`
           })
         }, 1000)
+        try { request.post('/api/audit/events', { module: 'registration', action: 'createOrder', targetId: data.orderNo, payload: orderData, ts: Date.now() }, { showLoading: false }) } catch {}
         
         // 重新加载医生列表
         this.loadDoctors(this.data.selectedDept)

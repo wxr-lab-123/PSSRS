@@ -83,4 +83,21 @@ public class AppointmentOrder implements Serializable {
     @ApiModelProperty(value = "取消原因")
     private String cancelReason;
 
+    @ApiModelProperty(value = "就诊状态")
+    private Integer queueStatus;
+    @ApiModelProperty(value = "叫号时间")
+    private LocalDateTime callTime;
+    @ApiModelProperty(value = "叫号医生")
+    private Integer calledBy;
+    @ApiModelProperty(value = "跳号时间")
+    private LocalDateTime skipTime;
+    @ApiModelProperty(value = "重叫时间")
+    private LocalDateTime recallTime;
+    @ApiModelProperty(value = "就诊时间")
+    private LocalDateTime startTime;
+    @ApiModelProperty(value = "就诊完成时间")
+    private LocalDateTime endTime;
+
+
+
 }

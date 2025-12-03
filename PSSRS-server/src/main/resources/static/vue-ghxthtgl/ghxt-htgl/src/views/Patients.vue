@@ -12,7 +12,7 @@
           <el-input v-model="query.phone" placeholder="手机号" clearable style="width:180px" />
           <el-button type="primary" @click="onSearch">查询</el-button>
           <el-button @click="onReset">重置</el-button>
-          <el-button type="primary" @click="onAdd">新增患者</el-button>
+          <el-button v-if="hasPerm('patients:create')" type="primary" @click="onAdd">新增患者</el-button>
         </el-space>
       </div>
     </template>
@@ -28,8 +28,8 @@
       <el-table-column prop="address" label="家庭住址" min-width="180" />
       <el-table-column label="操作" width="160">
         <template #default="{ row }">
-          <el-button type="primary" link @click="onEdit(row)">编辑</el-button>
-          <el-button type="danger" link @click="onDelete(row)">删除</el-button>
+          <el-button v-if="hasPerm('patients:update')" type="primary" link @click="onEdit(row)">编辑</el-button>
+          <el-button v-if="hasPerm('patients:delete')" type="danger" link @click="onDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -115,11 +115,16 @@ import { ref, reactive, onMounted, inject, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { User } from '@element-plus/icons-vue'
 import { fetchPatients, createPatient, updatePatient, deletePatient } from '../api/patients'
+import { useAuthStore } from '../stores/auth'
+import request from '../api/request'
 
 const loading = ref(false)
 const rows = ref([])
 const total = ref(0)
 const query = reactive({ page: 1, size: 10, name: '', gender: '', phone: '' })
+
+const auth = useAuthStore()
+const hasPerm = (code) => auth.hasPerm(code)
 
 const createVisible = ref(false)
 const createSubmitting = ref(false)
@@ -203,12 +208,15 @@ function onCreateSubmit() {
   if (!createFormRef.value) return
   createFormRef.value.validate(async (valid) => {
     if (!valid) return
+    if (!hasPerm('patients:create')) { ElMessage.error('无权限'); return }
     createSubmitting.value = true
     try {
-      await createPatient({ ...createForm })
+      const payload = { ...createForm }
+      await createPatient(payload)
       ElMessage.success('新增成功')
       createVisible.value = false
       fetchList()
+      try { await request.post('/audit/events', { module: 'patients', action: 'create', targetId: payload.phone, payload, ts: Date.now() }) } catch {}
     } catch (e) {
       ElMessage.error(e?.msg || e?.message || '新增失败')
     } finally {
@@ -243,6 +251,7 @@ function onEditSubmit() {
   if (!editFormRef.value) return
   editFormRef.value.validate(async (valid) => {
     if (!valid) return
+    if (!hasPerm('patients:update')) { ElMessage.error('无权限'); return }
     editSubmitting.value = true
     try {
       const { id, ...payload } = editForm
@@ -266,6 +275,7 @@ function onEditSubmit() {
         // 如果找不到，重新获取列表
         fetchList()
       }
+      try { await request.post('/audit/events', { module: 'patients', action: 'update', targetId: id, payload, ts: Date.now() }) } catch {}
     } catch (e) {
       ElMessage.error(e?.msg || e?.message || '保存失败')
       fetchList() // 出错时重新获取列表
@@ -276,14 +286,16 @@ function onEditSubmit() {
 }
 
 function onDelete(row) {
+  if (!hasPerm('patients:delete')) { ElMessage.error('无权限'); return }
   ElMessageBox.confirm(`确认删除患者「${row.name}」吗？`, '提示', { type: 'warning' })
     .then(async () => {
       try {
         await deletePatient(row.id)
         ElMessage.success('删除成功')
         fetchList()
+        try { await request.post('/audit/events', { module: 'patients', action: 'delete', targetId: row.id, ts: Date.now() }) } catch {}
       } catch (e) {
-        ElMessage.error(e?.msg) // Prefer backend error messages
+        ElMessage.error(e?.msg || e?.message || '删除失败')
       }
     })
 }
@@ -291,5 +303,4 @@ function onDelete(row) {
 
 <style scoped>
 </style>
-
 

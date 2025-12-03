@@ -8,7 +8,7 @@
     </view>
 
     <view class="appointment-list" wx:if="{{appointments.length > 0}}">
-      <view class="appointment-item" wx:for="{{appointments}}" wx:key="id">
+      <view class="appointment-item" wx:for="{{appointments}}" wx:key="registrationNo">
         <view class="item-header">
           <text class="order-no">预约单号：{{item.orderNo}}</text>
           <text class="status {{item.status}}">{{item.statusText}}</text>

@@ -9,6 +9,9 @@
         <el-menu-item index="/doctor/registrations">
           <span>我的挂号</span>
         </el-menu-item>
+        <el-menu-item index="/doctor/notifications">
+          <span>消息通知</span>
+        </el-menu-item>
         <el-menu-item index="/doctor/profile">
           <span>个人信息</span>
         </el-menu-item>
@@ -101,5 +104,4 @@ function goProfile() {
 :deep(.el-card__header) { padding: 16px 16px 8px }
 :deep(.el-card__body) { padding: var(--ui-card-padding) }
 </style>
-
 

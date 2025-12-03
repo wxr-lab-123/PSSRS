@@ -19,6 +19,7 @@ import Settings from '../views/Settings.vue'
 import DoctorMySchedules from '../views/doctor/MySchedules.vue'
 import DoctorMyRegistrations from '../views/doctor/MyRegistrations.vue'
 import DoctorProfile from '../views/doctor/Profile.vue'
+import DoctorNotifications from '../views/doctor/Notifications.vue'
 
 export const routes = [
   { path: '/login', name: 'login', component: Login, meta: { public: true, title: '登录' } },
@@ -50,6 +51,7 @@ export const routes = [
     children: [
       { path: '', name: 'doctor-schedules', component: DoctorMySchedules, meta: { title: '我的排班', roles: ['DOCTOR'] } },
       { path: 'registrations', name: 'doctor-registrations', component: DoctorMyRegistrations, meta: { title: '我的挂号', roles: ['DOCTOR'] } },
+      { path: 'notifications', name: 'doctor-notifications', component: DoctorNotifications, meta: { title: '消息通知', roles: ['DOCTOR'] } },
       { path: 'profile', name: 'doctor-profile', component: DoctorProfile, meta: { title: '个人信息', roles: ['DOCTOR'] } }
     ]
   }

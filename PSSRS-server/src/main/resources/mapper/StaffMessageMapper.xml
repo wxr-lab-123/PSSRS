@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hjm.mapper.StaffMessageMapper">
+
+    <select id="countUnreadByDoctorId" resultType="java.lang.Long">
+        SELECT COUNT(1) FROM staff_message
+        WHERE receiver_id = #{doctorId}
+          AND is_deleted = 0
+          AND status = '未读'
+    </select>
+
+    <select id="listByDoctorId" resultType="com.hjm.pojo.Entity.StaffMessage">
+        SELECT * FROM staff_message
+        <where>
+            receiver_id = #{doctorId}
+            AND is_deleted = 0
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="type != null and type != ''">
+                AND message_type = #{type}
+            </if>
+            <if test="q != null and q != ''">
+                AND (title LIKE CONCAT('%', #{q}, '%') OR content LIKE CONCAT('%', #{q}, '%'))
+            </if>
+        </where>
+        ORDER BY pinned DESC, create_time DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countByDoctorId" resultType="java.lang.Long">
+        SELECT COUNT(1) FROM staff_message
+        <where>
+            receiver_id = #{doctorId}
+            AND is_deleted = 0
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="type != null and type != ''">
+                AND message_type = #{type}
+            </if>
+            <if test="q != null and q != ''">
+                AND (title LIKE CONCAT('%', #{q}, '%') OR content LIKE CONCAT('%', #{q}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <update id="markRead">
+        UPDATE staff_message
+        SET status = '已读', read_time = NOW()
+        WHERE message_id = #{id} AND receiver_id = #{doctorId} AND is_deleted = 0
+    </update>
+
+</mapper>

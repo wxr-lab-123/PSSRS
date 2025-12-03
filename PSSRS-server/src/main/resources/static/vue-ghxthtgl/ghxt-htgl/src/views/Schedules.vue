@@ -36,8 +36,8 @@
           <el-space>
             <el-button type="primary" @click="onSearch">查询</el-button>
             <el-button @click="onReset">重置</el-button>
-            <el-button type="primary" @click="onAdd">新增排班</el-button>
-            <el-button type="success" @click="onBatchAdd">批量排班</el-button>
+          <el-button v-if="hasPerm('schedules:create')" type="primary" @click="onAdd">新增排班</el-button>
+          <el-button v-if="hasPerm('schedules:batch')" type="success" @click="onBatchAdd">批量排班</el-button>
           </el-space>
         </div>
       </div>
@@ -92,16 +92,9 @@
       <el-table-column prop="notes" label="备注" show-overflow-tooltip />
       <el-table-column label="操作" width="220" fixed="right">
         <template #default="{ row }">
-          <el-button type="primary" link @click="onEdit(row)">编辑</el-button>
-          <el-button type="warning" link @click="onCopy(row)">复制</el-button>
-          <el-button 
-            v-if="row.status !== 'CANCELLED'" 
-            type="danger" 
-            link 
-            @click="onDelete(row)"
-          >
-            取消
-          </el-button>
+          <el-button v-if="hasPerm('schedules:update')" type="primary" link @click="onEdit(row)">编辑</el-button>
+          <el-button v-if="hasPerm('schedules:copy')" type="warning" link @click="onCopy(row)">复制</el-button>
+          <el-button v-if="hasPerm('schedules:delete') && row.status !== 'CANCELLED'" type="danger" link @click="onDelete(row)">取消</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -121,9 +114,9 @@
           <div>状态：{{ getStatusLabel(row.status) }}</div>
         </div>
         <div class="card-actions" @click.stop>
-          <el-button type="primary" size="small" @click="onEdit(row)">编辑</el-button>
-          <el-button size="small" @click="onCopy(row)">复制</el-button>
-          <el-button v-if="row.status !== 'CANCELLED'" type="danger" size="small" @click="onDelete(row)">取消</el-button>
+          <el-button v-if="hasPerm('schedules:update')" type="primary" size="small" @click="onEdit(row)">编辑</el-button>
+          <el-button v-if="hasPerm('schedules:copy')" size="small" @click="onCopy(row)">复制</el-button>
+          <el-button v-if="hasPerm('schedules:delete') && row.status !== 'CANCELLED'" type="danger" size="small" @click="onDelete(row)">取消</el-button>
         </div>
       </el-card>
     </div>
@@ -386,6 +379,8 @@
 import { ref, reactive, computed, onMounted, nextTick, inject, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Calendar } from '@element-plus/icons-vue'
+import { useAuthStore } from '../stores/auth'
+import request from '../api/request'
 import { 
   fetchSchedules, 
   fetchScheduleById,
@@ -485,6 +480,8 @@ const copyRules = {
 const filteredDoctors = computed(() => filteredDoctorsList.value)
 const batchFilteredDoctors = computed(() => batchFilteredDoctorsList.value)
 
+const auth = useAuthStore()
+const hasPerm = (code) => auth.hasPerm(code)
 function normalizeDoctors(list) {
   return (list || []).map(d => ({
     ...d,
@@ -755,6 +752,8 @@ function onSave() {
   if (!editFormRef.value) return
   editFormRef.value.validate(async (valid) => {
     if (!valid) return
+    if (editForm.id && !hasPerm('schedules:update')) { ElMessage.error('无权限'); return }
+    if (!editForm.id && !hasPerm('schedules:create')) { ElMessage.error('无权限'); return }
     editSubmitting.value = true
     try {
       const payload = {
@@ -774,6 +773,9 @@ function onSave() {
       ElMessage.success('保存成功')
       editVisible.value = false
       fetchList()
+      try {
+        await request.post('/audit/events', { module: 'schedules', action: editForm.id ? 'update' : 'create', targetId: editForm.id || payload?.doctor_id, payload, ts: Date.now() })
+      } catch {}
     } catch (e) {
       ElMessage.error(e?.msg || e?.message || '保存失败')
     } finally {
@@ -813,6 +815,7 @@ function onBatchSave() {
   if (!batchFormRef.value) return
   batchFormRef.value.validate(async (valid) => {
     if (!valid) return
+    if (!hasPerm('schedules:batch')) { ElMessage.error('无权限'); return }
     batchSubmitting.value = true
     try {
       const dates = []
@@ -835,6 +838,7 @@ function onBatchSave() {
       ElMessage.success('批量创建成功')
       batchVisible.value = false
       fetchList()
+      try { await request.post('/audit/events', { module: 'schedules', action: 'batchCreate', payload, ts: Date.now() }) } catch {}
     } catch (e) {
       ElMessage.error(e?.msg || e?.message || '批量创建失败')
     } finally {
@@ -862,6 +866,7 @@ function onCopySave() {
   if (!copyFormRef.value) return
   copyFormRef.value.validate(async (valid) => {
     if (!valid) return
+    if (!hasPerm('schedules:copy')) { ElMessage.error('无权限'); return }
     copySubmitting.value = true
     try {
       await copySchedule({
@@ -871,6 +876,7 @@ function onCopySave() {
       ElMessage.success('复制成功')
       copyVisible.value = false
       fetchList()
+      try { await request.post('/audit/events', { module: 'schedules', action: 'copy', payload: { source_schedule_id: copyForm.source_schedule_id, target_dates: copyForm.targetDates }, ts: Date.now() }) } catch {}
     } catch (e) {
       ElMessage.error(e?.msg || e?.message || '复制失败')
     } finally {
@@ -907,6 +913,7 @@ async function onEnable(row) {
 }
 
 function onDelete(row) {
+  if (!hasPerm('schedules:delete')) { ElMessage.error('无权限'); return }
   ElMessageBox.confirm('确认删除该排班吗？', '提示', { type: 'warning' })
     .then(async () => {
       try {
@@ -915,6 +922,7 @@ function onDelete(row) {
         await deleteSchedule(idNum)
         ElMessage.success('删除成功')
         fetchList()
+        try { await request.post('/audit/events', { module: 'schedules', action: 'delete', targetId: idNum, ts: Date.now() }) } catch {}
       } catch (e) {
         ElMessage.error(e?.msg || e?.message || '删除失败')
       }
@@ -1036,4 +1044,3 @@ onMounted(() => {
  .card-content { font-size:14px; line-height:1.6; padding: 0 16px; display:flex; flex-direction:column; gap:12px }
  .card-actions { display:flex; justify-content:flex-end; gap:8px; padding: 8px 16px }
 </style>
-

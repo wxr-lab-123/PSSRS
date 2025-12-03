@@ -6,7 +6,8 @@ Page({
     orderInfo: null,
     loading: false,
     selectedMethod: 'WECHAT',
-    payPassword: ''
+    payPassword: '',
+    _paying: false
   },
 
   onLoad(options) {
@@ -37,21 +38,58 @@ Page({
       wx.showToast({ title: '订单信息异常', icon: 'none' })
       return
     }
+    if (this.data._paying) return
     wx.showModal({
       title: '确认支付',
       content: `确认使用${selectedMethod==='WECHAT'?'微信支付':'支付宝'}支付 ¥${orderInfo.price}？`,
       confirmColor: '#1890ff',
       success: (res) => {
         if (!res.confirm) return
+        this.data._paying = true
         wx.showLoading({ title: '支付中...' })
         orderApi.createPayment(orderInfo.orderNo, selectedMethod)
-          .then(() => {
-            wx.hideLoading()
-            wx.showToast({ title: '支付成功', icon: 'success' })
-            setTimeout(() => { wx.navigateBack({ delta: 1 }) }, 800)
+          .then((resp) => {
+            const data = resp?.data || resp || {}
+            if (selectedMethod === 'WECHAT' && data && (data.timeStamp || data.timestamp)) {
+              const payArgs = {
+                timeStamp: String(data.timeStamp || data.timestamp),
+                nonceStr: String(data.nonceStr || data.nonce),
+                package: String(data.package || data.prepayId || data.prepay_id || ''),
+                signType: String(data.signType || 'RSA'),
+                paySign: String(data.paySign || data.sign)
+              }
+              const timer = setTimeout(() => {
+                try { wx.hideLoading() } catch {}
+                this.data._paying = false
+                wx.showToast({ title: '支付超时', icon: 'none' })
+              }, 120000)
+              wx.requestPayment({
+                ...payArgs,
+                success: () => {
+                  clearTimeout(timer)
+                  try { wx.hideLoading() } catch {}
+                  this.data._paying = false
+                  wx.showToast({ title: '支付成功', icon: 'success' })
+                  setTimeout(() => { wx.navigateBack({ delta: 1 }) }, 800)
+                },
+                fail: (err) => {
+                  clearTimeout(timer)
+                  try { wx.hideLoading() } catch {}
+                  this.data._paying = false
+                  const msg = err?.errMsg && /cancel/.test(err.errMsg) ? '已取消支付' : (err?.errMsg || '支付失败')
+                  wx.showToast({ title: msg, icon: 'none' })
+                }
+              })
+            } else {
+              try { wx.hideLoading() } catch {}
+              this.data._paying = false
+              wx.showToast({ title: '支付下单成功', icon: 'success' })
+              setTimeout(() => { wx.navigateBack({ delta: 1 }) }, 800)
+            }
           })
           .catch(err => {
-            wx.hideLoading()
+            try { wx.hideLoading() } catch {}
+            this.data._paying = false
             wx.showModal({ title: '支付失败', content: err?.msg || err?.message || '支付失败，请重试', showCancel: true })
           })
       }

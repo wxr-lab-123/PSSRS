@@ -5,6 +5,32 @@ const config = require('./config.js')
 const i18n = require('./i18n.js')
 const T = (k) => (i18n && typeof i18n.t === 'function') ? i18n.t(k) : k
 
+const ERROR_CODE_MAP = {
+  400: '参数错误',
+  401: '未登录或登录过期',
+  403: '无权限',
+  404: '资源不存在',
+  409: '业务冲突',
+  422: '参数校验失败',
+  429: '请求过于频繁',
+  500: '服务器错误',
+  E_SCHEDULE_FULL: '号源已满',
+  E_PAYMENT_SIGNATURE_INVALID: '支付签名无效',
+  E_PAYMENT_TIMEOUT: '支付超时',
+  E_IDEMPOTENT_REPLAY: '重复请求',
+  E_ORDER_NOT_FOUND: '订单不存在'
+}
+
+function genId() {
+  const s4 = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1)
+  return `${Date.now().toString(16)}-${s4()}-${s4()}-${s4()}`
+}
+
+function mapMsg(code, msg) {
+  const key = code == null ? undefined : (typeof code === 'number' ? code : String(code))
+  return ERROR_CODE_MAP[key] || msg || T('common.requestFailed')
+}
+
 /**
  * 封装的HTTP请求方法
  * @param {Object} options 请求配置
@@ -22,6 +48,12 @@ function request(options) {
     const header = {
       'Content-Type': 'application/json',
       ...options.header
+    }
+    const method = (options.method || 'GET').toUpperCase()
+    if (method === 'POST' || method === 'PUT' || method === 'DELETE') {
+      const reqId = genId()
+      header['X-Request-Id'] = reqId
+      header['Idempotency-Key'] = reqId
     }
     
     // 如果有token，添加到请求头
@@ -54,6 +86,7 @@ function request(options) {
             resolve(res.data)
           } else {
             // 业务逻辑失败
+            res.data.message = mapMsg(res.data.code, res.data.message || res.data.msg)
             handleError(res.data)
             reject(res.data)
           }
@@ -63,7 +96,9 @@ function request(options) {
           reject(res.data)
         } else {
           // 其他错误
-          handleError(res.data)
+          const data = res.data || {}
+          data.message = mapMsg(res.statusCode, data.message || data.msg)
+          handleError(data)
           reject(res.data)
         }
       },

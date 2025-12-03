@@ -106,6 +106,63 @@ public class WebSocketServer {
                 return;
             }
             String role = session.getRequestParameterMap().getOrDefault("role", java.util.List.of("")).get(0);
+            if ("CALL_PATIENT".equals(type)) {
+                String orderNo = msg.path("orderId").asText("");
+                if (orderNo != null && !orderNo.isBlank()) {
+                    try {
+                        AppointmentOrderMapper mapper2 = SpringUtils.getBean(AppointmentOrderMapper.class);
+                        com.hjm.pojo.Entity.AppointmentOrder order = mapper2.getByOrderNo(orderNo);
+                        if (order != null) {
+                            com.hjm.mapper.DoctorScheduleMapper dsm = SpringUtils.getBean(com.hjm.mapper.DoctorScheduleMapper.class);
+                            com.hjm.pojo.VO.DoctorScheduleVO vo = dsm.getXq(order.getScheduleId());
+                            String dep = vo != null ? String.valueOf(vo.getDepartmentName()) : "";
+                            String doc = vo != null ? String.valueOf(vo.getDoctorName()) : "";
+                            String room = vo != null ? String.valueOf(vo.getRoomNumber()) : "";
+                            String reg = String.valueOf(order.getRegistrationNo());
+                            try {
+                                com.hjm.service.IPatientMessageService pms = SpringUtils.getBean(com.hjm.service.IPatientMessageService.class);
+                                String t = "CALL_PATIENT";
+                                Long did = null;
+                                try { String d = msg.path("doctorId").asText(""); if (d != null && !d.isBlank()) did = Long.valueOf(d); } catch (Exception ignored) {}
+                                String content = String.join(", ", dep, doc, room, reg);
+                                pms.saveForPatients(java.util.List.of(order.getPatientId()), t, content, did == null ? 0L : did);
+                            } catch (Exception ignored) {}
+                            String payload = "{"+
+                                    "\"type\":\"ORDER_CALLED\","+
+                                    "\"orderId\":\"" + orderNo + "\","+
+                                    "\"doctorId\":\"" + msg.path("doctorId").asText("") + "\","+
+                                    "\"departmentName\":\"" + dep + "\","+
+                                    "\"doctorName\":\"" + doc + "\","+
+                                    "\"roomNumber\":\"" + room + "\","+
+                                    "\"registrationNo\":\"" + reg + "\","+
+                                    "\"timestamp\":" + System.currentTimeMillis() +
+                                    "}";
+                            sendMessage(String.valueOf(order.getPatientId()), payload, "patient");
+                        }
+                    } catch (Exception ignored) {}
+                }
+                return;
+            }
+            if ("PATIENT_ARRIVAL".equals(type)) {
+                String doctorId = msg.path("doctorId").asText("");
+                String patientName = msg.path("patientName").asText("");
+                String roomName = msg.path("roomName").asText("");
+                String title = "患者到诊提醒";
+                String content = "患者[" + patientName + "]已到达[" + roomName + "]，请准备接诊";
+                try {
+                    Long did = Long.valueOf(doctorId);
+                    com.hjm.service.IStaffMessageService sms = SpringUtils.getBean(com.hjm.service.IStaffMessageService.class);
+                    sms.saveForDoctor(did, "PATIENT_ARRIVAL", title, content, 2, true);
+                } catch (Exception ignored) {}
+                String payload = "{"+
+                        "\"type\":\"PATIENT_ARRIVAL\","+
+                        "\"patientName\":\"" + patientName + "\","+
+                        "\"roomName\":\"" + roomName + "\","+
+                        "\"timestamp\":" + System.currentTimeMillis() +
+                        "}";
+                if (doctorId != null && !doctorId.isBlank()) sendMessage(doctorId, payload, "doctor");
+                return;
+            }
             if ("LEAVE_REQUEST".equals(type)) {
                 String doctorId = msg.path("doctorId").asText("");
                 String adminId = resolveAdminId(doctorId);

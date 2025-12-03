@@ -57,7 +57,7 @@
             详情
           </el-button>
           <el-button 
-            v-if="row.status !== '2'"
+            v-if="hasPerm('registrations:update') && row.status !== '2'"
             type="primary" 
             link 
             size="small"
@@ -66,7 +66,7 @@
             编辑
           </el-button>
           <el-button 
-            v-if="row.status !== '2'" 
+            v-if="hasPerm('registrations:cancel') && row.status !== '2'" 
             type="danger" 
             link 
             size="small"
@@ -92,8 +92,8 @@
         </div>
         <div class="card-actions" @click.stop>
           <el-button type="primary" size="small" @click="handleView(row)">详情</el-button>
-          <el-button v-if="row.status !== '2'" size="small" @click="onEdit(row)">编辑</el-button>
-          <el-button v-if="row.status !== '2'" type="danger" size="small" @click="openCancel(row)">取消</el-button>
+          <el-button v-if="hasPerm('registrations:update') && row.status !== '2'" size="small" @click="onEdit(row)">编辑</el-button>
+          <el-button v-if="hasPerm('registrations:cancel') && row.status !== '2'" type="danger" size="small" @click="openCancel(row)">取消</el-button>
         </div>
       </el-card>
     </div>
@@ -205,6 +205,8 @@ import { Search, Refresh, Calendar, User, UserFilled, OfficeBuilding } from '@el
 import { fetchAdminRegistrations, cancelRegistration, updateRegistration } from '../api/registrations'
 import { fetchDepartmentsList } from '../api/departments'
 import { fetchDoctorsByDepartment } from '../api/doctors'
+import { useAuthStore } from '../stores/auth'
+import request from '../api/request'
 
 const loading = ref(false)
 const rows = ref([])
@@ -240,6 +242,9 @@ const query = reactive({
   departmentName: '',
   status: ''
 })
+
+const auth = useAuthStore()
+const hasPerm = (code) => auth.hasPerm(code)
 
 // 状态映射
 function mapStatus(s) {
@@ -346,12 +351,14 @@ function openCancel(row) {
 
 async function handleCancelSubmit() {
   if (!currentRowId.value) return
+  if (!hasPerm('registrations:cancel')) { ElMessage.error('无权限'); return }
   cancelSubmitting.value = true
   try {
     await cancelRegistration(currentRowId.value, { reason: cancelForm.reason, remark: cancelForm.remark })
     ElMessage.success('取消挂号成功')
     cancelVisible.value = false
     fetchList()
+    try { await request.post('/audit/events', { module: 'registrations', action: 'cancel', targetId: currentRowId.value, payload: { ...cancelForm }, ts: Date.now() }) } catch {}
   } catch (e) {
     ElMessage.error(e?.msg || e?.message || '操作失败')
   } finally {
@@ -390,6 +397,7 @@ async function onEditDepartmentChange(deptId) {
 
 async function onEditSubmit() {
   if (!editForm.id) return
+  if (!hasPerm('registrations:update')) { ElMessage.error('无权限'); return }
   editSubmitting.value = true
   try {
     const payload = {
@@ -405,6 +413,7 @@ async function onEditSubmit() {
     ElMessage.success('修改成功')
     editVisible.value = false
     fetchList()
+    try { await request.post('/audit/events', { module: 'registrations', action: 'update', targetId: editForm.id, payload, ts: Date.now() }) } catch {}
   } catch (e) {
     ElMessage.error(e?.msg || e?.message || '修改失败')
   } finally {

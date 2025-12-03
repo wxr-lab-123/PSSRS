@@ -287,6 +287,12 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
             throw new AppiontmentOrderException("挂号失败，请稍后再试");
         }
 
+        // 设置初始队列状态为等待(0)，避免后续更新条件因NULL而不命中
+        this.update()
+                .set("queue_status", 0)
+                .eq("id", order.getId())
+                .update();
+
         // 6. 返回结果
         Map<String, Object> map = new HashMap<>();
         map.put("registrationNo", order.getRegistrationNo());

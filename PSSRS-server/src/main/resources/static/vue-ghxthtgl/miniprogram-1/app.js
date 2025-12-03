@@ -80,6 +80,24 @@ App({
           list.push(entry)
           wx.setStorageSync('messages', list)
           wx.showModal({ title: '号源取消通知', content: '你挂的号由于医生原因已取消，是否查看详情？', success: (r) => { if (r.confirm) wx.switchTab({ url: '/pages/message/message' }) } })
+        } else if (msg.type === 'ORDER_CALLED' || msg.type === 'ORDER_RECALLED' || msg.type === 'CALL_PATIENT') {
+          const name = msg.type === 'ORDER_RECALLED' ? '重叫' : '叫号'
+          const text = `${name}通知：请按序就诊`
+          const list = wx.getStorageSync('messages') || []
+          const entry = {
+            id: `${Date.now()}`,
+            type: msg.type,
+            departmentName: msg.departmentName || '',
+            doctorName: msg.doctorName || '',
+            roomNumber: msg.roomNumber || '',
+            registrationNo: msg.registrationNo || '',
+            timestamp: Date.now(),
+            message: text
+          }
+          list.push(entry)
+          wx.setStorageSync('messages', list)
+          wx.showModal({ title: '叫号通知', content: text, showCancel: false })
+          try { wx.vibrateShort() } catch {}
         }
       })
       this.globalData.socket = s

@@ -11,7 +11,7 @@
           </el-select>
           <el-button type="primary" @click="onSearch">查询</el-button>
           <el-button @click="onReset">重置</el-button>
-          <el-button type="primary" @click="onAdd">新增管理员</el-button>
+          <el-button v-if="hasPerm('admins:create')" type="primary" @click="onAdd">新增管理员</el-button>
         </el-space>
       </div>
     </template>
@@ -30,8 +30,8 @@
       </el-table-column>
       <el-table-column label="操作" width="220">
         <template #default="{ row }">
-          <el-button type="primary" link @click="onEdit(row)">编辑</el-button>
-          <el-button type="danger" link @click="onDelete(row)">删除</el-button>
+          <el-button v-if="hasPerm('admins:update')" type="primary" link @click="onEdit(row)">编辑</el-button>
+          <el-button v-if="hasPerm('admins:delete')" type="danger" link @click="onDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -47,8 +47,8 @@
           <div>状态：{{ (row.status === 1 || row.status === '1' || row.status === 'ACTIVE') ? '启用' : '禁用' }}</div>
         </div>
         <div class="card-actions" @click.stop>
-          <el-button type="primary" size="small" @click="onEdit(row)">编辑</el-button>
-          <el-button type="danger" size="small" @click="onDelete(row)">删除</el-button>
+          <el-button v-if="hasPerm('admins:update')" type="primary" size="small" @click="onEdit(row)">编辑</el-button>
+          <el-button v-if="hasPerm('admins:delete')" type="danger" size="small" @click="onDelete(row)">删除</el-button>
         </div>
       </el-card>
     </div>
@@ -140,12 +140,17 @@
 import { ref, reactive, onMounted, inject, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { fetchAdmins, createAdmin, updateAdmin, deleteAdmin } from '../api/admins'
+import { useAuthStore } from '../stores/auth'
+import request from '../api/request'
 
 const loading = ref(false)
 const rows = ref([])
 const total = ref(0)
 const roleOptions = ref([])
 const query = reactive({ page: 1, size: 10, username: '', status: '' })
+
+const auth = useAuthStore()
+const hasPerm = (code) => auth.hasPerm(code)
 
 const phonePattern = /^(?:(?:\+?86)?1\d{10})$/
 
@@ -196,12 +201,15 @@ function onCreateSubmit() {
   if (!createFormRef.value) return
   createFormRef.value.validate(async (valid) => {
     if (!valid) return
+    if (!hasPerm('admins:create')) { ElMessage.error('无权限'); return }
     createSubmitting.value = true
     try {
-      await createAdmin({ ...createForm, status: 1 })
+      const payload = { ...createForm, status: 1 }
+      await createAdmin(payload)
       ElMessage.success('新增成功')
       createVisible.value = false
       fetchList()
+      try { await request.post('/audit/events', { module: 'admins', action: 'create', targetId: payload.username, payload, ts: Date.now() }) } catch {}
     } catch (e) { ElMessage.error(e?.msg || e?.message || '新增失败') }
     finally { createSubmitting.value = false }
   })
@@ -222,6 +230,7 @@ function onEditSubmit() {
   if (!editFormRef.value) return
   editFormRef.value.validate(async (valid) => {
     if (!valid) return
+    if (!hasPerm('admins:update')) { ElMessage.error('无权限'); return }
     editSubmitting.value = true
     try {
       const { id, ...payload } = editForm
@@ -244,6 +253,7 @@ function onEditSubmit() {
       } else {
         fetchList()
       }
+      try { await request.post('/audit/events', { module: 'admins', action: 'update', targetId: id, payload, ts: Date.now() }) } catch {}
     } catch (e) { 
       ElMessage.error(e?.msg || e?.message || '保存失败')
       fetchList() // 出错时重新获取列表
@@ -253,8 +263,16 @@ function onEditSubmit() {
 }
 
 function onDelete(row) {
+  if (!hasPerm('admins:delete')) { ElMessage.error('无权限'); return }
   ElMessageBox.confirm(`确认删除管理员「${row.username}」吗？`, '提示', { type: 'warning' })
-    .then(async () => { try { await deleteAdmin(row.id); ElMessage.success('删除成功'); fetchList() } catch (e) { ElMessage.error(e?.msg || e?.message || '删除失败') } })
+    .then(async () => {
+      try {
+        await deleteAdmin(row.id)
+        ElMessage.success('删除成功')
+        fetchList()
+        try { await request.post('/audit/events', { module: 'admins', action: 'delete', targetId: row.id, ts: Date.now() }) } catch {}
+      } catch (e) { ElMessage.error(e?.msg || e?.message || '删除失败') }
+    })
 }
 
 const uiViewMode = inject('ui_view_mode', ref('card'))
@@ -274,5 +292,4 @@ onMounted(() => { fetchRoleOptions(); fetchList() })
 .card-content { font-size:14px; line-height:1.6; padding: 0 16px; display:flex; flex-direction:column; gap:12px }
 .card-actions { display:flex; justify-content:flex-end; gap:8px; padding: 8px 16px }
 </style>
-
 
