@@ -54,7 +54,10 @@
           <button class="action-btn detail-btn full-width" bindtap="viewDetail" data-item="{{item}}">{{i18n.orders.buttons.detail}}</button>
           <button class="action-btn pay-btn" wx:if="{{item.status === '0'}}" bindtap="payNow" data-item="{{item}}">{{i18n.orders.buttons.pay}}</button>
           <button class="action-btn refund-btn" wx:if="{{item.status === '1'}}" bindtap="applyRefund" data-item="{{item}}">{{i18n.orders.buttons.refund}}</button>
-          <text class="progress-tip" wx:if="{{item.status === '3'}}">{{i18n.orders.tips.refunding}}</text>
+          <view wx:if="{{item.status === '3'}}" class="progress-row">
+            <text class="progress-tip">{{i18n.orders.tips.refunding}}</text>
+            <button class="action-btn detail-btn" bindtap="viewRefundStatus" data-item="{{item}}">{{i18n.orders.buttons.progress}}</button>
+          </view>
         </view>
       </view>
     </view>

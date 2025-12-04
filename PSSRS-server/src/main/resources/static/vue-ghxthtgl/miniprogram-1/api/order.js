@@ -17,6 +17,10 @@ function applyRefund(orderNo) {
   return request.post(config.API.APPLY_REFUND, { orderNo })
 }
 
+function getRefundStatus(orderNo) {
+  return request.get(config.API.GET_REFUND_STATUS, { orderNo })
+}
+
 /**
  * 创建挂号订单
  * @param {Number} scheduleId 号源ID
@@ -52,4 +56,5 @@ module.exports = {
   createPayment,
   getOrderList,
   applyRefund
+  ,getRefundStatus
 }

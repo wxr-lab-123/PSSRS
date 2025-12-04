@@ -98,6 +98,13 @@ App({
           wx.setStorageSync('messages', list)
           wx.showModal({ title: '叫号通知', content: text, showCancel: false })
           try { wx.vibrateShort() } catch {}
+        } else if (msg.type === 'REFUND_SUCCEEDED' || msg.type === 'REFUND_FAILED') {
+          const isOk = msg.type === 'REFUND_SUCCEEDED'
+          const text = isOk ? `退款成功：订单 ${msg.orderNo || ''} 金额 ¥${msg.amount || ''}` : `退款失败：订单 ${msg.orderNo || ''}`
+          const list = wx.getStorageSync('messages') || []
+          list.push({ id: `${Date.now()}`, type: msg.type, orderNo: msg.orderNo, amount: msg.amount, timestamp: Date.now(), message: text })
+          wx.setStorageSync('messages', list)
+          wx.showModal({ title: '退款通知', content: text, showCancel: false })
         }
       })
       this.globalData.socket = s

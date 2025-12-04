@@ -81,6 +81,7 @@ module.exports = {
     CREATE_ORDER: '/api/order/create',                   // 创建挂号订单
     CREATE_PAYMENT: '/api/payment/create',               // 创建支付订单
     APPLY_REFUND: '/api/order/refund/apply'              // 申请退款
+    ,GET_REFUND_STATUS: '/api/order/refund/status'       // 退款进度查询
     ,GET_MESSAGES: '/api/user/messages'
     ,UNREAD_COUNT: '/api/user/messages/unread-count'
     ,MARK_MESSAGE_READ: (id) => `/api/user/messages/${id}/read`

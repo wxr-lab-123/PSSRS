@@ -7,7 +7,7 @@ module.exports = {
       selectDate: '选择日期',
       search: '搜索',
       fields: { orderNo: '订单号', createTime: '创建时间', amount: '订单金额', remark: '备注' },
-      buttons: { detail: '查看详情', pay: '立即支付', refund: '申请退款' },
+      buttons: { detail: '查看详情', pay: '立即支付', refund: '申请退款', progress: '查看进度' },
       tips: { refunding: '退款处理中...' },
       empty: '暂无订单记录'
     },
@@ -20,7 +20,7 @@ module.exports = {
       selectDate: 'Select date',
       search: 'Search',
       fields: { orderNo: 'Order No.', createTime: 'Created At', amount: 'Amount', remark: 'Remark' },
-      buttons: { detail: 'View Details', pay: 'Pay Now', refund: 'Request Refund' },
+      buttons: { detail: 'View Details', pay: 'Pay Now', refund: 'Request Refund', progress: 'View Progress' },
       tips: { refunding: 'Refund in progress...' },
       empty: 'No orders'
     },

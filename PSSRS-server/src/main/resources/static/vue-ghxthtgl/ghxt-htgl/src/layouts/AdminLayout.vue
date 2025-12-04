@@ -39,6 +39,10 @@
           <el-icon><List /></el-icon>
           <span>订单管理</span>
         </el-menu-item>
+        <el-menu-item index="/admin/refunds">
+          <el-icon><List /></el-icon>
+          <span>退款审批</span>
+        </el-menu-item>
         <el-menu-item v-if="hasPerm('roles:view')" index="/admin/roles">
           <el-icon><Setting /></el-icon>
           <span>角色权限</span>

@@ -193,6 +193,23 @@ Page({
     })
   },
 
+  // 查看退款进度
+  viewRefundStatus(e) {
+    const { orderNo } = e.currentTarget.dataset.item
+    wx.showLoading({ title: '查询中...' })
+    orderApi.getRefundStatus(orderNo)
+      .then(res => {
+        wx.hideLoading()
+        const data = res || {}
+        const content = `订单号：${data.orderNo || orderNo}\n退款单号：${data.refundNo || '-'}\n状态：${data.status || '未知'}\n金额：¥${Number(data.amount || 0).toFixed(2)}`
+        wx.showModal({ title: '退款进度', content, showCancel: false })
+      })
+      .catch(err => {
+        wx.hideLoading()
+        wx.showToast({ title: err?.msg || err?.message || '查询失败', icon: 'none' })
+      })
+  },
+
   // 搜索
   onDateChange(e) { this.setData({ 'search.date': e.detail.value }) },
   doSearch() { this.setData({ refresherTriggered: true }); this.loadOrders() },

@@ -5,7 +5,11 @@ const { API } = require('../../utils/config.js')
 Page({
   data: {
     messages: [],
-    refresherTriggered: false
+    refresherTriggered: false,
+    page: 1,
+    size: 10,
+    hasMore: true,
+    loading: false
   },
 
   onLoad() {
@@ -13,24 +17,38 @@ Page({
   },
 
   onShow() {
-    this.loadMessages()
+    this.loadMessages({ reset: true })
   },
 
   onRefresh() {
     if (this.data.refresherTriggered) return
     this.setData({ refresherTriggered: true })
-    this.loadMessages()
+    this.loadMessages({ reset: true })
   },
 
-  async loadMessages() {
+  async loadMessages({ reset = false } = {}) {
+    if (this.data.loading) return
+    if (reset) {
+      this.setData({ page: 1, hasMore: true, messages: [] })
+    }
+    if (!this.data.hasMore && !reset) return
+    this.setData({ loading: true })
     let msgs = []
     try {
-      const res = await request.get(API.GET_MESSAGES, { page: 1, size: 50 }, { showLoading: false })
+      const res = await request.get(API.GET_MESSAGES, { page: this.data.page, size: this.data.size }, { showLoading: false })
       msgs = Array.isArray(res?.data?.records) ? res.data.records : (Array.isArray(res?.data?.list) ? res.data.list : (res?.data || []))
+      if (Array.isArray(msgs) && msgs.length < this.data.size) {
+        this.setData({ hasMore: false })
+      }
     } catch (e) {
-      msgs = wx.getStorageSync('messages') || []
+      if (reset) {
+        msgs = wx.getStorageSync('messages') || []
+      } else {
+        msgs = []
+        this.setData({ hasMore: false })
+      }
     }
-    const list = msgs.map(m => {
+    const mapped = msgs.map(m => {
         let raw = {}
         try { raw = JSON.parse(m.content || '{}') } catch(e) { raw = {} }
         raw.type = raw.type || m.messageType
@@ -121,8 +139,12 @@ Page({
           raw,
           read: String(m.status || raw.read) === '已读'
         }
-      }).sort((a,b)=> String(b.raw.timestamp||b.raw.createTime||'').localeCompare(String(a.raw.timestamp||a.raw.createTime||'')))
-    this.setData({ messages: list, refresherTriggered: false })
+      })
+    const map = new Map(this.data.messages.map(i => [i.id, i]))
+    mapped.forEach(i => map.set(i.id, i))
+    const list = Array.from(map.values()).sort((a,b)=> String(b.raw.timestamp||b.raw.createTime||'').localeCompare(String(a.raw.timestamp||a.raw.createTime||'')))
+    const nextPage = this.data.page + (Array.isArray(msgs) && msgs.length > 0 ? 1 : 0)
+    this.setData({ messages: list, refresherTriggered: false, loading: false, page: nextPage })
     try {
       const cnt = await request.get(API.UNREAD_COUNT, {}, { showLoading: false })
       const unread = Number(cnt?.data || 0)
@@ -148,6 +170,11 @@ Page({
       const content = `排班：${item.raw.scheduleId || ''}\n医生：${item.raw.doctorId || ''}\n状态：${item.statusText}\n理由：${item.raw.reason || ''}`
       wx.showModal({ title: '审批结果', content, confirmText: '知道了', showCancel: false })
     }
+    this.loadMessages({ reset: true })
+  },
+
+  onScrollToLower() {
+    if (this.data.loading || !this.data.hasMore) return
     this.loadMessages()
   },
 

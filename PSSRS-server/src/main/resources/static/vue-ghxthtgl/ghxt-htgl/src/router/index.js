@@ -12,6 +12,7 @@ import Admins from '../views/Admins.vue'
 import Schedules from '../views/Schedules.vue'
 import Registrations from '../views/Registrations.vue'
 import Orders from '../views/Orders.vue'
+import Refunds from '../views/Refunds.vue'
 import LeaveApprovals from '../views/LeaveApprovals.vue'
 import Roles from '../views/Roles.vue'
 import Permissions from '../views/Permissions.vue'
@@ -39,6 +40,7 @@ export const routes = [
       { path: 'registrations', name: 'registrations', component: Registrations, meta: { title: '挂号管理', roles: ['ADMIN'], permissions: ['registrations:view'] } },
       { path: 'leave-approvals', name: 'leaveApprovals', component: LeaveApprovals, meta: { title: '请假审批', roles: ['ADMIN'] } },
       { path: 'orders', name: 'orders', component: Orders, meta: { title: '订单管理', roles: ['ADMIN'], permissions: ['orders:view'] } },
+      { path: 'refunds', name: 'refunds', component: Refunds, meta: { title: '退款审批', roles: ['ADMIN'] } },
       { path: 'roles', name: 'roles', component: Roles, meta: { title: '角色权限', roles: ['ADMIN'], permissions: ['roles:view'] } },
       { path: 'permissions', name: 'permissions', component: Permissions, meta: { title: '权限管理', roles: ['ADMIN'], permissions: ['permissions:view'] } },
       { path: 'settings', name: 'settings', component: Settings, meta: { title: '个人信息设置', roles: ['ADMIN'] } }

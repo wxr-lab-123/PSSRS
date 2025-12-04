@@ -2,17 +2,21 @@
 
 <view class="container">
   <view wx:if="{{messages.length===0}}" class="empty">暂无消息</view>
-  <scroll-view wx:else scroll-y class="list" refresher-enabled="true" refresher-triggered="{{refresherTriggered}}" bindrefresherrefresh="onRefresh">
+  <scroll-view wx:else scroll-y class="list" refresher-enabled="true" refresher-triggered="{{refresherTriggered}}" bindrefresherrefresh="onRefresh" bindscrolltolower="onScrollToLower">
     <block wx:for="{{messages}}" wx:key="id">
       <view class="item" bindtap="openMsg" data-item="{{item}}">
         <view class="row">
           <text class="title">{{item.title}}</text>
-          <text class="status {{item.statusClass}}">{{item.statusText}}</text>
+          <view class="badges">
+            <text class="read-flag {{item.read ? 'read' : 'unread'}}">{{item.read ? '已读' : '未读'}}</text>
+            <text class="status {{item.statusClass}}">{{item.statusText}}</text>
+          </view>
         </view>
         <view class="sub">{{item.subtitle}}</view>
         <view class="time">{{item.timeText}}</view>
       </view>
     </block>
+    <view class="bottom-gap"></view>
   </scroll-view>
 
   <view class="actions" wx:if="{{messages.length>0}}">
