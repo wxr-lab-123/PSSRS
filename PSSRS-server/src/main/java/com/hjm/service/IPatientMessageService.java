@@ -7,9 +7,10 @@ import com.hjm.result.Result;
 
 import java.util.List;
 
+
 public interface IPatientMessageService extends IService<PatientMessage> {
     void saveForPatients(List<Long> patientIds, String type, String content, Long doctorId);
-    PageResult listByPatient(Long patientId, Long page, Long size, String status);
-    Result markRead(Long patientId, Long id);
-    Result<Long> unreadCount(Long patientId);
+    PageResult listByPatient(Long userPatientId, Long page, Long size, String status);
+    Result markRead(Long userPatientId, Long id);
+    Result<Long> unreadCount(Long patientId, Long userPatientId);
 }

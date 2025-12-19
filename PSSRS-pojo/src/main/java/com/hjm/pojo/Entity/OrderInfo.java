@@ -39,6 +39,9 @@ public class OrderInfo implements Serializable {
     @ApiModelProperty(value = "患者ID")
     private Long patientId;
 
+    @ApiModelProperty(value = "所属用户ID(user_patient表)")
+    private Long userPatientId;
+
     @ApiModelProperty(value = "对应的号源ID")
     private Long scheduleId;
 

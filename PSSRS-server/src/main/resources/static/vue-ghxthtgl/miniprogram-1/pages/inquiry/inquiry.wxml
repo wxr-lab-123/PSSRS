@@ -2,12 +2,6 @@
 <navigation-bar title="我的挂号" back="{{true}}" color="white" background="#a8edea"></navigation-bar>
 <scroll-view class="scrollarea" scroll-y type="list">
   <view class="container">
-    <view class="query-tabs">
-      <view 
-        class="tab-item active">
-        挂号记录
-      </view>
-    </view>
 
     <!-- 挂号记录 -->
     <view class="content-section">
@@ -20,11 +14,12 @@
               <text class="record-title">{{item.department}} - {{item.doctor}}</text>
               <text class="record-status pending">{{item.statusText}}</text>
             </view>
-            <view class="record-info">
-              <text class="info-item">就诊时间：{{item.time}}</text>
-              <text class="info-item">挂号费：¥{{item.fee}}</text>
-              <text class="info-item">就诊号：{{item.number}}</text>
-            </view>
+      <view class="record-info">
+        <text class="info-item">就诊人：{{item.patientName}}</text>
+        <text class="info-item">就诊时间：{{item.time}}</text>
+        <text class="info-item">挂号费：¥{{item.fee}}</text>
+        <text class="info-item">就诊号：{{item.number}}</text>
+      </view>
             <view class="record-actions">
               <button class="action-btn cancel-btn" bindtap="cancelAppointment" data-id="{{item.id}}">取消</button>
               <button class="action-btn detail-btn" bindtap="viewDetails" data-id="{{item.id}}">查看详情</button>
@@ -42,11 +37,12 @@
               <text class="record-title">{{item.department}} - {{item.doctor}}</text>
               <text class="record-status completed">{{item.statusText}}</text>
             </view>
-            <view class="record-info">
-              <text class="info-item">就诊时间：{{item.time}}</text>
-              <text class="info-item">挂号费：¥{{item.fee}}</text>
-              <text class="info-item">就诊号：{{item.number}}</text>
-            </view>
+      <view class="record-info">
+        <text class="info-item">就诊人：{{item.patientName}}</text>
+        <text class="info-item">就诊时间：{{item.time}}</text>
+        <text class="info-item">挂号费：¥{{item.fee}}</text>
+        <text class="info-item">就诊号：{{item.number}}</text>
+      </view>
             <view class="record-actions">
               <button class="action-btn detail-btn full-width" bindtap="viewDetails" data-id="{{item.id}}">查看详情</button>
             </view>
@@ -63,11 +59,12 @@
               <text class="record-title">{{item.department}} - {{item.doctor}}</text>
               <text class="record-status cancelled">{{item.statusText}}</text>
             </view>
-            <view class="record-info">
-              <text class="info-item">就诊时间：{{item.time}}</text>
-              <text class="info-item">挂号费：¥{{item.fee}}</text>
-              <text class="info-item">就诊号：{{item.number}}</text>
-            </view>
+      <view class="record-info">
+        <text class="info-item">就诊人：{{item.patientName}}</text>
+        <text class="info-item">就诊时间：{{item.time}}</text>
+        <text class="info-item">挂号费：¥{{item.fee}}</text>
+        <text class="info-item">就诊号：{{item.number}}</text>
+      </view>
             <view class="record-actions">
               <button class="action-btn detail-btn full-width" bindtap="viewDetails" data-id="{{item.id}}">查看详情</button>
             </view>

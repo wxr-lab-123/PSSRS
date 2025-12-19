@@ -2,6 +2,7 @@ package com.hjm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hjm.mapper.StaffMessageMapper;
 import com.hjm.pojo.Entity.StaffMessage;
 import com.hjm.result.PageResult;
@@ -15,14 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class StaffMessageServiceImpl implements IStaffMessageService {
+public class StaffMessageServiceImpl extends ServiceImpl<StaffMessageMapper, StaffMessage> implements IStaffMessageService {
 
     @Resource
     private StaffMessageMapper staffMessageMapper;
 
     @Override
     public Result<Long> countUnread(Long doctorId) {
-        try { return Result.success(staffMessageMapper.countUnreadByDoctorId(doctorId)); } catch (Exception e) { return Result.success(0L); }
+        try {
+            return Result.success(staffMessageMapper.countUnreadByDoctorId(doctorId)); }
+        catch (Exception e)
+        {
+            return Result.success(0L);
+        }
     }
 
     @Override
@@ -40,8 +46,16 @@ public class StaffMessageServiceImpl implements IStaffMessageService {
             params.put("q", q);
             params.put("offset", offset);
             params.put("size", s);
-            total = staffMessageMapper.selectCount(new QueryWrapper<StaffMessage>().eq("receiver_id", doctorId).eq("is_deleted", 0));
-            rows = staffMessageMapper.selectList(new QueryWrapper<StaffMessage>().eq("receiver_id", doctorId).eq("is_deleted", 0).orderByDesc("pinned","create_time").last("LIMIT "+offset+","+s));
+            total = staffMessageMapper.selectCount(
+                    new QueryWrapper<StaffMessage>()
+                            .eq("receiver_id", doctorId)
+                    .eq("is_deleted", 0));
+            rows = staffMessageMapper.selectList(
+                    new QueryWrapper<StaffMessage>()
+                            .eq("receiver_id", doctorId)
+                    .eq("is_deleted", 0)
+                    .orderByDesc("pinned","create_time")
+                    .last("LIMIT "+offset+","+s));
         } catch (Exception e) {
             total = 0L;
             rows = new ArrayList<>();
@@ -52,14 +66,16 @@ public class StaffMessageServiceImpl implements IStaffMessageService {
     @Override
     public Result markRead(Long id, Long doctorId) {
         try {
-            UpdateWrapper<StaffMessage> uw = new UpdateWrapper<>();
-            uw.lambda()
-                    .eq(StaffMessage::getMessageId, id)
-                    .eq(StaffMessage::getReceiverId, doctorId)
-                    .eq(StaffMessage::getIsDeleted, 0)
-                    .set(StaffMessage::getStatus, "已读")
-                    .set(StaffMessage::getReadTime, LocalDateTime.now());
-            staffMessageMapper.update(null, uw);
+            StaffMessage message =  getById( id);
+            if (message == null) return Result.error("消息不存在");
+            if (!message.getReceiverId().equals(doctorId)) return Result.error("无权操作");
+            UpdateWrapper<StaffMessage> u = new UpdateWrapper<>();
+            u.eq("message_id", id)
+                    .eq("receiver_id", doctorId)
+                    .eq("status", "未读")
+                    .set("status", "已读")
+                    .set("read_time", LocalDateTime.now());
+            update(u);
             return Result.success();
         } catch (Exception e) { return Result.error("操作失败"); }
     }

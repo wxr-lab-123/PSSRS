@@ -20,8 +20,8 @@
     </template>
 
     <el-table :data="rows" :loading="loading" style="width:100%">
-      <el-table-column prop="refundNo" label="退款单号" width="180" />
-      <el-table-column prop="orderNo" label="订单号" width="180" />
+      <el-table-column prop="refundNo" label="退款单号" min-width="220" />
+      <el-table-column prop="orderNo" label="订单号" min-width="220" />
       <el-table-column prop="amount" label="金额" width="120">
         <template #default="{ row }">{{ Number(row.amount || 0).toFixed(2) }}</template>
       </el-table-column>

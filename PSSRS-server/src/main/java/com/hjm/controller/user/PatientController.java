@@ -3,14 +3,21 @@ package com.hjm.controller.user;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.hjm.context.PatientContext;
+import com.hjm.context.UserPatientContext;
 import com.hjm.exception.PatientException;
 import com.hjm.pojo.DTO.*;
 import com.hjm.pojo.Entity.Patient;
-import com.hjm.pojo.VO.PatientInfoVO;
+import com.hjm.pojo.DTO.UserPatientDTO;
+import com.hjm.pojo.Entity.UserPatient;
 import com.hjm.result.Result;
 import com.hjm.service.IPatientService;
+import com.hjm.service.IUserPatientService;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
@@ -30,13 +37,16 @@ import java.util.Map;
 public class PatientController {
 
     private final IPatientService patientService;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+    private final IUserPatientService userPatientService;
     /**
      * 发送手机验证码
      */
     @RequestMapping("/sms/sendRegisterCode")
     public Result sendCode(@RequestParam("phone") String phone) {
-        // 发送短信验证码并保存验证码
-        return patientService.sendCode(phone);
+        patientService.sendCode(phone);
+        return Result.success("发送成功");
     }
 
     /**
@@ -45,9 +55,7 @@ public class PatientController {
      */
     @PostMapping("/user/login")
     public Result login(@RequestBody PatientLoginDTO patientLoginDTO){
-        //  实现登录功能
-
-        return patientService.login(patientLoginDTO);
+        return Result.error("不支持该登录方式，请使用微信登录");
     }
 
     /**
@@ -55,17 +63,13 @@ public class PatientController {
      */
     @PostMapping("/user/register")
     public Result register(@RequestBody PatientRegisterDTO patientRegisterDTO) {
-        return patientService.patientRegister(patientRegisterDTO);
+        return Result.error("不支持注册，请直接使用微信登录");
     }
 
     @GetMapping("/user/info")
-    public Result<PatientInfoVO> getCurrentPatient() {
-        PatientDTO patient = PatientContext.getPatient();
-        Long patientId = patient.getId() ;
-        Patient patientInfo = patientService.getById(patientId);
-        PatientInfoVO patientInfoVO = BeanUtil.copyProperties(patientInfo, PatientInfoVO.class);
-        patientInfoVO.setPatientId(patientId); // Fixed method name
-        return Result.success(patientInfoVO);
+    public Result<UserPatient> getCurrentPatient() {
+        Long userpId = UserPatientContext.get().getId();
+        return Result.success(userPatientService.getById(userpId));
     }
 
     @PutMapping("/user/update")
@@ -73,6 +77,22 @@ public class PatientController {
         Patient patient = BeanUtil.copyProperties(patientUpdateDTO, Patient.class);
         patient.setId(PatientContext.getPatient().getId());
         patientService.updateById(patient);
+        try {
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            String token = null;
+            if (attrs != null) {
+                token = attrs.getRequest().getHeader("authorization");
+                if (token == null || token.isBlank()) token = attrs.getRequest().getHeader("Authorization");
+            }
+            if (token != null && !token.isBlank()) {
+                Map<String, String> map = new HashMap<>();
+                map.put("id", String.valueOf(PatientContext.getPatient().getId()));
+                map.put("name", patient.getName() == null ? "" : String.valueOf(patient.getName()));
+                map.put("phone", patient.getPhone() == null ? "" : String.valueOf(patient.getPhone()));
+                stringRedisTemplate.opsForHash().putAll(com.hjm.constant.RedisConstants.LOGIN_USER_KEY + token, map);
+                stringRedisTemplate.expire(com.hjm.constant.RedisConstants.LOGIN_USER_KEY + token, com.hjm.constant.RedisConstants.LOGIN_USER_TTL, java.util.concurrent.TimeUnit.MINUTES);
+            }
+        } catch (Exception ignored) {}
         return   Result.success();
     }
 
@@ -103,6 +123,17 @@ public class PatientController {
     @PostMapping("/user/logout")
     public Result logout() {
         PatientContext.removePatient();
+        try {
+            ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            String token = null;
+            if (attrs != null) {
+                token = attrs.getRequest().getHeader("authorization");
+                if (token == null || token.isBlank()) token = attrs.getRequest().getHeader("Authorization");
+            }
+            if (token != null && !token.isBlank()) {
+                stringRedisTemplate.delete(com.hjm.constant.RedisConstants.LOGIN_USER_KEY + token);
+            }
+        } catch (Exception ignored) {}
         return Result.success("登出成功");
     }
 
@@ -113,7 +144,7 @@ public class PatientController {
     }
     @PostMapping("/user/resetPassword")
     public Result resetPwd(@RequestBody PatientResetPwdDTO patientResetPwdDTO) {
-        return patientService.resetPwd(patientResetPwdDTO);
+        return Result.error("不支持密码重置，请使用微信登录");
     }
 
 }

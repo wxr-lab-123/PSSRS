@@ -6,6 +6,7 @@ import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -18,11 +19,14 @@ import java.util.List;
  */
 public interface IOrderInfoService extends IService<OrderInfo> {
 
-    Result createOrder(Integer scheduleId);
+    Result createOrder(Integer scheduleId, Long patientId);
 
     OrderInfo getByOrderNo(String orderNo);
 
-    List<OrderInfo> listByPId(Long patientId, Integer status, LocalDate startDate);
+    List<OrderInfo> listByPId(Long userPatientId, Integer status, LocalDate startDate);
 
     Result<PageResult> listByPage(String orderNo, Integer status, LocalDate startDate, LocalDate endDate, Integer page, Integer size, String patientName);
+
+
+    void cleanOutTimeOrder(LocalDateTime now);
 }

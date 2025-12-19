@@ -1,0 +1,293 @@
+/* pages/patients/patients.wxss */
+page {
+  background: #f7f8fa;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollarea {
+  flex: 1;
+  overflow-y: hidden;
+}
+
+.container { 
+  padding: 30rpx; 
+}
+
+.header { 
+  display: flex; 
+  justify-content: flex-end; 
+  margin-bottom: 30rpx; 
+}
+
+.add-btn {
+  background: linear-gradient(135deg, #1e90ff, #0056b3);
+  color: #fff;
+  border-radius: 40rpx;
+  padding: 0 40rpx;
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 30rpx;
+  box-shadow: 0 8rpx 16rpx rgba(30, 144, 255, 0.25);
+  font-weight: 500;
+  border: none;
+}
+
+.add-btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.empty { 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 120rpx;
+}
+
+.empty-img {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+  color: #dcdfe6;
+}
+
+.empty-text {
+  color: #909399;
+  font-size: 28rpx;
+}
+
+.card { 
+  background: #fff; 
+  border-radius: 24rpx; 
+  padding: 32rpx; 
+  margin-bottom: 24rpx; 
+  box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 24rpx;
+  border-bottom: 1rpx solid #f0f2f5;
+  padding-bottom: 20rpx;
+}
+
+.name-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.name { 
+  font-size: 36rpx; 
+  font-weight: 600; 
+  color: #333; 
+}
+
+.tag {
+  font-size: 22rpx;
+  color: #1e90ff;
+  background: rgba(30, 144, 255, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
+}
+
+.card-body {
+  margin-bottom: 24rpx;
+}
+
+.info-row { 
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.label {
+  font-size: 26rpx;
+  color: #909399;
+  width: 140rpx;
+}
+
+.value {
+  font-size: 28rpx;
+  color: #606266;
+  font-family: monospace;
+  letter-spacing: 1rpx;
+}
+
+.actions { 
+  display: flex; 
+  gap: 20rpx; 
+  justify-content: flex-end;
+}
+
+.btn-action {
+  margin: 0;
+  font-size: 26rpx;
+  padding: 0 30rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 32rpx;
+}
+
+.btn-edit {
+  background: #f2f3f5;
+  color: #606266;
+}
+
+.btn-delete {
+  background: #fff0f0;
+  color: #ff4d4f;
+}
+
+.btn-primary {
+  background: #e6f7ff;
+  color: #1e90ff;
+}
+
+/* 弹窗样式 */
+.modal { 
+  position: fixed; 
+  left: 0; 
+  right: 0; 
+  top: 0; 
+  bottom: 0; 
+  background: rgba(0,0,0,0.6); 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-body { 
+  background: #fff; 
+  width: 80%; 
+  border-radius: 32rpx; 
+  padding: 40rpx; 
+  transform: translateY(20rpx);
+  transition: transform 0.3s;
+}
+
+.modal.show .modal-body {
+  transform: translateY(0);
+}
+
+.modal-title {
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: 600;
+  margin-bottom: 40rpx;
+  color: #333;
+}
+
+.form-item { 
+  margin-bottom: 30rpx; 
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 16rpx;
+  display: block;
+  font-weight: 500;
+}
+
+.input-box {
+  background: #f7f8fa;
+  height: 88rpx;
+  border-radius: 16rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.radio-group {
+  display: flex;
+  gap: 30rpx;
+  flex-wrap: wrap;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  font-size: 28rpx;
+  color: #606266;
+}
+
+.radio-item {
+  transform: scale(0.8);
+  margin-right: 6rpx;
+}
+
+.modal-footer { 
+  display: flex; 
+  gap: 24rpx; 
+  margin-top: 50rpx; 
+}
+
+.modal-btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 30rpx;
+  border-radius: 44rpx;
+  border: none;
+  margin: 0;
+}
+
+.btn-cancel {
+  background: #f5f7fa;
+  color: #606266;
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #1e90ff, #0056b3);
+  color: #fff;
+  box-shadow: 0 6rpx 16rpx rgba(30, 144, 255, 0.2);
+}
+
+.input-box.disabled {
+  background: #ebeef5;
+  color: #909399;
+}
+
+.verify-row {
+  display: flex;
+  gap: 20rpx;
+}
+
+.verify-input {
+  flex: 1;
+}
+
+.verify-btn {
+  width: 240rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 28rpx;
+  padding: 0;
+  background: #e6f7ff;
+  color: #1e90ff;
+  border-radius: 16rpx;
+  border: none;
+}
+
+.verify-btn.disabled {
+  background: #f5f7fa;
+  color: #c0c4cc;
+}

@@ -29,6 +29,88 @@ page {
   margin-bottom: 20rpx;
 }
 
+/* 就诊人选择 */
+.patient-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.patient-list {
+  display: inline-flex;
+  gap: 20rpx;
+  padding-right: 20rpx;
+}
+
+.patient-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 30rpx;
+  background: #f8f9fa;
+  border-radius: 12rpx;
+  border: 2rpx solid transparent;
+  min-width: 160rpx;
+}
+
+.patient-item.active {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  border-color: #1890ff;
+}
+
+.patient-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.patient-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.patient-item.active .patient-name {
+  color: white;
+}
+
+.patient-relation {
+  font-size: 22rpx;
+  color: #666;
+  padding: 2rpx 10rpx;
+  background: rgba(0,0,0,0.05);
+  border-radius: 20rpx;
+}
+
+.patient-item.active .patient-relation {
+  color: #1890ff;
+  background: white;
+}
+
+.patient-add-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 30rpx;
+  background: #fff;
+  border-radius: 12rpx;
+  border: 2rpx dashed #d9d9d9;
+  min-width: 120rpx;
+}
+
+.add-icon {
+  font-size: 36rpx;
+  color: #999;
+  line-height: 1;
+  margin-bottom: 5rpx;
+}
+
+.add-text {
+  font-size: 24rpx;
+  color: #999;
+}
+
 /* 日期选择 */
 .date-scroll {
   width: 100%;

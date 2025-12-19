@@ -1,5 +1,5 @@
 <!--pages/take-number/take-number.wxml-->
-<navigation-bar title="预约取号" back="{{true}}" color="white" background="#fa709a"></navigation-bar>
+<navigation-bar title="预约取号" back="{{true}}" color="white" background="#1e90ff"></navigation-bar>
 <scroll-view class="scrollarea" scroll-y type="list">
   <view class="container">
 

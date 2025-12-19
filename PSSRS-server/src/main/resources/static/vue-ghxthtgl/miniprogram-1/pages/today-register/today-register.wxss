@@ -33,6 +33,12 @@ page {
   color: #1890ff;
 }
 
+/* 就诊人选择栏 */
+.patient-bar { display:flex; align-items:center; gap: 12rpx; background:#fff; border-radius:16rpx; padding: 20rpx; margin-bottom: 20rpx; }
+.patient-label { color:#666; font-size:26rpx; }
+.patient-name { color:#333; font-size:28rpx; font-weight:600; }
+.patient-btn { background:#1890ff; color:#fff; border-radius:12rpx; padding: 8rpx 16rpx; }
+
 /* 主内容区域 - 左右布局 */
 .main-content {
   flex: 1;

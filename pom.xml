@@ -97,6 +97,13 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!--redisson-->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.13.6</version>
+        </dependency>
+
 
 
     </dependencies>
@@ -115,6 +122,16 @@
 <!--                    </excludes>-->
 <!--                </configuration>-->
 <!--            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <retryOnError>true</retryOnError>
+                    <followSymLinks>false</followSymLinks>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

@@ -1,6 +1,5 @@
 package com.hjm.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hjm.pojo.DTO.PatientLoginDTO;
 import com.hjm.pojo.DTO.PatientRegisterDTO;
@@ -9,8 +8,6 @@ import com.hjm.pojo.Entity.Patient;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import org.springframework.stereotype.Service;
-
-import javax.servlet.http.HttpSession;
 
 /**
  * <p>
@@ -32,4 +29,6 @@ public interface IPatientService extends IService<Patient> {
     PageResult list(Integer page, Integer size, String name, String phone, String gender);
 
     Result resetPwd(PatientResetPwdDTO patientResetPwdDTO);
+
+    Result createPatient(PatientRegisterDTO p);
 }

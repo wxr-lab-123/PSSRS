@@ -26,7 +26,7 @@
     </template>
 
     <el-table v-if="!isCardView" :data="rows" :loading="loading" style="width:100%">
-      <el-table-column prop="orderNo" label="订单号" width="170" />
+      <el-table-column prop="orderNo" label="订单号" min-width="220" />
       <el-table-column prop="patientName" label="患者" min-width="120" />
       <el-table-column prop="amount" label="金额" width="100">
         <template #default="{ row }">{{ Number(row.amount || 0).toFixed(2) }}</template>

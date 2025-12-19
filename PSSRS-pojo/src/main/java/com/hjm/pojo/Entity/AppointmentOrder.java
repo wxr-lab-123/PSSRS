@@ -40,6 +40,9 @@ public class AppointmentOrder implements Serializable {
     @ApiModelProperty(value = "患者ID（patient表）")
     private Long patientId;
 
+    @ApiModelProperty(value = "所属用户ID(user_patient表)")
+    private Long userPatientId;
+
     @ApiModelProperty(value = "医生档案ID（doctor_profile表）")
     private Long doctorId;
 

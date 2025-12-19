@@ -15,7 +15,10 @@ Page({
     departments: [],
     doctors: [],
     showModal: false,
-    selectedDoctor: null
+    selectedDoctor: null,
+    patients: [],
+    selectedPatientId: null,
+    selectedPatientName: null
   },
 
   onLoad() {
@@ -27,6 +30,7 @@ Page({
     if (this.data.selectedDept) {
       this.loadDoctors(this.data.selectedDept)
     }
+    this.loadPatients()
   },
 
   // 设置当前日期
@@ -81,6 +85,32 @@ Page({
         console.error('获取医生列表失败:', err)
       })
   },
+
+  // 加载就诊人列表
+  loadPatients() {
+    const token = wx.getStorageSync('token')
+    if (!token) return
+    userApi.listPatients()
+      .then(res => {
+        const list = Array.isArray(res?.data) ? res.data : []
+        const selected = this.data.selectedPatientId || (list[0]?.id || null)
+        const selectedName = selected ? ((list.find(p=>p.id===selected) || {}).name || null) : null
+        this.setData({ patients: list, selectedPatientId: selected, selectedPatientName: selectedName })
+      })
+      .catch(() => {})
+  },
+
+  choosePatient() {
+    const list = this.data.patients
+    if (!list || list.length === 0) {
+      wx.showModal({ title: '请先添加就诊人', content: '需要先绑定至少一个就诊人', confirmText: '去添加', success: r=>{ if (r.confirm) wx.navigateTo({ url: '/pages/patients/patients' }) } })
+      return
+    }
+    const names = list.map(p=>`${p.name}${p.relation?`(${p.relation})`:''}`)
+    wx.showActionSheet({ itemList: names, success: r=>{ const idx=r.tapIndex; const item=list[idx]; const pid=item?.id; if (pid) this.setData({ selectedPatientId: pid, selectedPatientName: item?.name || null }) } })
+  },
+
+  goManage() { wx.navigateTo({ url: '/pages/patients/patients' }) },
 
   // 选择医生，显示详情弹窗
   selectDoctor(e) {
@@ -194,14 +224,24 @@ Page({
 
         wx.showLoading({ title: '挂号中...' })
 
-        // 只传 scheduleId，由后端根据排班和登录用户创建订单并计算金额
         const scheduleId = doctorData.id
         if (!scheduleId && scheduleId !== 0) {
           console.error('排班ID缺失，当前值:', scheduleId)
           throw new Error('排班ID缺失')
         }
 
-        return orderApi.createOrder(scheduleId)
+        if (!this.data.selectedPatientId) {
+          const list = this.data.patients
+          if (!list || list.length === 0) {
+            wx.showModal({ title: '请先添加就诊人', content: '需要先绑定至少一个就诊人', confirmText: '去添加', success: r=>{ if (r.confirm) wx.navigateTo({ url: '/pages/patients/patients' }) } })
+            throw new Error('请选择就诊人')
+          }
+          const names = list.map(p=>`${p.name} (${p.relation||''})`)
+          return new Promise((resolve, reject) => {
+            wx.showActionSheet({ itemList: names, success: r=>{ const idx=r.tapIndex; const pid=list[idx]?.id; if (pid){ this.setData({ selectedPatientId: pid }); resolve(orderApi.createOrder(scheduleId, pid)) } else { reject(new Error('未选择就诊人')) } }, fail: ()=> reject(new Error('未选择就诊人')) })
+          })
+        }
+        return orderApi.createOrder(scheduleId, this.data.selectedPatientId)
       })
       .then(res => {
         console.log('挂号接口成功返回，准备显示Toast', res)
@@ -221,10 +261,8 @@ Page({
 
         // 构建订单数据，使用后端返回的订单信息
         const rawUserInfo = wx.getStorageSync('userInfo') || {}
-        const local = validateUserInfo({
-          name: rawUserInfo.name,
-          phone: rawUserInfo.phone
-        })
+        const sel = (this.data.patients || []).find(p=>p.id===this.data.selectedPatientId) || {}
+        const local = { normalized: { name: sel.name || rawUserInfo.name, phone: sel.phone || rawUserInfo.phone } }
       const data = res.data || {}
       const orderData = {
           orderNo: data.orderNo,
@@ -250,7 +288,7 @@ Page({
             url: `/pages/payment/payment?orderData=${encodeURIComponent(JSON.stringify(orderData))}`
           })
         }, 1000)
-        try { request.post('/api/audit/events', { module: 'registration', action: 'createOrder', targetId: data.orderNo, payload: orderData, ts: Date.now() }, { showLoading: false }) } catch {}
+        // 已移除审计上报接口调用
         
         // 重新加载医生列表
         this.loadDoctors(this.data.selectedDept)

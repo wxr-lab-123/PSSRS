@@ -9,7 +9,8 @@ export function countUnread() {
 }
 
 export function markRead(id) {
-  return request.put(`/messages/${id}/read`)
+  const sid = encodeURIComponent(String(id))
+  return request.put(`/messages/${sid}/read`)
 }
 
 export function createAnnouncement(payload) {

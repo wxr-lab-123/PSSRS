@@ -41,9 +41,11 @@ Page({
             statusText = '已取消'
           }
 
+          const realOrderNo = item.visitNumber || item.orderNo
           return {
             id: item.id,
-            orderNo: item.orderNo,
+            orderNo: realOrderNo,
+            displayOrderNo: status === 'paid' ? '请先取号' : realOrderNo,
             registrationNo: item.registrationNo,
             patientName: item.patientName,
             department: item.departmentName,
@@ -109,12 +111,13 @@ Page({
 
               // 只更新当前取号的预约项状态，确保UI即时响应
               const appointments = this.data.appointments.map(appointment => {
-                // 精确匹配当前操作的预约项
-                if (appointment.id === item.id && appointment.orderNo === item.orderNo) {
+                // 使用 registrationNo 进行唯一匹配
+                if (appointment.registrationNo === item.registrationNo) {
                   return {
                     ...appointment,
                     status: 'taken',
-                    statusText: '已就诊' // 与初始加载时状态码2的映射保持一致
+                    statusText: '已就诊', // 与初始加载时状态码2的映射保持一致
+                    displayOrderNo: appointment.orderNo
                   }
                 }
                 return appointment

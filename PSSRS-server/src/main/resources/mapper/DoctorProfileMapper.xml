@@ -11,5 +11,16 @@
         </set>
         WHERE user_id = #{userId}
     </update>
+    <select id="getProfile" resultType="com.hjm.pojo.VO.UserProfileVO">
+        select
+            u.username,
+            u.phone,
+            u.gender as sex,
+            u.age,
+            df.title,
+            df.image
+            from user u left join doctor_profile df on u.id = df.user_id
+        where  u.id = #{userId}
+    </select>
 
 </mapper>

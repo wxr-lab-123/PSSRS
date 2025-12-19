@@ -63,6 +63,10 @@ function updateUserInfo(data) {
   return request.put(config.API.UPDATE_USER_INFO, data)
 }
 
+function updateUserProfile(data) {
+  return request.put(config.API.UPDATE_USER_PROFILE, data)
+}
+
 /**
  * 后端检测用户信息是否完善
  * 后端根据当前登录态识别用户，不需要传 id
@@ -109,7 +113,13 @@ module.exports = {
   logout,
   getUserInfo,
   updateUserInfo,
+  updateUserProfile,
   checkUserInfo,
   changePassword,
-  resetPassword
+  resetPassword,
+  listPatients: () => request.get(config.API.USER_PATIENTS),
+  addPatient: (data) => request.post(config.API.USER_PATIENTS, data),
+  updatePatient: (id, data) => request.put(`${config.API.USER_PATIENTS}/${id}`, data),
+  deletePatient: (id) => request.del(`${config.API.USER_PATIENTS}/${id}`),
+  switchPatient: (patientId) => request.post(config.API.SWITCH_PATIENT, { patientId })
 }

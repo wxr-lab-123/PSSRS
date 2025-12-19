@@ -38,7 +38,6 @@ public class PatientController {
     public Result save(@RequestBody PatientAdminSaveDTO patientAdminSaveDTO) {
         Patient patient = BeanUtil.copyProperties(patientAdminSaveDTO, Patient.class);
         //md5加密
-        patient.setPassword(DigestUtils.md5DigestAsHex(DEFAULT_PASSWORD.getBytes()));
         patientService.save(patient);
         return Result.success();
     }

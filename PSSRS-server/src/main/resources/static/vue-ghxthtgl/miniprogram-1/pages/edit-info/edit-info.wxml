@@ -5,37 +5,12 @@
   <view class="form-card">
     <view class="form-section">
       <view class="form-item">
-        <text class="form-label">姓名</text>
+        <text class="form-label">昵称</text>
         <input 
           class="form-input" 
-          placeholder="请输入姓名" 
-          value="{{name}}"
-          bindinput="onNameInput"
-        />
-      </view>
-
-      <picker 
-        mode="selector" 
-        range="{{genderOptions}}" 
-        value="{{genderIndex}}"
-        bindchange="onGenderChange"
-      >
-        <view class="form-item">
-          <text class="form-label">性别</text>
-          <text class="form-input {{gender === 0 || gender === 1 ? '' : 'placeholder'}}">{{gender === 0 ? '男' : gender === 1 ? '女' : '请选择性别'}}</text>
-          <text class="form-arrow">›</text>
-        </view>
-      </picker>
-
-      <view class="form-item">
-        <text class="form-label">年龄</text>
-        <input 
-          class="form-input" 
-          placeholder="请输入年龄" 
-          type="number"
-          maxlength="3"
-          value="{{age}}"
-          bindinput="onAgeInput"
+          placeholder="请输入昵称" 
+          value="{{nickname}}"
+          bindinput="onNicknameInput"
         />
       </view>
 
@@ -52,15 +27,15 @@
       </view>
 
       <view class="form-item disabled">
-        <text class="form-label">身份证号</text>
-        <text class="form-value">{{idCard}}</text>
+        <text class="form-label">注册时间</text>
+        <text class="form-value">{{createTime || '暂无'}}</text>
         <text class="form-tip">不可修改</text>
       </view>
     </view>
 
     <view class="tips-section">
       <text class="tips-title">温馨提示</text>
-      <text class="tips-text">• 身份证号注册后不可修改</text>
+      <text class="tips-text">• 昵称用于展示与沟通</text>
       <text class="tips-text">• 修改手机号后请使用新手机号登录</text>
       <text class="tips-text">• 请确保信息真实有效</text>
     </view>

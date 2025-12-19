@@ -6,6 +6,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hjm.constant.RedisConstants;
+import com.hjm.context.UserPatientContext;
 import com.hjm.exception.AccountNotFoundException;
 import com.hjm.mapper.PatientMapper;
 import com.hjm.pojo.DTO.PatientDTO;
@@ -75,9 +76,7 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         if (patient == null) {
             throw new AccountNotFoundException("用户不存在");
         }
-        if (!patient.getPassword().equals(DigestUtils.md5DigestAsHex(patientLoginDTO.getPassword().getBytes()))) {
-            throw new AccountNotFoundException("密码错误");
-        }
+
         // 保存用户信息到redis
         // 生成token,作为登录凭证
         String token = UUID.randomUUID().toString();
@@ -121,8 +120,8 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         }
         Patient patient = new Patient();
         BeanUtil.copyProperties(patientRegisterDTO, patient);
-        String password = patient.getPassword();
-        patient.setPassword(DigestUtils.md5DigestAsHex(password.getBytes()));
+//        String password = patient.getPassword();
+//        patient.setPassword(DigestUtils.md5DigestAsHex(password.getBytes()));
         patient.setAge(getAgeByIdCard(patient.getIdCard()));
         save(patient);
         stringRedisTemplate.delete(RedisConstants.LOGIN_CODE_KEY + patientRegisterDTO.getPhone());
@@ -161,10 +160,40 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
         if (patient == null) {
             return Result.error("用户不存在");
         }
-        patient.setPassword(DigestUtils.md5DigestAsHex(patientResetPwdDTO.getNewPassword().getBytes()));
+       // patient.setPassword(DigestUtils.md5DigestAsHex(patientResetPwdDTO.getNewPassword().getBytes()));
         updateById(patient);
         stringRedisTemplate.delete(RedisConstants.LOGIN_CODE_KEY + patientResetPwdDTO.getPhone());
         return Result.success();
+    }
+
+    @Override
+    public Result createPatient(PatientRegisterDTO p) {
+        String phone = p.getPhone();
+        Patient isExist = getOne(new QueryWrapper<Patient>().eq("phone", phone));
+        if (isExist != null) {
+            return Result.error("手机号已存在");
+        }
+        if (p == null) {
+            return Result.error("参数错误");
+        }
+        if (p == null) {
+            return Result.error("参数错误");
+        }
+        if (p.getName().isEmpty() || p.getPhone().isEmpty() || p.getIdCard().isEmpty()) {
+            return Result.error("参数错误");
+        }
+        if (!p.getIdCard().matches("^[1-9]\\d{5}(18|19|20)\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$"))
+            return Result.error("身份证号格式错误");
+        if (!p.getCode().equals(stringRedisTemplate.opsForValue().get(RedisConstants.LOGIN_CODE_KEY + p.getPhone())))
+            return Result.error("验证码错误");
+        Patient p1 = new Patient();
+        BeanUtil.copyProperties(p, p1);
+        p1.setAge(getAgeByIdCard(p.getIdCard()));
+        p1.setGender(String.valueOf(getGender(p.getIdCard())));
+        p1.setUserPatientId(UserPatientContext.get().getId());
+        save(p1);
+        stringRedisTemplate.delete(RedisConstants.LOGIN_CODE_KEY + p.getPhone());
+        return Result.success("创建成功");
     }
 
     public static int getAgeByIdCard(String idCard) {
@@ -184,6 +213,15 @@ public class PatientServiceImpl extends ServiceImpl<PatientMapper, Patient> impl
 
         // 计算年龄
         return Period.between(birthDate, now).getYears();
+    }
+
+    public static Integer getGender(String idCard) {
+        if (idCard == null || idCard.length() != 18) {
+            throw new IllegalArgumentException("身份证号不合法");
+        }
+        char genderChar = idCard.charAt(16); // 第17位，下标16
+        int genderNum = genderChar - '0';
+        return ((genderNum % 2 == 0) ? 1 : 0);
     }
 
 }

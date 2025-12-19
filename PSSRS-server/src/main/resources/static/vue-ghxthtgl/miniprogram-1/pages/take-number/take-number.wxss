@@ -108,13 +108,19 @@ page {
 
 .take-btn {
   width: 100%;
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  background: linear-gradient(135deg, #1e90ff, #0056b3);
   color: white;
   border: none;
   border-radius: 50rpx;
   padding: 25rpx;
   font-size: 30rpx;
   font-weight: bold;
+  box-shadow: 0 8rpx 16rpx rgba(30, 144, 255, 0.25);
+}
+
+.take-btn:active {
+  opacity: 0.9;
+  transform: scale(0.98);
 }
 
 .empty-state {

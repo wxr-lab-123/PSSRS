@@ -5,12 +5,14 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hjm.constant.OrderConstant;
 import com.hjm.context.PatientContext;
+import com.hjm.context.UserPatientContext;
 import com.hjm.exception.AppiontmentOrderException;
 import com.hjm.mapper.AppointmentOrderMapper;
 import com.hjm.mapper.DoctorScheduleMapper;
 import com.hjm.pojo.DTO.AppointmentOrderPageDTO;
 import com.hjm.pojo.DTO.PaymentDTO;
 import com.hjm.pojo.DTO.RegistrationCreateDTO;
+import com.hjm.pojo.DTO.RegistrationDTO;
 import com.hjm.pojo.Entity.AppointmentOrder;
 import com.hjm.pojo.Entity.DoctorSchedule;
 import com.hjm.pojo.Entity.OrderInfo;
@@ -24,6 +26,8 @@ import com.hjm.service.IDoctorScheduleService;
 import com.hjm.service.IOrderInfoService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -56,6 +60,7 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
     private final DoctorScheduleMapper doctorScheduleMapper;
     private final IDoctorScheduleService doctorScheduleService;
     private final IOrderInfoService orderInfoService;
+    private final RedissonClient redissonClient;
 //    @Override
 //    @Transactional
 //    public Result<Map<String,Object>> createRegistration(RegistrationCreateDTO registrationCreateDTO) {
@@ -156,17 +161,24 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
         }
 
         // 4. 当前患者ID
-        Long patientId = PatientContext.getPatient().getId();
-
-        // 5. 给当前患者加锁，防止并发重复挂号
+        Long patientId = registrationCreateDTO.getPatientId();
+        // 5. 给当前患者加分布式锁，防止并发重复挂号
+        RLock lock = redissonClient.getLock("lock:appointment:" + patientId);
+        Boolean locked = lock.tryLock();
+        if (!locked) {
+            throw new AppiontmentOrderException("请勿重复挂号");
+        }
         synchronized (patientId.toString().intern()) {
 
-            // 6. 获取当前对象的代理，确保事务生效（与秒杀写法一致）
-            IAppointmentOrderService proxy =
+            // 6. 获取当前对象的代理，确保事务生效（
+            try {
+                IAppointmentOrderService proxy =
                     (IAppointmentOrderService) AopContext.currentProxy();
-
-            // 7. 调用事务方法
-            return proxy.createRegistrationOrder(registrationCreateDTO);
+                // 7. 调用事务方法
+                return proxy.createRegistrationOrder(registrationCreateDTO);
+            }finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -176,8 +188,8 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
     }
 
     @Override
-    public List<RegistrationVO> listByPId(Long patientId) {
-        return appointmentOrderMapper.listByPId(patientId);
+    public List<RegistrationVO> listByPId(Long userId) {
+        return appointmentOrderMapper.listByPId(userId);
     }
 
     @Override
@@ -215,18 +227,49 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
         DoctorSchedule schedule = doctorScheduleService.getById(orderInfo.getScheduleId());
         RegistrationCreateDTO registrationCreateDTO = new RegistrationCreateDTO();
         registrationCreateDTO.setScheduleId(orderInfo.getScheduleId());
-        registrationCreateDTO.setPatientPhone(PatientContext.getPatient().getPhone());
+        com.hjm.service.IPatientService ps = com.hjm.utils.SpringUtils.getBean(com.hjm.service.IPatientService.class);
+        com.hjm.pojo.Entity.Patient p = ps.getById(orderInfo.getPatientId());
+        registrationCreateDTO.setPatientPhone(p == null ? null : p.getPhone());
         registrationCreateDTO.setScheduleType(schedule.getScheduleType());
         registrationCreateDTO.setRegistrationDate(schedule.getScheduleDate());
         registrationCreateDTO.setTimeSlot(schedule.getTimeSlot()+" "+schedule.getStartTime()+" "+schedule.getEndTime());
         registrationCreateDTO.setDepartmentId(schedule.getDepartmentId());
         registrationCreateDTO.setDoctorId(schedule.getDoctorId());
+        registrationCreateDTO.setPatientId(orderInfo.getPatientId());
         return createRegistration(registrationCreateDTO);
     }
 
     @Override
     public List<Long> listPatientIdsByScheduleId(Long scheduleId) {
         return appointmentOrderMapper.listPatientIdsByScheduleId(scheduleId);
+    }
+
+    @Override
+    public Result cancel(RegistrationDTO registrationDTO) {
+        Long userPatientId = UserPatientContext.get().getId();
+        AppointmentOrder appointmentOrder = getByOrderNo(registrationDTO.getRegistrationNo());
+        if (appointmentOrder == null) {
+            throw new AppiontmentOrderException("号源不存在");
+        }
+        if (appointmentOrder.getUserPatientId() != userPatientId) {
+            throw new AppiontmentOrderException("号源不属于当前用户");
+        }
+        if (appointmentOrder.getStatus() != 0) {
+            throw new AppiontmentOrderException("号源状态异常");
+        }
+        boolean update = update()
+                .set("status", 2)
+                .eq("id", appointmentOrder.getId())
+                .update();
+        DoctorSchedule doctorSchedule = doctorScheduleService.getById(appointmentOrder.getScheduleId());
+        Integer currentAppointments = doctorSchedule.getCurrentAppointments();
+        currentAppointments--;
+        doctorSchedule.setCurrentAppointments(currentAppointments);
+        doctorScheduleService.updateById(doctorSchedule);
+        if (!update) {
+            throw new AppiontmentOrderException("取消失败");
+        }
+        return Result.success("取消成功");
     }
 
 
@@ -236,63 +279,54 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
     @Override
     @Transactional
     public Result<Map<String, Object>> createRegistrationOrder(RegistrationCreateDTO dto) {
-
-        Long patientId = PatientContext.getPatient().getId();
-
+        Long patientId = dto.getPatientId();
         Long count = query().eq("patient_id", patientId).eq("schedule_id", dto.getScheduleId()).eq("status", 0).count();
-
         // 若已存在订单则返回失败
         if (count > 0) {
            throw new AppiontmentOrderException ("挂过该号!!!");
         }
-
         // 1. 构造订单对象
         AppointmentOrder order = new AppointmentOrder();
         BeanUtil.copyProperties(dto, order);
         order.setPatientId(patientId);
         order.setAppointmentDate(dto.getRegistrationDate());
-
-
-
+        Long uid = com.hjm.context.UserPatientContext.get() == null ? null : com.hjm.context.UserPatientContext.get().getId();
+        order.setUserPatientId(uid);
         // 2. 生成挂号号
         String prefix = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
         String redisKey = "registration:" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         Long incr = stringRedisTemplate.opsForValue().increment(redisKey);
         String registrationNo = prefix + String.format("%06d", incr);
         order.setRegistrationNo(registrationNo);
-
         // 3. 查询费用
         Long fee = appointmentOrderMapper.getFee(dto.getScheduleType());
         order.setFee(BigDecimal.valueOf(fee));
-
         // 4. 扣减号源（乐观锁）
-        Long scheduleId = doctorScheduleService.getById(dto.getScheduleId()).getId();
-        Boolean success = doctorScheduleService.update()
-                .setSql("current_appointments = current_appointments + 1")
-                .lt("current_appointments", doctorScheduleService.getById(scheduleId).getMaxAppointments())
-                .eq("id", dto.getScheduleId())
-                .update();
-
-        if (!success) {
-            doctorScheduleService.update()
-                    .setSql("status = FULL")
-                    .eq("id", dto.getScheduleId())
-                    .update();
-            throw new AppiontmentOrderException("挂号已满");
-        }
-
+        Long scheduleId = dto.getScheduleId();
+//        DoctorSchedule s = doctorScheduleService.getById(scheduleId);
+//        Boolean success = doctorScheduleService.update()
+//                .setSql("current_appointments = current_appointments + 1")
+//                .lt("current_appointments", s.getMaxAppointments())
+//                .eq("id", scheduleId)
+//                .update();
+//
+//        if (!success) {
+//            doctorScheduleService.update()
+//                    .setSql("status = FULL")
+//                    .eq("id", dto.getScheduleId())
+//                    .update();
+//            throw new AppiontmentOrderException("挂号已满");
+//        }
         // 5. 保存订单
         boolean saved = this.save(order);
         if (!saved) {
             throw new AppiontmentOrderException("挂号失败，请稍后再试");
         }
-
         // 设置初始队列状态为等待(0)，避免后续更新条件因NULL而不命中
         this.update()
                 .set("queue_status", 0)
                 .eq("id", order.getId())
                 .update();
-
         // 6. 返回结果
         Map<String, Object> map = new HashMap<>();
         map.put("registrationNo", order.getRegistrationNo());

@@ -46,12 +46,6 @@ public class Patient implements Serializable {
     @ApiModelProperty(value = "身份证号")
     private String idCard;
 
-    @ApiModelProperty(value = "登录密码（加密存储）")
-    private String password;
-
-    @ApiModelProperty(value = "家庭住址")
-    private String address;
-
     @ApiModelProperty(value = "创建时间")
     private LocalDateTime createTime;
 
@@ -63,5 +57,11 @@ public class Patient implements Serializable {
     @TableField("is_deleted")
     private Integer isDeleted;
 
+    @ApiModelProperty(value = "所属用户ID(user_patient表)")
+    @TableField("user_patient_id")
+    private Long userPatientId;
+
+    @ApiModelProperty(value = "与用户关系")
+    private String relation;
 
 }

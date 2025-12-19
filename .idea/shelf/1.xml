@@ -1,9 +1,0 @@
-<changelist name="在变基之前未提交的更改1" date="1762092421022" recycled="true" deleted="true">
-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/在变基之前未提交的更改1/shelved.patch" />
-  <option name="DESCRIPTION" value="在变基之前未提交的更改" />
-  <binary>
-    <option name="BEFORE_PATH" value="PSSRS-server/target/classes/com/hjm/controller/admin/UserController.class" />
-    <option name="AFTER_PATH" value="PSSRS-server/target/classes/com/hjm/controller/admin/UserController.class" />
-    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在变基之前未提交的更改1/UserController.class" />
-  </binary>
-</changelist>

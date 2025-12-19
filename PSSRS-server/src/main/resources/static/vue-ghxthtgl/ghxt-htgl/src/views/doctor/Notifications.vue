@@ -26,7 +26,7 @@
     </template>
 
     <div class="cards-grid">
-      <el-card v-for="m in rows" :key="m.messageId" shadow="hover">
+      <el-card v-for="m in rows" :key="String(m.messageId || m.id)" shadow="hover">
         <template #header>
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div>{{ titleOf(m) }}</div>
@@ -91,8 +91,15 @@ async function fetchList(){
   loading.value = true
   try {
     const data = await fetchStaffMessages({ ...query })
-    rows.value = data.records || []
-    total.value = data.total || 0
+    const list = data.records || []
+    rows.value = list.map(r => ({
+      ...r,
+      messageId: String(r.messageId ?? r.id ?? ''),
+      receiverId: r.receiverId != null ? String(r.receiverId) : r.receiverId,
+      patientId: r.patientId != null ? String(r.patientId) : r.patientId,
+      createTime: r.createTime || ''
+    }))
+    total.value = Number(data.total || 0)
   } catch (e) { ElMessage.error(e?.msg || e?.message || '加载消息失败') }
   finally { loading.value = false }
 }
@@ -103,7 +110,7 @@ function open(m){
   ElMessageBox.alert(contentOf(m), titleOf(m), { confirmButtonText: '知道了' })
 }
 async function mark(m){
-  try { await markRead(m.messageId); m.status = '已读' } catch (e) { ElMessage.error(e?.msg || e?.message || '标记失败') }
+  try { await markRead(String(m.messageId)); m.status = '已读' } catch (e) { ElMessage.error(e?.msg || e?.message || '标记失败') }
 }
 
 onMounted(()=>{ fetchSummary(); fetchList() })

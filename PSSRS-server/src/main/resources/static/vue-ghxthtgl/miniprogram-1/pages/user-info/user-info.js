@@ -25,15 +25,14 @@ Page({
     userApi.getUserInfo()
       .then(res => {
         wx.hideLoading()
-        // 后端返回格式：{code: 0, msg: "success", data: {...}}
+        // 后端返回格式：{code: 0 | 200, msg: "success", data: {...}}
         if (res.code === 0 || res.code === 200) {
           // 处理显示数据（脱敏）
           const displayInfo = {
             ...res.data,
-            phone: formatUtil.maskPhone(res.data.phone),
-            idCard: formatUtil.maskIdCard(res.data.idCard),
-            gender: formatUtil.formatGender(res.data.gender),
-            createTime: formatUtil.formatDateTime(res.data.createTime)
+            nickname: (res.data && (res.data.nickname || res.data.name)) || '',
+            phone: formatUtil.maskPhone((res.data && res.data.phone) || ''),
+            createTime: formatUtil.formatDateTime(res.data.createdAt || res.data.createTime)
           }
           
           this.setData({
@@ -57,10 +56,9 @@ Page({
           // 处理显示数据（脱敏）
           const displayInfo = {
             ...localUserInfo,
-            phone: formatUtil.maskPhone(localUserInfo.phone),
-            idCard: formatUtil.maskIdCard(localUserInfo.idCard),
-            gender: formatUtil.formatGender(localUserInfo.gender),
-            createTime: formatUtil.formatDateTime(localUserInfo.createTime)
+            nickname: (localUserInfo && (localUserInfo.nickname || localUserInfo.name)) || '',
+            phone: formatUtil.maskPhone((localUserInfo && localUserInfo.phone) || ''),
+            createTime: formatUtil.formatDateTime(localUserInfo.createdAt || localUserInfo.createTime)
           }
           
           this.setData({

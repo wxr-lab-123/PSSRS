@@ -10,15 +10,61 @@ Page({
   data: {
     selectedDate: null,
     selectedDept: null,
+    selectedPatient: null,
     dateList: [],
     departments: [],
     doctors: [],
+    patients: [],
     loadingDoctors: false
+  },
+
+  onShow() {
+    this.loadPatients()
+    // 如果已经选择了科室和日期，重新加载医生列表以更新号源状态
+    if (this.data.selectedDept && this.data.selectedDate) {
+      this.loadDoctors()
+    }
   },
 
   onLoad() {
     this.generateDateList()
     this.loadDepartments()
+  },
+
+  // 加载就诊人列表
+  loadPatients() {
+    userApi.listPatients()
+      .then(res => {
+        const list = res.data || []
+        this.setData({
+          patients: list
+        })
+        
+        // 如果没有选中的就诊人，默认选中第一个
+        if (!this.data.selectedPatient && list.length > 0) {
+          this.setData({
+            selectedPatient: list[0]
+          })
+        }
+      })
+      .catch(err => {
+        console.error('获取就诊人列表失败:', err)
+      })
+  },
+
+  // 选择就诊人
+  selectPatient(e) {
+    const item = e.currentTarget.dataset.item
+    this.setData({
+      selectedPatient: item
+    })
+  },
+
+  // 跳转添加就诊人
+  goToAddPatient() {
+    wx.navigateTo({
+      url: '/pages/patients/patients'
+    })
   },
 
   // 生成未来14天的日期列表（仅工作日）
@@ -198,6 +244,14 @@ Page({
       return
     }
 
+    if (!this.data.selectedPatient) {
+      wx.showToast({
+        title: '请选择就诊人',
+        icon: 'none'
+      })
+      return
+    }
+
     if (!slot || !slot.available) {
       wx.showToast({
         title: '该时段已满',
@@ -208,7 +262,7 @@ Page({
 
     wx.showModal({
       title: '确认预约',
-      content: `预约${doctor.name}医生\n日期：${this.data.selectedDate}\n时间：${slot.time}\n费用：¥${doctor.price}`,
+      content: `预约就诊人：${this.data.selectedPatient.name}\n医生：${doctor.name}\n日期：${this.data.selectedDate}\n时间：${slot.time}\n费用：¥${doctor.price}`,
       success: (res) => {
         if (res.confirm) {
           this.confirmAppointment(doctor, slot)
@@ -224,48 +278,33 @@ Page({
     }
 
     this._submitting = true
+    const patient = this.data.selectedPatient
 
-    userApi.checkUserInfo()
-      .then(resp => {
-        const data = resp && resp.data ? resp.data : {}
-        const isValid = data.isValid === true || data.valid === true
+    // 这里不再校验当前登录用户的信息，而是校验选中的就诊人信息
+    // 假设选择的就诊人信息已经是完整的
+    if (!patient || !patient.name || !patient.phone || !patient.idCard) {
+       wx.showToast({
+         title: '就诊人信息不完整',
+         icon: 'none'
+       })
+       this._submitting = false
+       return
+    }
 
-        if (!isValid) {
-          wx.showModal({
-            title: '完善资料',
-            content: '请先完善个人信息（姓名与手机号）后再预约挂号',
-            confirmText: '去完善',
-            cancelText: '取消',
-            success: (res) => {
-              if (res.confirm) {
-                wx.navigateTo({ url: '/pages/edit-info/edit-info' })
-              }
-            }
-          })
-          this._submitting = false
-          return Promise.reject({ message: '用户资料未完善' })
-        }
+    wx.showLoading({ title: '挂号中...' })
 
-        const rawUserInfo = wx.getStorageSync('userInfo') || {}
-        const local = validateUserInfo({
-          name: rawUserInfo.name,
-          phone: rawUserInfo.phone
-        })
-        const patientName = local.normalized.name
-        const patientPhone = local.normalized.phone
+    console.log('appointment.js: 准备创建订单，doctor.raw 对象:', doctor.raw)
 
-        wx.showLoading({ title: '挂号中...' })
+    // 只传 scheduleId，由后端根据排班和登录用户创建订单并计算金额
+    const scheduleId = doctor.raw.id || doctor.id
+    if (!scheduleId && scheduleId !== 0) {
+      wx.hideLoading()
+      this._submitting = false
+      wx.showToast({ title: '排班ID缺失', icon: 'none' })
+      return
+    }
 
-        console.log('appointment.js: 准备创建订单，doctor.raw 对象:', doctor.raw)
-
-        // 只传 scheduleId，由后端根据排班和登录用户创建订单并计算金额
-        const scheduleId = doctor.raw.id || doctor.id
-        if (!scheduleId && scheduleId !== 0) {
-          throw new Error('排班ID缺失')
-        }
-
-        return orderApi.createOrder(scheduleId)
-      })
+    orderApi.createOrder(scheduleId, patient.id)
       .then(res => {
         wx.hideLoading()
         
@@ -279,11 +318,6 @@ Page({
         }, 300)
 
         // 构建订单数据，使用后端返回的订单信息
-        const rawUserInfo = wx.getStorageSync('userInfo') || {}
-        const local = validateUserInfo({
-          name: rawUserInfo.name,
-          phone: rawUserInfo.phone
-        })
         const data = res.data || {}
         const orderData = {
           orderNo: data.orderNo,
@@ -292,7 +326,7 @@ Page({
           status: data.status,
           expireTime: data.expireTime,
           createTime: data.createTime,
-          patientName: local.normalized.name,
+          patientName: patient.name,
           doctorName: data.doctorName || doctor.name,
           departmentName: data.departmentName || this.data.departments.find(d => d.id === this.data.selectedDept)?.name || '',
           registrationDate: doctor.raw.scheduleDate || this.data.selectedDate,
@@ -310,23 +344,8 @@ Page({
           })
         }, 1000)
         
-        // 更新医生列表状态
-        const doctors = this.data.doctors.map(item => {
-          if (item.id === doctor.id) {
-            const timeSlots = item.timeSlots.map(s => {
-              if (s.time === slot.time) {
-                return { ...s, available: false }
-              }
-              return s
-            })
-            return { ...item, timeSlots }
-          }
-          return item
-        })
-
-        this.setData({
-          doctors
-        })
+        // 不需要手动更新前端状态，onShow 会自动刷新
+        // 之前的逻辑会强制将号源设为已满，导致显示错误
       })
       .catch(err => {
         if (err && err.message === '用户资料未完善') return

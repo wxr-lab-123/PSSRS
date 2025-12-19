@@ -27,7 +27,7 @@
         LEFT JOIN pssrs.doctor_schedule ds ON a.schedule_id = ds.id
         LEFT JOIN registration_fee r ON ds.schedule_type = r.type
         join department dp on ds.department_id = dp.id
-        WHERE a.patient_id = #{patientId}
+        WHERE a.user_patient_id = #{userId}
         ORDER BY a.update_time DESC
     </select>
     <select id="getByPage" resultType="com.hjm.pojo.VO.AppointmentOrderPageVO">

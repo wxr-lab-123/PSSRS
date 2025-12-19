@@ -7,6 +7,14 @@
       <text class="date-text">{{currentDate}}</text>
     </view>
 
+    <!-- 就诊人选择 -->
+    <view class="patient-bar">
+      <text class="patient-label">就诊人：</text>
+      <text class="patient-name">{{selectedPatientName || '未选择'}}</text>
+      <button class="patient-btn" size="mini" bindtap="choosePatient">选择</button>
+      <button class="patient-btn" size="mini" bindtap="goManage">管理</button>
+    </view>
+
     <!-- 左右布局 -->
     <view class="main-content">
       <!-- 左侧科室列表 -->

@@ -3,6 +3,7 @@ package com.hjm.controller.user;
 
 import com.hjm.constant.OrderConstant;
 import com.hjm.context.PatientContext;
+import com.hjm.context.UserPatientContext;
 import com.hjm.pojo.Entity.OrderInfo;
 import com.hjm.result.Result;
 import com.hjm.service.IOrderInfoService;
@@ -36,9 +37,9 @@ public class OrderInfoController {
 
 
     @PostMapping("/create")
-    public Result create(@RequestParam Integer scheduleId) {
+    public Result create(@RequestParam Integer scheduleId, @RequestParam Long patientId) {
         log.info("创建订单：{}", scheduleId);
-        return  orderInfoService.createOrder(scheduleId);
+        return  orderInfoService.createOrder(scheduleId, patientId);
     }
 
     @GetMapping("/list")
@@ -46,8 +47,8 @@ public class OrderInfoController {
   , @RequestParam(required = false)  LocalDate startDate
     ) {
         log.info("查询订单");
-        Long patientId = PatientContext.getPatient().getId();
-        List<OrderInfo> orders = orderInfoService.listByPId(patientId, status, startDate);
+        Long userPatientId = UserPatientContext.get().getId();
+        List<OrderInfo> orders = orderInfoService.listByPId(userPatientId, status, startDate);
         return Result.success(orders);
     }
 

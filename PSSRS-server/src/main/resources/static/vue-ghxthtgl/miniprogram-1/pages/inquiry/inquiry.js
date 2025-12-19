@@ -121,6 +121,7 @@ Page({
     const detailContent = `
       科室：${record.department}\n
       医生：${record.doctor}\n
+      就诊人：${record.patientName || ''}\n
       就诊时间：${record.time}\n
       挂号费：¥${record.fee}\n
       就诊号：${record.number}\n
@@ -176,6 +177,7 @@ Page({
               registrationNo: item.registrationNo,
               department: item.departmentName,
               doctor: item.doctorName,
+              patientName: item.patientName,
               time: `${item.appointmentDate} ${item.timeSlot}`,
               fee: item.fee || 0,
               number: item.visitNumber || '',
@@ -191,6 +193,7 @@ Page({
               registrationNo: item.registrationNo,
               department: item.departmentName,
               doctor: item.doctorName,
+              patientName: item.patientName,
               time: `${item.appointmentDate} ${item.timeSlot}`,
               fee: item.fee || 0,
               number: item.visitNumber || '',
@@ -207,6 +210,7 @@ Page({
               registrationNo: item.registrationNo,
               department: item.departmentName,
               doctor: item.doctorName,
+              patientName: item.patientName,
               time: `${item.appointmentDate} ${item.timeSlot}`,
               fee: item.fee || 0,
               number: item.visitNumber || '',

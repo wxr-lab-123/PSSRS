@@ -1,4 +1,5 @@
 import request from './request'
+import axios from 'axios'
 
 export function getProfile() {
   return request.get('/user/profile')
@@ -18,4 +19,8 @@ export function bindPhone(data) {
 
 export function updateAvatar(avatar) {
   return request.put('/user/avatar', { avatar })
+}
+
+export function sendPhoneCode(phone) {
+  return request.post('/user/phone/sendCode', { phone })
 }

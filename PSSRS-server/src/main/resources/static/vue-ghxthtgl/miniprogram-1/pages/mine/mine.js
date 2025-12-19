@@ -18,7 +18,12 @@ Page({
   // 检查登录状态
   checkLoginStatus() {
     const token = wx.getStorageSync('token')
-    const userInfo = wx.getStorageSync('userInfo')
+    let userInfo = wx.getStorageSync('userInfo')
+    if (userInfo) {
+      userInfo.nickname = userInfo.nickname || userInfo.nickName || ''
+      userInfo.name = userInfo.name || userInfo.nickname || userInfo.nickName || ''
+      userInfo.phone = userInfo.phone || ''
+    }
     
     if (token && userInfo) {
       this.setData({
@@ -43,6 +48,8 @@ Page({
           // 合并并保存用户信息
           const userInfo = wx.getStorageSync('userInfo')
           const fullUserInfo = { ...userInfo, ...res.data }
+          fullUserInfo.name = fullUserInfo.name || fullUserInfo.nickname || ''
+          fullUserInfo.phone = fullUserInfo.phone || ''
           
           wx.setStorageSync('userInfo', fullUserInfo)
           this.setData({

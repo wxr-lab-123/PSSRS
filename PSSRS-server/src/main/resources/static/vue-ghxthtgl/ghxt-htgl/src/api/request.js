@@ -55,7 +55,12 @@ instance.interceptors.request.use((config) => {
 
 instance.interceptors.response.use(
   (response) => {
-    const res = response.data
+    let res = response.data
+    const raw = response?.request?.responseText
+    if (typeof raw === 'string' && raw.length > 0) {
+      const parsed = safeParse(raw)
+      if (parsed) res = parsed
+    }
     console.log('API 响应:', res)
     if (typeof res === 'object' && res !== null && 'code' in res) {
       if (res.code === 0) {
@@ -88,3 +93,12 @@ instance.interceptors.response.use(
 export default instance
 
 
+function safeParse(raw) {
+  try {
+    const s = String(raw)
+    const fixed = s
+      .replace(/("messageId"\s*:\s*)(\d{16,})(?=[,}\s])/g, '$1"$2"')
+      .replace(/("id"\s*:\s*)(\d{16,})(?=[,}\s])/g, '$1"$2"')
+    return JSON.parse(fixed)
+  } catch { return null }
+}

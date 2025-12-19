@@ -44,7 +44,7 @@ public interface AppointmentOrderMapper extends BaseMapper<AppointmentOrder> {
      * @param patientId
      * @return
      */
-    List<RegistrationVO> listByPId(Long patientId);
+    List<RegistrationVO> listByPId(Long userId);
 
     Long countTodayRegistrations();
 

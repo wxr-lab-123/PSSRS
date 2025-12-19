@@ -11,45 +11,86 @@
       </div>
     </template>
 
-    <el-table :data="requests" :loading="loading" style="width:100%">
-      <el-table-column prop="scheduleId" label="排班ID" width="100" />
-      <el-table-column label="医生" width="140">
-        <template #default="{ row }">{{ nameOfDoctor(row.doctorId) }}</template>
-      </el-table-column>
-      <el-table-column prop="date" label="日期" width="120" />
-      <el-table-column prop="timeSlot" label="时间段" width="100" />
-      <el-table-column prop="leaveType" label="类型" width="100" />
-      <el-table-column prop="startTime" label="开始时间" width="160" />
-      <el-table-column prop="endTime" label="结束时间" width="160" />
-      <el-table-column prop="reason" label="理由" min-width="180" />
-      <el-table-column label="附件" width="120">
-        <template #default="{ row }">
-          <template v-if="typeof row.attachments==='string' && row.attachments">
-            <el-image
-              v-if="/^https?:\/\//.test(row.attachments)"
-              :src="row.attachments"
-              :preview-src-list="[row.attachments]"
-              fit="cover"
-              style="width:40px;height:40px;border-radius:4px"
-            />
-            <el-tag v-else type="info">{{ row.attachments }}</el-tag>
+    <div v-if="!isCardView">
+      <el-table :data="requests" :loading="loading" style="width:100%">
+        <el-table-column prop="scheduleId" label="排班ID" width="100" />
+        <el-table-column label="医生" width="140">
+          <template #default="{ row }">{{ nameOfDoctor(row.doctorId) }}</template>
+        </el-table-column>
+        <el-table-column prop="date" label="日期" width="120" />
+        <el-table-column prop="timeSlot" label="时间段" width="100" />
+        <el-table-column prop="leaveType" label="类型" width="100" />
+        <el-table-column prop="startTime" label="开始时间" width="160" />
+        <el-table-column prop="endTime" label="结束时间" width="160" />
+        <el-table-column prop="reason" label="理由" min-width="180" />
+        <el-table-column label="附件" width="120">
+          <template #default="{ row }">
+            <template v-if="typeof row.attachments==='string' && row.attachments">
+              <el-image
+                v-if="/^https?:\/\//.test(row.attachments)"
+                :src="row.attachments"
+                :preview-src-list="[row.attachments]"
+                fit="cover"
+                style="width:40px;height:40px;border-radius:4px"
+              />
+              <el-tag v-else type="info">{{ row.attachments }}</el-tag>
+            </template>
           </template>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" width="120">
-        <template #default="{ row }">
-          <el-tag :type="row.state==='approved'?'success':row.state==='rejected'?'danger':row.state==='withdrawn'?'warning':'info'">
-            {{ row.state==='approved'?'已批准':row.state==='rejected'?'已拒绝':row.state==='withdrawn'?'已撤销':'待审批' }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right">
-        <template #default="{ row }">
-          <el-button :disabled="row.state!=='pending'" type="success" size="small" @click="approve(row)">批准</el-button>
-          <el-button :disabled="row.state!=='pending'" type="danger" size="small" @click="openReject(row)">拒绝</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        </el-table-column>
+        <el-table-column label="状态" width="120">
+          <template #default="{ row }">
+            <el-tag :type="row.state==='approved'?'success':row.state==='rejected'?'danger':row.state==='withdrawn'?'warning':'info'">
+              {{ row.state==='approved'?'已批准':row.state==='rejected'?'已拒绝':row.state==='withdrawn'?'已撤销':'待审批' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="180" fixed="right">
+          <template #default="{ row }">
+            <el-button :disabled="row.state!=='pending'" type="success" size="small" @click="approve(row)">批准</el-button>
+            <el-button :disabled="row.state!=='pending'" type="danger" size="small" @click="openReject(row)">拒绝</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <div v-else>
+      <el-row :gutter="20">
+        <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="row in requests" :key="row.scheduleId" style="margin-bottom: 20px">
+          <el-card shadow="hover" :body-style="{ padding: '15px' }">
+            <template #header>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-weight:bold">{{ nameOfDoctor(row.doctorId) }}</span>
+                <el-tag :type="row.state==='approved'?'success':row.state==='rejected'?'danger':row.state==='withdrawn'?'warning':'info'" size="small">
+                  {{ row.state==='approved'?'已批准':row.state==='rejected'?'已拒绝':row.state==='withdrawn'?'已撤销':'待审批' }}
+                </el-tag>
+              </div>
+            </template>
+            <div style="font-size:14px;line-height:1.8;color:#606266">
+              <div><span style="color:#909399">排班ID：</span>{{ row.scheduleId }}</div>
+              <div><span style="color:#909399">日期时段：</span>{{ row.date }} {{ row.timeSlot }}</div>
+              <div><span style="color:#909399">请假类型：</span>{{ row.leaveType }}</div>
+              <div><span style="color:#909399">开始时间：</span>{{ row.startTime }}</div>
+              <div><span style="color:#909399">结束时间：</span>{{ row.endTime }}</div>
+              <div><span style="color:#909399">理由：</span>{{ row.reason }}</div>
+              <div v-if="typeof row.attachments==='string' && row.attachments" style="margin-top:5px">
+                 <span style="color:#909399">附件：</span>
+                 <el-image
+                  v-if="/^https?:\/\//.test(row.attachments)"
+                  :src="row.attachments"
+                  :preview-src-list="[row.attachments]"
+                  fit="cover"
+                  style="width:40px;height:40px;border-radius:4px;vertical-align:middle"
+                />
+                <el-tag v-else type="info" size="small">{{ row.attachments }}</el-tag>
+              </div>
+            </div>
+            <div style="margin-top:15px;text-align:right;border-top:1px solid #f0f2f5;padding-top:10px">
+              <el-button :disabled="row.state!=='pending'" type="success" size="small" @click="approve(row)">批准</el-button>
+              <el-button :disabled="row.state!=='pending'" type="danger" size="small" @click="openReject(row)">拒绝</el-button>
+            </div>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
 
     <el-dialog v-model="rejectVisible" title="拒绝申请" width="480px">
       <el-form ref="rejectFormRef" :model="rejectForm" label-width="100px">
@@ -80,6 +121,7 @@ const auth = useAuthStore()
 const loading = ref(false)
 const requests = ref([])
 const doctorMap = ref({})
+const isCardView = ref(false)
 
 const ws = ref(null)
 const wsState = ref('idle')

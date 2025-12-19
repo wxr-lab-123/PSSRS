@@ -1,6 +1,7 @@
 package com.hjm.controller.user;
 
 import com.hjm.context.PatientContext;
+import com.hjm.context.UserPatientContext;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.service.IPatientMessageService;
@@ -18,20 +19,24 @@ public class MessageController {
     public Result<PageResult> list(@RequestParam(required = false) Long page,
                                    @RequestParam(required = false) Long size,
                                    @RequestParam(required = false) String status) {
-        Long pid = PatientContext.getPatient().getId();
-        PageResult pr = patientMessageService.listByPatient(pid, page, size, status);
+        Long upid = null;
+        try { com.hjm.pojo.DTO.UserPatientDTO u = com.hjm.context.UserPatientContext.get(); if (u != null) upid = u.getId(); } catch (Exception ignored) {}
+        PageResult pr = patientMessageService.listByPatient(upid, page, size, status);
         return Result.success(pr);
     }
 
     @GetMapping("/unread-count")
     public Result<Long> unreadCount() {
         Long pid = PatientContext.getPatient().getId();
-        return patientMessageService.unreadCount(pid);
+        Long upid = null;
+        try { com.hjm.pojo.DTO.UserPatientDTO u = com.hjm.context.UserPatientContext.get(); if (u != null) upid = u.getId(); } catch (Exception ignored) {}
+        return patientMessageService.unreadCount(pid, upid);
     }
 
     @PutMapping("/{id}/read")
     public Result read(@PathVariable Long id) {
-        Long pid = PatientContext.getPatient().getId();
-        return patientMessageService.markRead(pid, id);
+        Long upid = null;
+        try { com.hjm.pojo.DTO.UserPatientDTO u = com.hjm.context.UserPatientContext.get(); if (u != null) upid = u.getId(); } catch (Exception ignored) {}
+        return patientMessageService.markRead(upid, id);
     }
 }

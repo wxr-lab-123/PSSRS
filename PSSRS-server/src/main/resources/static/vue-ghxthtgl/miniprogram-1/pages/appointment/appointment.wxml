@@ -2,6 +2,30 @@
 <navigation-bar title="挂号预约" back="{{true}}" color="white" background="#4e54c8"></navigation-bar>
 <scroll-view class="scrollarea" scroll-y type="list">
   <view class="container">
+    <!-- 就诊人选择 -->
+    <view class="section">
+      <view class="section-title">选择就诊人</view>
+      <scroll-view class="patient-scroll" scroll-x>
+        <view class="patient-list">
+          <view 
+            class="patient-item {{selectedPatient.id === item.id ? 'active' : ''}}" 
+            wx:for="{{patients}}" 
+            wx:key="id"
+            bindtap="selectPatient"
+            data-item="{{item}}">
+            <view class="patient-info">
+              <text class="patient-name">{{item.name}}</text>
+              <text class="patient-relation">{{item.relation || '家属'}}</text>
+            </view>
+          </view>
+          <view class="patient-add-btn" bindtap="goToAddPatient">
+            <text class="add-icon">+</text>
+            <text class="add-text">添加</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
     <!-- 日期选择 -->
     <view class="section">
       <view class="section-title">选择日期</view>

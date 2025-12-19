@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hjm.pojo.DTO.DoctorDTO;
 import com.hjm.pojo.Entity.User;
 import com.hjm.pojo.VO.DoctorVO;
+import com.hjm.pojo.VO.UserProfileVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -36,4 +37,6 @@ public interface UserMapper extends BaseMapper<User> {
      */
 
     List<User> listAdmins(Page<User> pageInfo, String name, Integer status);
+
+    UserProfileVO getProfile(Long userId);
 }

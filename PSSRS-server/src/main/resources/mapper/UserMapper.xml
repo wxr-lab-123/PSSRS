@@ -81,4 +81,13 @@
         </if>
         ORDER BY u.create_time DESC
     </select>
+    <select id="getProfile" resultType="com.hjm.pojo.VO.UserProfileVO">
+        select
+            u.age,
+            u.gender as sex,
+            u.phone,
+            u.name,
+            u.username
+             from user u where id = #{userId}
+    </select>
 </mapper>

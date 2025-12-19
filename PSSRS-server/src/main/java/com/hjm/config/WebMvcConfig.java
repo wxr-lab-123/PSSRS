@@ -24,7 +24,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .order(0);
         registry.addInterceptor(new LoginInterceptor()).
                 addPathPatterns("/api/user/**").
-                excludePathPatterns("/api/user/login", "/api/user/register", "/api/user/logout","/api/user/resetPassword")
+                excludePathPatterns("/api/user/login", "/api/user/register", "/api/user/logout","/api/user/resetPassword", "/api/user/wechatLogin")
                 .order(1);
     }
 }

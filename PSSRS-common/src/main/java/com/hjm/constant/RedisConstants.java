@@ -2,6 +2,7 @@ package com.hjm.constant;
 
 public class RedisConstants {
     public static final String LOGIN_CODE_KEY = "login:code:";
+    public static final String UPDATE_CODE_KEY = "update:code:";
     public static final Long LOGIN_CODE_TTL = 2L;
     public static final String LOGIN_USER_KEY = "login:token:";
     public static final Long LOGIN_USER_TTL = 30L;
@@ -16,4 +17,5 @@ public class RedisConstants {
     public static final Long USER_PERMS_TTL = 60L;
 
 
+    public static final long UPDATE_CODE_TTL = 2L;
 }

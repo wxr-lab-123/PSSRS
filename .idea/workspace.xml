@@ -14,12 +14,14 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="HTML File" />
+        <option value="Exception" />
         <option value="Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -43,6 +45,10 @@
   </component>
   <component name="MavenRunner">
     <option name="jreName" value="17" />
+    <option name="skipTests" value="true" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -52,68 +58,73 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "JUnit.PssrsServerApplicationTests.executor": "Run",
-    "Maven.PSSRS-server [install].executor": "Run",
-    "Maven.PSSRS1 [clean].executor": "Run",
-    "Maven.PSSRS1 [install].executor": "Run",
-    "Maven.PSSRS1 [package].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.PssrsServerApplication.executor": "Run",
-    "git-widget-placeholder": "master",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "E:/webHD/myMeaven/PSSRS1/PSSRS-server/src/main/resources/static",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "onboarding.tips.debug.path": "E:/webHD/myMeaven/PSSRS1/PSSRS-pojo/src/main/java/com/hjm/Main.java",
-    "project.structure.last.edited": "模块",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;JUnit.PssrsServerApplicationTests.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.PSSRS-server [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.PSSRS-server [compile].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.PSSRS-server [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.PSSRS1 [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.PSSRS1 [compile].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.PSSRS1 [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.PSSRS1 [package].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.PssrsServerApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/webHD/myMeaven/PSSRS1/PSSRS-server&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;E:/webHD/myMeaven/PSSRS1/PSSRS-pojo/src/main/java/com/hjm/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;模块&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "mysql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;mysql&quot;
     ],
-    "GitStage.ChangesTree.GroupingKeys": [
-      "directory",
-      "module",
-      "repository"
+    &quot;GitStage.ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;,
+      &quot;module&quot;,
+      &quot;repository&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources\static" />
+      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server" />
+      <recent name="E:\webHD\myMeaven\PSSRS1" />
+      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources\static\vue-ghxthtgl" />
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources\mapper" />
-      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources" />
-      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-common\src\main\java\com\hjm" />
-      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-pojo\src\main\java\com\hjm" />
+      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\java\com\hjm\mapper" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources" />
       <recent name="E:\webHD\myMeaven\PSSRS1\PSSRS-pojo\src\main\java\com\hjm\pojo" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.hjm.exception" />
+      <recent name="com.hjm.controller.user" />
       <recent name="com.hjm.interceptor" />
       <recent name="com.hjm.utils" />
       <recent name="com.hjm.constant" />
-      <recent name="com.hjm.controller.common" />
     </key>
   </component>
   <component name="RunManager" selected="Spring Boot.PssrsServerApplication">
@@ -183,6 +194,80 @@
       <workItem from="1762241220105" duration="3751000" />
       <workItem from="1762246627610" duration="9831000" />
       <workItem from="1762303481948" duration="1874000" />
+      <workItem from="1762340691799" duration="11432000" />
+      <workItem from="1762392989949" duration="10822000" />
+      <workItem from="1762482204506" duration="11044000" />
+      <workItem from="1762509897521" duration="1935000" />
+      <workItem from="1762516665980" duration="3458000" />
+      <workItem from="1762573109077" duration="10478000" />
+      <workItem from="1762664262889" duration="6509000" />
+      <workItem from="1762733686474" duration="5562000" />
+      <workItem from="1762787419539" duration="1316000" />
+      <workItem from="1762837143520" duration="7925000" />
+      <workItem from="1762858274903" duration="4025000" />
+      <workItem from="1762906670233" duration="1206000" />
+      <workItem from="1762936644985" duration="10047000" />
+      <workItem from="1763009355802" duration="3729000" />
+      <workItem from="1763018748225" duration="2961000" />
+      <workItem from="1763079530603" duration="6144000" />
+      <workItem from="1763106074653" duration="4343000" />
+      <workItem from="1763264249322" duration="14928000" />
+      <workItem from="1763341174935" duration="832000" />
+      <workItem from="1763369746441" duration="10059000" />
+      <workItem from="1763382068902" duration="10383000" />
+      <workItem from="1763430415043" duration="5148000" />
+      <workItem from="1763443996217" duration="2817000" />
+      <workItem from="1763456111571" duration="3911000" />
+      <workItem from="1763558567837" duration="12000" />
+      <workItem from="1763621565288" duration="622000" />
+      <workItem from="1763683875200" duration="4740000" />
+      <workItem from="1763718784753" duration="9644000" />
+      <workItem from="1763773800859" duration="17257000" />
+      <workItem from="1763868187384" duration="7393000" />
+      <workItem from="1763981245484" duration="7322000" />
+      <workItem from="1764035738024" duration="2020000" />
+      <workItem from="1764039532999" duration="3053000" />
+      <workItem from="1764048239690" duration="720000" />
+      <workItem from="1764058574410" duration="7212000" />
+      <workItem from="1764073592670" duration="611000" />
+      <workItem from="1764145462897" duration="11710000" />
+      <workItem from="1764221053707" duration="3976000" />
+      <workItem from="1764251312581" duration="5371000" />
+      <workItem from="1764289397423" duration="4896000" />
+      <workItem from="1764422552285" duration="4506000" />
+      <workItem from="1764468110416" duration="16172000" />
+      <workItem from="1764548148182" duration="5657000" />
+      <workItem from="1764577045595" duration="4000000" />
+      <workItem from="1764590558435" duration="5973000" />
+      <workItem from="1764638669019" duration="5966000" />
+      <workItem from="1764767090853" duration="7128000" />
+      <workItem from="1764828127589" duration="1614000" />
+      <workItem from="1764853288293" duration="7037000" />
+      <workItem from="1764894393423" duration="4318000" />
+      <workItem from="1765002324699" duration="613000" />
+      <workItem from="1765080957319" duration="151000" />
+      <workItem from="1765082430488" duration="79000" />
+      <workItem from="1765093820821" duration="2127000" />
+      <workItem from="1765107703388" duration="1818000" />
+      <workItem from="1765163116472" duration="165000" />
+      <workItem from="1765163295071" duration="5000" />
+      <workItem from="1765175707974" duration="124000" />
+      <workItem from="1765187462659" duration="744000" />
+      <workItem from="1765271083816" duration="10166000" />
+      <workItem from="1765442508519" duration="1051000" />
+      <workItem from="1765757732705" duration="3000" />
+      <workItem from="1765757807515" duration="6936000" />
+      <workItem from="1765790971593" duration="325000" />
+      <workItem from="1765791432500" duration="6795000" />
+      <workItem from="1765804873016" duration="952000" />
+      <workItem from="1765864104213" duration="2466000" />
+      <workItem from="1765879641488" duration="528000" />
+      <workItem from="1765958257094" duration="3137000" />
+      <workItem from="1765976352398" duration="3162000" />
+      <workItem from="1766020870967" duration="504000" />
+      <workItem from="1766021441673" duration="1895000" />
+      <workItem from="1766040638417" duration="1432000" />
+      <workItem from="1766103764288" duration="2015000" />
     </task>
     <task id="LOCAL-00001" summary="初始代码且部分后台管理系统">
       <option name="closed" value="true" />
@@ -224,7 +309,95 @@
       <option name="project" value="LOCAL" />
       <updated>1762131332159</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="完善医生管理模块,科室管理模块&#10;完善web拦截器&#10;完成用户端,患者登录,注册等功能">
+      <option name="closed" value="true" />
+      <created>1762341440503</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1762341440503</updated>
+    </task>
+    <task id="LOCAL-00007" summary="医生排班功能">
+      <option name="closed" value="true" />
+      <created>1762399691720</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1762399691720</updated>
+    </task>
+    <task id="LOCAL-00008" summary="用户端产看医生排版信息挂号">
+      <option name="closed" value="true" />
+      <created>1762841746446</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1762841746446</updated>
+    </task>
+    <task id="LOCAL-00009" summary="优化系统,前端界面,逻辑过期缓存排班信息详情">
+      <option name="closed" value="true" />
+      <created>1763341565489</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1763341565489</updated>
+    </task>
+    <task id="LOCAL-00010" summary="小程序代码,todo">
+      <option name="closed" value="true" />
+      <created>1763686874204</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1763686874204</updated>
+    </task>
+    <task id="LOCAL-00011" summary="小程序代码,todo">
+      <option name="closed" value="true" />
+      <created>1763687781290</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1763687781290</updated>
+    </task>
+    <task id="LOCAL-00012" summary="备份">
+      <option name="closed" value="true" />
+      <created>1764040293836</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1764040293836</updated>
+    </task>
+    <task id="LOCAL-00013" summary="基本完成所有功能">
+      <option name="closed" value="true" />
+      <created>1764510154542</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1764510154542</updated>
+    </task>
+    <task id="LOCAL-00014" summary="删除逻辑">
+      <option name="closed" value="true" />
+      <created>1764579567968</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1764579567968</updated>
+    </task>
+    <task id="LOCAL-00015" summary="医生消息功能完成">
+      <option name="closed" value="true" />
+      <created>1764770589203</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1764770589203</updated>
+    </task>
+    <task id="LOCAL-00016" summary="退款功能实现">
+      <option name="closed" value="true" />
+      <created>1764828197179</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1764828197179</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -248,62 +421,32 @@
       <path value="$PROJECT_DIR$" />
     </ignored-roots>
     <MESSAGE value="初始代码且部分后台管理系统" />
-    <option name="LAST_COMMIT_MESSAGE" value="初始代码且部分后台管理系统" />
+    <MESSAGE value="完善医生管理模块,科室管理模块&#10;完善web拦截器&#10;完成用户端,患者登录,注册等功能" />
+    <MESSAGE value="医生排班功能" />
+    <MESSAGE value="用户端产看医生排版信息挂号" />
+    <MESSAGE value="优化系统,前端界面,逻辑过期缓存排班信息详情" />
+    <MESSAGE value="小程序代码,todo" />
+    <MESSAGE value="备份" />
+    <MESSAGE value="基本完成所有功能" />
+    <MESSAGE value="删除逻辑" />
+    <MESSAGE value="医生消息功能完成" />
+    <MESSAGE value="退款功能实现" />
+    <option name="LAST_COMMIT_MESSAGE" value="退款功能实现" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
-          <line>43</line>
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
-          <line>47</line>
-          <option name="timeStamp" value="29" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
-          <line>50</line>
-          <option name="timeStamp" value="30" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
-          <line>49</line>
-          <option name="timeStamp" value="31" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
-          <line>48</line>
-          <option name="timeStamp" value="32" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/interceptor/JwtTokenUserInterceptor.java</url>
-          <line>63</line>
-          <option name="timeStamp" value="33" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/controller/admin/UserController.java</url>
-          <line>59</line>
-          <option name="timeStamp" value="34" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/controller/admin/UserController.java</url>
-          <line>58</line>
-          <option name="timeStamp" value="35" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/PSSRS-server/src/main/java/com/hjm/controller/admin/UserController.java</url>
-          <line>61</line>
-          <option name="timeStamp" value="36" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="java.lang.Long" memberName="value" />
+      </pinned-members>
+    </pin-to-top-manager>
     <watches-manager>
       <configuration name="SpringBootApplicationConfigurationType">
-        <watch expression="((Request)((RequestFacade)request).request).internalDispatcherType" custom="org.apache.catalina.connector.RequestFacade,org.apache.catalina.connector.Request" />
+        <watch expression="((Request)((RequestFacade)request).request).internalDispatcherType" language="JAVA" custom="org.apache.catalina.connector.RequestFacade,org.apache.catalina.connector.Request" />
       </configuration>
     </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

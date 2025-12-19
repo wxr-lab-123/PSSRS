@@ -1,10 +1,12 @@
 package com.hjm.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hjm.constant.MessageConstant;
 import com.hjm.constant.PasswordConstant;
+import com.hjm.constant.RedisConstants;
 import com.hjm.constant.StatusConstant;
 import com.hjm.exception.AccountLockedException;
 import com.hjm.exception.PasswordErrorException;
@@ -17,6 +19,7 @@ import com.hjm.pojo.Entity.DoctorProfile;
 import com.hjm.pojo.Entity.User;
 import com.hjm.pojo.Entity.UserRole;
 import com.hjm.pojo.VO.DoctorVO;
+import com.hjm.pojo.VO.UserProfileVO;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.service.IDoctorProfileService;
@@ -24,6 +27,7 @@ import com.hjm.service.IUserRoleService;
 import com.hjm.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
@@ -31,6 +35,7 @@ import org.springframework.util.DigestUtils;
 import javax.security.auth.login.AccountNotFoundException;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.hjm.constant.MyConstant.*;
 
@@ -56,6 +61,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private UserMapper userMapper;
     @Autowired
     private DoctorProfileMapper doctorProfileMapper;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 用户登录功能
@@ -259,6 +266,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return Result.success();
     }
 
+    @Override
+    public UserProfileVO getProfile(Long userId) {
+        User user = getById(userId);
+        if (user == null){
+            throw new RuntimeException("用户不存在");
+        }
+        Long roleId = userRoleService.getOne(new QueryWrapper<UserRole>().eq("user_id", userId)).getRoleId();
+        if (roleId.equals(ROLE_DOCTOR_ID)){
+            return doctorProfileMapper.getProfile(userId);
+        }else {
+            return userMapper.getProfile(userId);
+        }
+    }
+
+    @Override
+    public Result sendUpdateCode(String phone) {
+            //检验手机号格式
+            if (phone.isEmpty()) {
+                return Result.error("手机号为空");
+            }
+            if (!phone.matches("^1[3-9]\\d{9}$")) {
+                return Result.error("手机号格式错误");
+            }
+            //生成验证码
+            String s = RandomUtil.randomNumbers(6);
+            stringRedisTemplate.opsForValue().set(RedisConstants.UPDATE_CODE_KEY + phone, s, RedisConstants.UPDATE_CODE_TTL, TimeUnit.MINUTES);
+            return Result.success();
+    }
 
 
     /**

@@ -18,6 +18,8 @@ public class PatientMessage implements Serializable {
     private Long messageId;
     @ApiModelProperty("患者ID")
     private Long patientId;
+    @ApiModelProperty("所属用户ID")
+    private Long userPatientId;
     @ApiModelProperty("医生ID")
     private Long doctorId;
     @ApiModelProperty("消息类型")

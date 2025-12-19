@@ -11,7 +11,8 @@
     "pages/user-info/user-info",
     "pages/edit-info/edit-info",
     "pages/payment/payment",
-    "pages/orders/orders"
+    "pages/orders/orders",
+    "pages/patients/patients"
   ],
   "window": {
     "navigationBarTextStyle": "white",

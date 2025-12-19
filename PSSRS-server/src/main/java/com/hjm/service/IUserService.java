@@ -5,6 +5,7 @@ import com.hjm.pojo.DTO.AdminDTO;
 import com.hjm.pojo.DTO.DoctorDTO;
 import com.hjm.pojo.DTO.UserLoginDTO;
 import com.hjm.pojo.Entity.User;
+import com.hjm.pojo.VO.UserProfileVO;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import org.springframework.stereotype.Service;
@@ -51,4 +52,8 @@ public interface IUserService extends IService<User> {
     PageResult listAdmins(String name, Integer status, Long page, Long pageSize);
 
     Result updateAdmin(Long id, AdminDTO adminDTO);
+
+    UserProfileVO getProfile(Long userId);
+
+    Result sendUpdateCode(String phone);
 }

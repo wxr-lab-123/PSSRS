@@ -257,5 +257,6 @@ module.exports = {
   post,
   put,
   del,
+  delete: del,
   upload
 }

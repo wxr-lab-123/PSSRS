@@ -8,7 +8,7 @@
             FROM order_info
             WHERE patient_id = #{patientId}
             AND schedule_id = #{scheduleId}
-            AND status = 0
+            AND status in (0, 1)
         )
     </select>
     <select id="listByPId" resultType="com.hjm.pojo.Entity.OrderInfo">
@@ -16,7 +16,7 @@
         FROM order_info
         <where>
             <if test="patientId != null">
-                patient_id = #{patientId}
+                user_patient_id = #{userPatientId}
             </if>
             <if test="status != null">
                 AND status = #{status}

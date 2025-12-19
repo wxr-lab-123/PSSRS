@@ -25,10 +25,11 @@ function getRefundStatus(orderNo) {
  * 创建挂号订单
  * @param {Number} scheduleId 号源ID
  */
-function createOrder(scheduleId) {
+function createOrder(scheduleId, patientId) {
   // 后端使用 @RequestParam Integer scheduleId 接收参数
   // 这里通过查询参数传递，避免 JSON Body 与 @RequestParam 不匹配
-  const url = `${config.API.CREATE_ORDER}?scheduleId=${encodeURIComponent(scheduleId)}`
+  const qs = `scheduleId=${encodeURIComponent(scheduleId)}${patientId?`&patientId=${encodeURIComponent(patientId)}`:''}`
+  const url = `${config.API.CREATE_ORDER}?${qs}`
   return request.post(url)
 }
 

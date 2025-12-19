@@ -12,7 +12,7 @@
   <view class="user-section" wx:if="{{isLogin}}">
     <view class="user-header" bindtap="goToUserInfo">
       <view class="user-info">
-        <text class="user-name">{{userInfo.name}}</text>
+        <text class="user-name">{{userInfo.nickname || userInfo.name}}</text>
         <text class="user-phone">{{userInfo.phone}}</text>
       </view>
       <text class="user-arrow">›</text>

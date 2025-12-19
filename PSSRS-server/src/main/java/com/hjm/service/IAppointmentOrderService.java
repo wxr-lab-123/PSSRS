@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.hjm.pojo.DTO.AppointmentOrderPageDTO;
 import com.hjm.pojo.DTO.PaymentDTO;
 import com.hjm.pojo.DTO.RegistrationCreateDTO;
+import com.hjm.pojo.DTO.RegistrationDTO;
 import com.hjm.pojo.Entity.AppointmentOrder;
 
 import com.hjm.pojo.VO.RegistrationVO;
@@ -31,11 +32,13 @@ public interface IAppointmentOrderService extends IService<AppointmentOrder> {
 
     AppointmentOrder getByOrderNo(String orderNo);
 
-    List<RegistrationVO> listByPId(Long patientId);
+    List<RegistrationVO> listByPId(Long userId);
 
     Result<PageResult> listByPage(AppointmentOrderPageDTO appointmentOrderPageDTO);
 
     Result createPayment(PaymentDTO paymentDTO);
 
     List<Long> listPatientIdsByScheduleId(Long scheduleId);
+
+    Result cancel(RegistrationDTO registrationDTO);
 }

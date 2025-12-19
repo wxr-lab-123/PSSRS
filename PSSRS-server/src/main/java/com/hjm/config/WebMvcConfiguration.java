@@ -30,6 +30,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         log.info("注册自定义拦截器...");
 
+        registry.addInterceptor(new ReflsahInterceptor(stringRedisTemplate))
+                .addPathPatterns("/api/**");
+
         registry.addInterceptor(jwtTokenUserInterceptor)
                 .addPathPatterns("/api/admin/**")
                 .excludePathPatterns("/api/admin/auth/login");

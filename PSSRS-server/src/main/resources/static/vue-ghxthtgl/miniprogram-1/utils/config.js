@@ -37,6 +37,7 @@ module.exports = {
     LOGOUT: '/api/user/logout',                  // 退出登录
     GET_USER_INFO: '/api/user/info',             // 获取用户信息
     UPDATE_USER_INFO: '/api/user/update',        // 更新用户信息
+    UPDATE_USER_PROFILE: '/api/user/profile',
     CHECK_USER_INFO: '/api/user/validate',       // 检测用户信息是否完善（后端校验）
     CHANGE_PASSWORD: '/api/user/changePassword',  // 修改密码
     
@@ -85,5 +86,7 @@ module.exports = {
     ,GET_MESSAGES: '/api/user/messages'
     ,UNREAD_COUNT: '/api/user/messages/unread-count'
     ,MARK_MESSAGE_READ: (id) => `/api/user/messages/${id}/read`
+    ,USER_PATIENTS: '/api/user/patients'
+    ,SWITCH_PATIENT: '/api/user/switchPatient'
   }
 }

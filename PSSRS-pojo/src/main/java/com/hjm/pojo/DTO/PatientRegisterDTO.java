@@ -10,4 +10,5 @@ public class PatientRegisterDTO {
     private String code;
     private String idCard;
     private String confirmPassword;
+    private String relation;
 }

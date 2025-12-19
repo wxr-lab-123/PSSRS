@@ -2,12 +2,14 @@ package com.hjm.controller.admin;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hjm.context.BaseContext;
 import com.hjm.pojo.DTO.AdminDTO;
 import com.hjm.pojo.DTO.DoctorDTO;
 import com.hjm.pojo.DTO.UserLoginDTO;
 import com.hjm.pojo.Entity.DoctorProfile;
 import com.hjm.pojo.Entity.User;
 import com.hjm.pojo.Entity.UserRole;
+import com.hjm.pojo.VO.UserProfileVO;
 import com.hjm.properties.JwtProperties;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
@@ -179,6 +181,20 @@ public class UserController {
         userService.removeById(id);
         userRoleService.remove(new QueryWrapper<UserRole>().eq("user_id", id));
         return Result.success();
+    }
+
+    @GetMapping("/user/profile")
+    public Result<UserProfileVO> getProfile() {
+        Long userId = BaseContext.getCurrentId();
+        UserProfileVO userProfileVO = userService.getProfile(userId);
+        return Result.success(userProfileVO);
+    }
+
+
+    @PostMapping("/user/phone/sendCode")
+    public Result sendUpdateCode(@RequestParam String phone) {
+        log.info("发送手机验证码：{}", phone);
+        return userService.sendUpdateCode(phone);
     }
 
 }
