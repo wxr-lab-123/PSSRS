@@ -10,6 +10,9 @@ public class RedisConstants {
     public static final String SCHEDULE_DETAIL_KEY = "cache:scheduleDetail:";
     public static final Long SCHEDULE_TTL = 30L;
 
+    public static final String ADMIM_PD_CODE = "pdc:code:";
+    public static final Long ADMIM_PD_CODE_TTL = 2L;
+
     public static final String LOCK_SCH_KEY = "lock:schedule:";
     public static final Long LOCK_SCH_TTL = 10L;
 

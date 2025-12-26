@@ -27,6 +27,7 @@ Page({
 
   onShow() {
     // 页面显示时刷新数据
+    this.setData({ i18n: i18n.getBundle() })
     this.loadOrders()
   },
 
@@ -95,6 +96,7 @@ Page({
           return {
             id: item.id,
             orderNo: item.orderNo,
+            patientName: item.patientName,
             createTime: `${formatDateTime(item.createTime || item.createdAt)} (${i18n.t('common.tzLabel')})`,
             amount: Number(item.amount) || 0,
             status: String(item.status),

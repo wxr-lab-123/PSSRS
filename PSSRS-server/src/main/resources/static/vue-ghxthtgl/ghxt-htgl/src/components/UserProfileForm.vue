@@ -142,8 +142,16 @@
     <!-- 更改密码弹窗 -->
     <el-dialog v-model="passwordDialogVisible" title="更改密码" width="400px" align-center class="custom-dialog">
       <el-form :model="pwdForm" :rules="pwdRules" ref="pwdRef" label-width="90px" size="large">
-        <el-form-item label="当前密码" prop="oldPassword">
-          <el-input type="password" show-password v-model="pwdForm.oldPassword" placeholder="请输入当前密码" />
+        <el-form-item label="手机号">
+          <el-input :model-value="form.phone" disabled placeholder="未绑定手机号" />
+        </el-form-item>
+        <el-form-item label="验证码" prop="code">
+          <div class="code-input-group">
+            <el-input v-model="pwdForm.code" maxlength="6" placeholder="请输入验证码" />
+            <el-button class="send-btn" :disabled="pwdCodeSending || pwdCodeCountdown>0" :loading="pwdCodeSending" @click="onSendPwdCode">
+              {{ pwdCodeCountdown>0 ? `${pwdCodeCountdown}s` : '获取验证码' }}
+            </el-button>
+          </div>
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
           <el-input type="password" show-password v-model="pwdForm.newPassword" placeholder="请输入新密码" />
@@ -166,7 +174,7 @@ import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import { User, Iphone, Lock, Edit, UserFilled, Camera } from '@element-plus/icons-vue'
 import { useAuthStore } from '../stores/auth'
-import { getProfile, updateProfile, updateAvatar, bindPhone, changePassword, sendPhoneCode } from '../api/profile'
+import { getProfile, updateProfile, updateAvatar, bindPhone, changePassword, sendPhoneCode, sendPasswordChangeCode } from '../api/profile'
 import { updateDoctor } from '../api/doctors'
 import { uploadDoctorAvatar } from '../api/upload'
 
@@ -192,6 +200,9 @@ const phoneLoading = ref(false)
 const passwordLoading = ref(false)
 const codeCountdown = ref(0)
 const codeSending = ref(false)
+const pwdCodeCountdown = ref(0)
+const pwdCodeSending = ref(false)
+let pwdCodeTimer = null
 
 const rules = {
   nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }]
@@ -205,9 +216,9 @@ const phoneRules = {
   phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }, { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }],
   code: [{ required: true, message: '请输入验证码', trigger: 'blur' }]
 }
-const pwdForm = reactive({ oldPassword: '', newPassword: '', confirm: '' })
+const pwdForm = reactive({ code: '', newPassword: '', confirm: '' })
 const pwdRules = {
-  oldPassword: [{ required: true, message: '请输入当前密码', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
   newPassword: [{ required: true, message: '请输入新密码', trigger: 'blur' }, { min: 6, message: '密码长度至少6位', trigger: 'blur' }],
   confirm: [{ required: true, message: '请再次输入新密码', trigger: 'blur' }]
 }
@@ -237,6 +248,14 @@ watch(phoneDialogVisible, (v) => {
     codeCountdown.value = 0
     codeSending.value = false
     if (codeTimer) { clearInterval(codeTimer); codeTimer = null }
+  }
+})
+
+watch(passwordDialogVisible, (v) => {
+  if (!v) {
+    pwdCodeCountdown.value = 0
+    pwdCodeSending.value = false
+    if (pwdCodeTimer) { clearInterval(pwdCodeTimer); pwdCodeTimer = null }
   }
 })
 
@@ -339,6 +358,23 @@ async function onSendCode() {
   }
 }
 
+async function onSendPwdCode() {
+  if (pwdCodeSending.value || pwdCodeCountdown.value > 0) return
+  if (!form.phone) { ElMessage.error('请先绑定手机号'); return }
+  pwdCodeSending.value = true
+  try {
+    await sendPasswordChangeCode(form.phone)
+    ElMessage.success('验证码已发送')
+    pwdCodeCountdown.value = 60
+    pwdCodeTimer = setInterval(() => {
+      pwdCodeCountdown.value -= 1
+      if (pwdCodeCountdown.value <= 0) { clearInterval(pwdCodeTimer); pwdCodeTimer = null }
+    }, 1000)
+  } finally {
+    pwdCodeSending.value = false
+  }
+}
+
 function submitPassword() {
   if (!pwdRef.value) return
   if (pwdForm.newPassword !== pwdForm.confirm) {
@@ -349,9 +385,14 @@ function submitPassword() {
     if (!ok) return
     passwordLoading.value = true
     try {
-      await changePassword({ oldPassword: pwdForm.oldPassword, newPassword: pwdForm.newPassword })
+      await changePassword({ 
+        phone: form.phone, 
+        code: pwdForm.code, 
+        newPd: pwdForm.newPassword, 
+        configPd: pwdForm.confirm 
+      })
       passwordDialogVisible.value = false
-      pwdForm.oldPassword = ''
+      pwdForm.code = ''
       pwdForm.newPassword = ''
       pwdForm.confirm = ''
       ElMessage.success('密码已更新')
@@ -361,7 +402,10 @@ function submitPassword() {
   })
 }
 
-onBeforeUnmount(() => { if (codeTimer) { clearInterval(codeTimer); codeTimer = null } })
+onBeforeUnmount(() => { 
+  if (codeTimer) { clearInterval(codeTimer); codeTimer = null }
+  if (pwdCodeTimer) { clearInterval(pwdCodeTimer); pwdCodeTimer = null }
+})
 </script>
 
 <style scoped>

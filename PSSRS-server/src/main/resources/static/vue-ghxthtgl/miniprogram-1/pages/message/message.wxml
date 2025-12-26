@@ -12,6 +12,7 @@
             <text class="status {{item.statusClass}}">{{item.statusText}}</text>
           </view>
         </view>
+        <view class="sub" wx:if="{{item.raw.patientName}}">就诊人：{{item.raw.patientName}}</view>
         <view class="sub">{{item.subtitle}}</view>
         <view class="time">{{item.timeText}}</view>
       </view>

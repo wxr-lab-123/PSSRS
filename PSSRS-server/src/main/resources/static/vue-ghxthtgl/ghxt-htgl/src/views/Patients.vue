@@ -10,26 +10,29 @@
             <el-option label="女" value="1" />
           </el-select>
           <el-input v-model="query.phone" placeholder="手机号" clearable style="width:180px" />
-          <el-button type="primary" @click="onSearch">查询</el-button>
-          <el-button @click="onReset">重置</el-button>
-          <el-button v-if="hasPerm('patients:create')" type="primary" @click="onAdd">新增患者</el-button>
+          <el-button type="primary" :icon="Search" @click="onSearch">查询</el-button>
+          <el-button :icon="Refresh" @click="onReset">重置</el-button>
+          <el-button v-if="hasPerm('patients:create')" type="primary" :icon="Plus" @click="onAdd">新增患者</el-button>
         </el-space>
       </div>
     </template>
-    <el-table :data="rows" style="width: 100%" :loading="loading">
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="name" label="姓名" />
-      <el-table-column prop="gender" label="性别" width="80">
-        <template #default="{ row }">{{ row.gender === '0' ? '男' : row.gender === '1' ? '女' : '-' }}</template>
-      </el-table-column>
-      <el-table-column prop="age" label="年龄" width="80" />
-      <el-table-column prop="phone" label="联系电话" />
-      <el-table-column prop="idCard" label="身份证号" min-width="160" />
-      <el-table-column prop="address" label="家庭住址" min-width="180" />
-      <el-table-column label="操作" width="160">
+    <el-table :data="rows" style="width: 100%" :loading="loading" stripe border highlight-current-row>
+      <el-table-column prop="id" label="ID" width="80" align="center" />
+      <el-table-column prop="name" label="姓名" align="center" />
+      <el-table-column prop="gender" label="性别" width="80" align="center">
         <template #default="{ row }">
-          <el-button v-if="hasPerm('patients:update')" type="primary" link @click="onEdit(row)">编辑</el-button>
-          <el-button v-if="hasPerm('patients:delete')" type="danger" link @click="onDelete(row)">删除</el-button>
+          <el-tag :type="row.gender === '0' ? '' : row.gender === '1' ? 'danger' : 'info'" size="small">
+            {{ row.gender === '0' ? '男' : row.gender === '1' ? '女' : '-' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="age" label="年龄" width="80" align="center" />
+      <el-table-column prop="phone" label="联系电话" align="center" />
+      <el-table-column prop="idCard" label="身份证号" min-width="160" align="center" />
+      <el-table-column label="操作" width="180" align="center" fixed="right">
+        <template #default="{ row }">
+          <el-button v-if="hasPerm('patients:update')" type="primary" link :icon="Edit" @click="onEdit(row)">编辑</el-button>
+          <el-button v-if="hasPerm('patients:delete')" type="danger" link :icon="Delete" @click="onDelete(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -65,9 +68,6 @@
         <el-form-item label="身份证号" prop="idCard">
           <el-input v-model="createForm.idCard" placeholder="请输入身份证号" />
         </el-form-item>
-        <el-form-item label="家庭住址" prop="address">
-          <el-input v-model="createForm.address" placeholder="请输入家庭住址" />
-        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -96,9 +96,6 @@
         <el-form-item label="身份证号" prop="idCard">
           <el-input v-model="editForm.idCard" placeholder="请输入身份证号" />
         </el-form-item>
-        <el-form-item label="家庭住址" prop="address">
-          <el-input v-model="editForm.address" placeholder="请输入家庭住址" />
-        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -113,7 +110,7 @@
 <script setup>
 import { ref, reactive, onMounted, inject, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { User } from '@element-plus/icons-vue'
+import { User, Search, Refresh, Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { fetchPatients, createPatient, updatePatient, deletePatient } from '../api/patients'
 import { useAuthStore } from '../stores/auth'
 import request from '../api/request'
@@ -129,7 +126,7 @@ const hasPerm = (code) => auth.hasPerm(code)
 const createVisible = ref(false)
 const createSubmitting = ref(false)
 const createFormRef = ref()
-const createForm = reactive({ name: '', gender: '', age: undefined, phone: '', idCard: '', address: '' })
+const createForm = reactive({ name: '', gender: '', age: undefined, phone: '', idCard: '' })
 const phonePattern = /^(?:(?:\+?86)?1\d{10})$/
 // 简化身份证校验：18位，前17位数字，最后一位数字或X/x
 const idCardPattern = /^(\d{17})([0-9Xx])$/
@@ -162,9 +159,6 @@ const createRules = {
 createRules.idCard = [
   { required: true, message: '请输入身份证号', trigger: 'blur' },
   { pattern: idCardPattern, message: '身份证号格式不正确', trigger: ['blur', 'change'] }
-]
-createRules.address = [
-  { required: true, message: '请输入家庭住址', trigger: 'blur' }
 ]
 
 async function fetchList() {
@@ -200,7 +194,6 @@ function onAdd() {
   createForm.age = undefined
   createForm.phone = ''
   createForm.idCard = ''
-  createForm.address = ''
   createVisible.value = true
 }
 
@@ -234,7 +227,7 @@ onMounted(fetchList)
 const editVisible = ref(false)
 const editSubmitting = ref(false)
 const editFormRef = ref()
-const editForm = reactive({ id: undefined, name: '', gender: '', age: undefined, phone: '', idCard: '', address: '' })
+const editForm = reactive({ id: undefined, name: '', gender: '', age: undefined, phone: '', idCard: '' })
 
 function onEdit(row) {
   editForm.id = row.id
@@ -243,7 +236,6 @@ function onEdit(row) {
   editForm.age = row.age
   editForm.phone = row.phone
   editForm.idCard = row.idCard
-  editForm.address = row.address
   editVisible.value = true
 }
 
@@ -268,8 +260,7 @@ function onEditSubmit() {
           gender: payload.gender,
           age: payload.age,
           phone: payload.phone,
-          idCard: payload.idCard,
-          address: payload.address
+          idCard: payload.idCard
         }
       } else {
         // 如果找不到，重新获取列表

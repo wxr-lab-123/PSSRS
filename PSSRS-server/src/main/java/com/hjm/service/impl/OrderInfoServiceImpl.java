@@ -14,6 +14,7 @@ import com.hjm.pojo.Entity.DoctorSchedule;
 import com.hjm.pojo.Entity.OrderInfo;
 import com.hjm.mapper.OrderInfoMapper;
 import com.hjm.pojo.VO.OrderCreateVO;
+import com.hjm.pojo.VO.OrderInfoVO;
 import com.hjm.pojo.VO.OrderPageVO;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
@@ -62,7 +63,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         orderInfo.setScheduleId(scheduleId.longValue());
         Long id = patientId;
         orderInfo.setPatientId(id);
-        Long uid = com.hjm.context.UserPatientContext.get() == null ? null : UserPatientContext.get().getId();
+        Long uid = UserPatientContext.get() == null ? null : UserPatientContext.get().getId();
         orderInfo.setUserPatientId(uid);
         // 2. 防止重复下单（同一患者同一号源未支付订单存在）
         boolean exists = orderInfoMapper.existsUnpaidOrder(id, scheduleId.longValue());
@@ -130,7 +131,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     }
 
     @Override
-    public List<OrderInfo> listByPId(Long userPatientId, Integer status, LocalDate startDate) {
+    public List<OrderInfoVO> listByPId(Long userPatientId, Integer status, LocalDate startDate) {
         return orderInfoMapper.listByPId(userPatientId, status, startDate);
     }
 

@@ -14,11 +14,7 @@ import com.hjm.properties.JwtProperties;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.security.RequiresPermissions;
-import com.hjm.service.IDoctorProfileService;
-import com.hjm.service.IPermissionService;
-import com.hjm.service.IRoleService;
-import com.hjm.service.IUserRoleService;
-import com.hjm.service.IUserService;
+import com.hjm.service.*;
 import com.hjm.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +45,7 @@ public class UserController {
     private final JwtProperties jwtProperties;
     private final IUserRoleService userRoleService;
     private final IPermissionService permissionService;
+    private final IDoctorScheduleService doctorScheduleService;
 
     @PostMapping("/auth/login")
     public Result login(@RequestBody UserLoginDTO userLoginDTO) throws AccountNotFoundException {
@@ -120,6 +117,7 @@ public class UserController {
     @DeleteMapping("/doctors/{id}")
     public Result deleteDoctor(@PathVariable Long id) {
         log.info("删除医生账号：{}", id);
+
         //逻辑删除
         userService.removeById(id);
         userRoleService.remove(new QueryWrapper<UserRole>().eq("user_id", id));

@@ -1,28 +1,58 @@
 <template>
-  <el-card>
+  <el-card class="page-container">
     <template #header>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>科室管理</div>
-        <el-space>
-          <el-input v-model="query.name" placeholder="科室名称" clearable style="width:160px" @keyup.enter="onSearch" />
-          <el-button type="primary" @click="onSearch">查询</el-button>
-          <el-button @click="onReset">重置</el-button>
-          <el-button type="primary" @click="onAdd">新增科室</el-button>
+      <div class="page-header">
+        <div class="header-title">
+          <div class="title-decoration"></div>
+          <span>科室管理</span>
+        </div>
+        <el-space :size="12">
+          <el-input 
+            v-model="query.name" 
+            placeholder="请输入科室名称搜索" 
+            clearable 
+            style="width: 240px" 
+            @keyup.enter="onSearch"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+          <el-button type="primary" @click="onSearch" :icon="Search">查询</el-button>
+          <el-button @click="onReset" :icon="RefreshRight">重置</el-button>
+          <el-button type="primary" class="add-btn" @click="onAdd" :icon="Plus">新增科室</el-button>
         </el-space>
       </div>
     </template>
-    <el-table v-if="!isCardView" :data="rows" style="width: 100%" :loading="loading">
-      <el-table-column prop="name" label="科室名称" />
-      <el-table-column prop="description" label="科室描述" min-width="300" show-overflow-tooltip />
-      <el-table-column prop="createTime" label="创建时间" width="180">
+
+    <el-table 
+      v-if="!isCardView" 
+      :data="rows" 
+      style="width: 100%" 
+      :loading="loading"
+      stripe
+      highlight-current-row
+      header-cell-class-name="table-header"
+    >
+      <el-table-column prop="name" label="科室名称" min-width="150">
         <template #default="{ row }">
-          {{ formatDateTime(row.createTime) }}
+          <span class="dept-name">{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="160">
+      <el-table-column prop="description" label="科室描述" min-width="300" show-overflow-tooltip>
         <template #default="{ row }">
-          <el-button type="primary" link @click="onEdit(row)">编辑</el-button>
-          <el-button type="danger" link @click="onDelete(row)">删除</el-button>
+          <span class="text-secondary">{{ row.description || '暂无描述' }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" width="180">
+        <template #default="{ row }">
+          <span class="date-text">{{ formatDateTime(row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="180" align="center" fixed="right">
+        <template #default="{ row }">
+          <el-button type="primary" link @click="onEdit(row)" :icon="Edit">编辑</el-button>
+          <el-button type="danger" link @click="onDelete(row)" :icon="Delete">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -30,27 +60,36 @@
     <div v-else class="cards-grid">
       <el-card v-for="row in rows" :key="row.id || row.name" class="dept-card" shadow="hover" @click="onEdit(row)">
         <template #header>
-          <div class="card-header">{{ row.name }}</div>
+          <div class="card-header">
+            <el-icon class="card-icon"><OfficeBuilding /></el-icon>
+            <span>{{ row.name }}</span>
+          </div>
         </template>
         <div class="card-content">
-          <div>描述：{{ row.description }}</div>
-          <div>创建时间：{{ formatDateTime(row.createTime) }}</div>
+          <div class="info-item">
+            <span class="label">描述：</span>
+            <span class="value">{{ row.description || '暂无描述' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">时间：</span>
+            <span class="value">{{ formatDateTime(row.createTime) }}</span>
+          </div>
         </div>
         <div class="card-actions" @click.stop>
-          <el-button type="primary" size="small" @click="onEdit(row)">编辑</el-button>
-          <el-button type="danger" size="small" @click="onDelete(row)">删除</el-button>
+          <el-button type="primary" size="small" @click="onEdit(row)" :icon="Edit" plain>编辑</el-button>
+          <el-button type="danger" size="small" @click="onDelete(row)" :icon="Delete" plain>删除</el-button>
         </div>
       </el-card>
     </div>
 
-    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+    <div class="pagination-container">
       <el-pagination
         background
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
         v-model:current-page="page"
         v-model:page-size="pageSize"
-        :page-sizes="[10,20,50,100]"
+        :page-sizes="[10, 20, 50, 100]"
         @current-change="handlePageChange"
         @size-change="handleSizeChange"
       />
@@ -60,24 +99,30 @@
     <el-dialog 
       v-model="dialogVisible" 
       :title="editForm.id ? '编辑科室' : '新增科室'" 
-      width="520px"
+      width="500px"
       @close="resetForm"
+      align-center
+      destroy-on-close
+      class="custom-dialog"
     >
       <el-form 
         ref="formRef" 
         :model="editForm" 
         :rules="rules" 
-        label-width="88px"
+        label-width="90px"
+        status-icon
       >
         <el-form-item label="科室名称" prop="name">
-          <el-input v-model="editForm.name" placeholder="请输入科室名称" />
+          <el-input v-model="editForm.name" placeholder="请输入科室名称" :prefix-icon="OfficeBuilding" />
         </el-form-item>
         <el-form-item label="科室描述" prop="description">
           <el-input 
             v-model="editForm.description" 
             type="textarea" 
-            :rows="3"
-            placeholder="请输入科室描述"
+            :rows="4"
+            placeholder="请输入科室职能、诊疗范围等描述信息..."
+            show-word-limit
+            maxlength="255"
           />
         </el-form-item>
       </el-form>
@@ -94,12 +139,13 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick, inject, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { OfficeBuilding } from '@element-plus/icons-vue'
+import { OfficeBuilding, Search, RefreshRight, Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { fetchDepartments, createDepartment, updateDepartment, deleteDepartment } from '../api/departments'
 import { toCreateDepartmentDTO, toUpdateDepartmentDTO } from '../dto/department'
 import { formatDateTime } from '../utils/date'
 
 const loading = ref(false)
+
 const rows = ref([])
 const total = ref(0)
 const page = ref(1)
@@ -245,13 +291,131 @@ onMounted(fetchList)
 </script>
 
 <style scoped>
-.cards-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px }
-@media (max-width:1200px){ .cards-grid{ grid-template-columns:repeat(3,minmax(0,1fr)) } }
-@media (max-width:900px){ .cards-grid{ grid-template-columns:repeat(2,minmax(0,1fr)) } }
-@media (max-width:600px){ .cards-grid{ grid-template-columns:1fr } }
-.dept-card { border-radius:8px; transition: all .2s ease }
-.dept-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.15) }
-.card-header { font-weight:600; font-size:16px }
-.card-content { font-size:14px; line-height:1.6; padding: 0 16px; display:flex; flex-direction:column; gap:12px }
-.card-actions { display:flex; justify-content:flex-end; gap:8px; padding: 8px 16px }
+.page-container {
+  min-height: calc(100vh - 120px);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.title-decoration {
+  width: 4px;
+  height: 18px;
+  background: var(--color-primary);
+  border-radius: 2px;
+  margin-right: 12px;
+}
+
+.dept-name {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.date-text {
+  color: var(--color-text-secondary);
+  font-family: monospace;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* Card View Styles */
+.cards-grid { 
+  display: grid; 
+  grid-template-columns: repeat(4, minmax(0, 1fr)); 
+  gap: 20px;
+}
+
+@media (max-width: 1400px) { .cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 1100px) { .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .cards-grid { grid-template-columns: 1fr; } }
+
+.dept-card { 
+  border-radius: 12px; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--color-border);
+}
+
+.dept-card:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-primary-soft);
+}
+
+.card-header { 
+  font-weight: 600; 
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-icon {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 18px;
+}
+
+.card-content { 
+  font-size: 14px; 
+  line-height: 1.6; 
+  padding: 0 4px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+}
+
+.info-item .label {
+  color: var(--color-text-secondary);
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.info-item .value {
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.card-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 12px; 
+  padding: 12px 4px 4px;
+  border-top: 1px solid var(--color-border);
+  margin-top: 16px;
+}
+
+/* Custom Table Header */
+:deep(.table-header) {
+  background-color: #f8fafc !important;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  height: 50px;
+}
 </style>

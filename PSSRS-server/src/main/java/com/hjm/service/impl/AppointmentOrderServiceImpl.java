@@ -272,6 +272,11 @@ public class AppointmentOrderServiceImpl extends ServiceImpl<AppointmentOrderMap
         return Result.success("取消成功");
     }
 
+    @Override
+    public void cleanOutTimeReg(LocalDateTime now) {
+        appointmentOrderMapper.cleanOutTimeReg(now);
+    }
+
 
     /**
      * 创建挂号订单（事务方法）

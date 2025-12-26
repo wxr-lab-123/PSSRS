@@ -409,9 +409,12 @@ function wsUrl() {
   const origin = window.location.origin
   const isHttps = origin.startsWith('https')
   const base = isHttps ? origin.replace('https', 'wss') : origin.replace('http', 'ws')
-  const uid = encodeURIComponent(String(auth.user?.id || ''))
-  const token = encodeURIComponent(String((typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('auth_token') : null) || localStorage.getItem('auth_token') || ''))
-  return `${base}/ws?role=doctor&userId=${uid}&token=${token}`
+  const token = encodeURIComponent(String((typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('auth_token') : localStorage.getItem('auth_token')) || ''))
+  let rawUser = null
+  try { rawUser = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('auth_user') : localStorage.getItem('auth_user')) } catch {}
+  let userId = ''
+  try { const parsed = rawUser && JSON.parse(rawUser); userId = encodeURIComponent(String(parsed?.id || parsed?.userId || '')) } catch {}
+  return `${base}/ws?role=doctor&userId=${userId}&token=${token}`
 }
 
 function connectWS() {
@@ -512,8 +515,8 @@ async function cancelMyLeave(row) {
     leaveStatus[row.scheduleId] = { ...prev, state: 'withdrawn' }
     ElMessage.success('已撤销申请')
   } catch (e) {
-    ElMessage.error(e?.msg || e?.message || '撤销失败')
-  }
+      ElMessage.error(e?.msg || e?.message || '撤销失败')
+    }
 }
 
 function submitLeave() {

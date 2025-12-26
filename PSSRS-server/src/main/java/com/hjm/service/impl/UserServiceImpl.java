@@ -211,6 +211,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         doctorProfile.setDescription(doctorDTO.getDescription());
         doctorProfile.setImage(doctorDTO.getImage());
         doctorProfileMapper.updateByUserId(doctorProfile);
+        Set<String> keys = stringRedisTemplate.keys(RedisConstants.SCHEDULE_+"*");
+        Set<String> key_s = stringRedisTemplate.keys(RedisConstants.SCHEDULE_DETAIL_KEY+"*");
+        if (!keys.isEmpty()) {
+            stringRedisTemplate.delete(keys);
+            if (!key_s.isEmpty()) {
+                stringRedisTemplate.delete(key_s);
+            }
+        }
         return Result.success();
     }
 

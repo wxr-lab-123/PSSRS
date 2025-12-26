@@ -5,6 +5,7 @@ import com.hjm.constant.OrderConstant;
 import com.hjm.context.PatientContext;
 import com.hjm.context.UserPatientContext;
 import com.hjm.pojo.Entity.OrderInfo;
+import com.hjm.pojo.VO.OrderInfoVO;
 import com.hjm.result.Result;
 import com.hjm.service.IOrderInfoService;
 import jakarta.annotation.Resource;
@@ -43,12 +44,12 @@ public class OrderInfoController {
     }
 
     @GetMapping("/list")
-    public Result<List<OrderInfo>> list(@RequestParam(required = false)  Integer status
+    public Result<List<OrderInfoVO>> list(@RequestParam(required = false)  Integer status
   , @RequestParam(required = false)  LocalDate startDate
     ) {
         log.info("查询订单");
         Long userPatientId = UserPatientContext.get().getId();
-        List<OrderInfo> orders = orderInfoService.listByPId(userPatientId, status, startDate);
+        List<OrderInfoVO> orders = orderInfoService.listByPId(userPatientId, status, startDate);
         return Result.success(orders);
     }
 

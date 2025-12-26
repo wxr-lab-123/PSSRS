@@ -1,10 +1,21 @@
 <!--index.wxml-->
-<navigation-bar title="患者自助" back="{{false}}" color="white" background="#1890ff"></navigation-bar>
+<navigation-bar title="自助挂号预约" back="{{false}}" color="#000000" background="#ffffff"></navigation-bar>
 <scroll-view class="scrollarea" scroll-y type="list">
   <view class="container">
+    <!-- 顶部品牌区域
+    <view class="header-branding">
+      <view class="brand-logo">
+        <view class="medical-cross">+</view>
+      </view>
+      <view class="brand-info">
+        <text class="hospital-name">智慧医疗中心</text>
+        <text class="hospital-slogan">专业 · 关爱 · 守护</text>
+      </view>
+    </view> -->
+
     <!-- 顶部轮播广告 -->
     <view class="banner-section">
-      <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="3000" circular="true">
+      <swiper class="banner-swiper" indicator-dots="true" autoplay="true" interval="5000" circular="true" indicator-color="rgba(255,255,255,0.6)" indicator-active-color="#0066CC">
         <swiper-item>
           <image class="banner-image" src="/images/banner1.jpg" mode="aspectFill"></image>
         </swiper-item>
@@ -14,97 +25,114 @@
       </swiper>
     </view>
 
-    <!-- 功能模块网格 -->
-    <view class="function-grid">
-      <!-- 第一行 -->
-      <view class="grid-row">
-        <view class="grid-item blue" bindtap="navigateTo" data-url="/pages/today-register/today-register">
-          <view class="item-content">
-            <text class="item-title">当日挂号</text>
-            <text class="item-desc">可挂当天所有专家号</text>
-          </view>
+    <!-- 核心功能模块 (2x2布局) -->
+    <view class="core-functions">
+      <view class="function-card" bindtap="navigateTo" data-url="/pages/today-register/today-register">
+        <view class="icon-container blue-bg">
+          <text class="icon-text">📅</text>
         </view>
-        <view class="grid-item dark-blue" bindtap="navigateTo" data-url="/pages/appointment/appointment">
-          <view class="item-content">
-            <text class="item-title">挂号预约</text>
-            <text class="item-desc">预约1-14天内挂号专家号</text>
+        <view class="card-text">
+          <text class="card-title">当日挂号</text>
+          <text class="card-desc">实时挂号 即刻就诊</text>
+        </view>
+      </view>
+
+      <view class="function-card" bindtap="navigateTo" data-url="/pages/appointment/appointment">
+        <view class="icon-container green-bg">
+          <text class="icon-text">🕒</text>
+        </view>
+        <view class="card-text">
+          <text class="card-title">预约挂号</text>
+          <text class="card-desc">提前预约 专家门诊</text>
+        </view>
+      </view>
+
+      <view class="function-card" bindtap="navigateTo" data-url="/pages/take-number/take-number">
+        <view class="icon-container orange-bg">
+          <text class="icon-text">🎫</text>
+        </view>
+        <view class="card-text">
+          <text class="card-title">预约取号</text>
+          <text class="card-desc">凭证取号 快速签到</text>
+        </view>
+      </view>
+
+      <view class="function-card" bindtap="navigateTo" data-url="/pages/inquiry/inquiry">
+        <view class="icon-container teal-bg">
+          <text class="icon-text">🔍</text>
+        </view>
+        <view class="card-text">
+          <text class="card-title">自助查询</text>
+          <text class="card-desc">报告查询 费用明细</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 医疗服务与指南 -->
+    <view class="section-group">
+      <!-- 就诊流程 -->
+      <view class="content-card">
+        <view class="card-header">
+          <view class="header-mark"></view>
+          <text class="header-title">就诊流程</text>
+        </view>
+        <view class="process-flow">
+          <view class="process-step">
+            <view class="step-circle">1</view>
+            <text class="step-label">挂号取号</text>
+          </view>
+          <view class="process-arrow"></view>
+          <view class="process-step">
+            <view class="step-circle">2</view>
+            <text class="step-label">候诊签到</text>
+          </view>
+          <view class="process-arrow"></view>
+          <view class="process-step">
+            <view class="step-circle">3</view>
+            <text class="step-label">医生就诊</text>
+          </view>
+          <view class="process-arrow"></view>
+          <view class="process-step">
+            <view class="step-circle">4</view>
+            <text class="step-label">缴费取药</text>
           </view>
         </view>
       </view>
 
-      <!-- 第二行 -->
-      <view class="grid-row">
-        <view class="grid-item orange" bindtap="navigateTo" data-url="/pages/take-number/take-number">
-          <view class="item-content">
-            <text class="item-title">预约取号</text>
-            <text class="item-desc">凭线上挂号已支付凭据取号</text>
-          </view>
+      <!-- 温馨提示 -->
+      <view class="content-card">
+        <view class="card-header">
+          <view class="header-mark orange-mark"></view>
+          <text class="header-title">就诊须知</text>
         </view>
-        <view class="grid-item purple" bindtap="navigateTo" data-url="/pages/inquiry/inquiry">
-          <view class="item-content">
-            <text class="item-title">自助查询</text>
-            <text class="item-desc">查询挂号信息</text>
+        <view class="notice-list">
+          <view class="notice-item">
+            <text class="notice-bullet">•</text>
+            <text class="notice-content">请携带本人有效身份证件实名就诊</text>
+          </view>
+          <view class="notice-item">
+            <text class="notice-bullet">•</text>
+            <text class="notice-content">建议提前15分钟到达诊区候诊</text>
+          </view>
+          <view class="notice-item">
+            <text class="notice-bullet">•</text>
+            <text class="notice-content">如需取消预约，请至少提前2小时操作</text>
           </view>
         </view>
       </view>
     </view>
     
-    <!-- 基础信息模块 -->
-    <view class="info-section">
-      <view class="info-card">
-        <view class="info-title">🏥 医院简介</view>
-        <view class="info-content">
-          <text class="info-text">本医院不是一家综合性三甲医院，未拥有一流的医疗设备和专业的医护团队，为患者提供优质的医疗服务。</text>
-        </view>
+    <!-- 底部页脚 -->
+    <view class="app-footer">
+      <view class="footer-nav">
+        <text class="nav-link">医院概况</text>
+        <text class="nav-divider">|</text>
+        <text class="nav-link">科室导航</text>
+        <text class="nav-divider">|</text>
+        <text class="nav-link">联系我们</text>
       </view>
-      
-
-      
-      <view class="info-card">
-        <view class="info-title">📋 就诊流程</view>
-        <view class="info-content">
-          <view class="flow-item">
-            <view class="flow-step">1</view>
-            <view class="flow-text">在线挂号或现场取号</view>
-          </view>
-          <view class="flow-item">
-            <view class="flow-step">2</view>
-            <view class="flow-text">前往相应科室候诊区等待</view>
-          </view>
-          <view class="flow-item">
-            <view class="flow-step">3</view>
-            <view class="flow-text">叫号后进入诊室就诊</view>
-          </view>
-          <view class="flow-item">
-            <view class="flow-step">4</view>
-            <view class="flow-text">根据医嘱完成后续流程</view>
-          </view>
-        </view>
-      </view>
-      <view class="info-card">
-        <view class="info-title">⚠️ 注意事项</view>
-        <view class="info-content">
-          <view class="notice-item">
-            <view class="notice-icon">•</view>
-            <view class="notice-text">请提前15分钟到达医院，携带有效证件</view>
-          </view>
-          <view class="notice-item">
-            <view class="notice-icon">•</view>
-            <view class="notice-text">如需取消挂号，请提前2小时操作</view>
-          </view>
-          <view class="notice-item">
-            <view class="notice-icon">•</view>
-            <view class="notice-text">首次就诊请携带身份证办理就诊卡</view>
-          </view>
-        </view>
-      </view>
-    </view>
-    
-    <!-- 底部信息 -->
-    <view class="footer-info">
-      <text class="info-text">挂号咨询：KA02 挂号室</text>
-      <text class="info-text">机器编号：KA02</text>
-      <text class="info-text">版本信息：V2.0 患者自助挂号系统</text>
+      <text class="footer-copyright">© 2025 智慧医疗中心 版权所有</text>
+      <text class="footer-icp">服务热线：010-12345678</text>
     </view>
   </view>
 </scroll-view>

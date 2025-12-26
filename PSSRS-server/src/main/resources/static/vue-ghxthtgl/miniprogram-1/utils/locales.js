@@ -1,12 +1,13 @@
 // e:\webHD\myMeaven\PSSRS1\PSSRS-server\src\main\resources\static\vue-ghxthtgl\miniprogram-1\utils\locales.js
 module.exports = {
+  // Localization files
   zh: {
     orders: {
       title: '订单查询',
       filter: { all: '全部', pending: '待支付', paid: '已支付', cancelled: '已取消', refunding: '退款中', refunded: '已退款' },
       selectDate: '选择日期',
       search: '搜索',
-      fields: { orderNo: '订单号', createTime: '创建时间', amount: '订单金额', remark: '备注' },
+      fields: { orderNo: '订单号', patientName: '就诊人', createTime: '创建时间', amount: '订单金额', remark: '备注' },
       buttons: { detail: '查看详情', pay: '立即支付', refund: '申请退款', progress: '查看进度' },
       tips: { refunding: '退款处理中...' },
       empty: '暂无订单记录'
@@ -19,7 +20,7 @@ module.exports = {
       filter: { all: 'All', pending: 'Pending', paid: 'Paid', cancelled: 'Cancelled', refunding: 'Refunding', refunded: 'Refunded' },
       selectDate: 'Select date',
       search: 'Search',
-      fields: { orderNo: 'Order No.', createTime: 'Created At', amount: 'Amount', remark: 'Remark' },
+      fields: { orderNo: 'Order No.', patientName: 'Patient', createTime: 'Created At', amount: 'Amount', remark: 'Remark' },
       buttons: { detail: 'View Details', pay: 'Pay Now', refund: 'Request Refund', progress: 'View Progress' },
       tips: { refunding: 'Refund in progress...' },
       empty: 'No orders'

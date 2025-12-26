@@ -56,6 +56,7 @@ Page({
         raw.createTime = m.createTime || raw.createTime
         raw.status = raw.status || m.status
         raw.doctorId = raw.doctorId || m.doctorId
+        raw.patientName = raw.patientName || m.patientName
         raw.messageId = m.messageId
 
         const t = raw.type
@@ -182,10 +183,26 @@ Page({
     wx.showModal({
       title: '清空消息',
       content: '确定清空所有消息吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          wx.removeStorageSync('messages')
-          this.loadMessages()
+          try {
+            const userInfo = wx.getStorageSync('userInfo') || {}
+            const userId = userInfo.id
+            if (!userId) {
+              wx.showToast({ title: '无法获取用户信息', icon: 'none' })
+              return
+            }
+            wx.showLoading({ title: '清空中...' })
+            await request.delete(API.CLEAR_MESSAGES(userId))
+            wx.hideLoading()
+            wx.showToast({ title: '已清空', icon: 'success' })
+            this.setData({ messages: [], page: 1, hasMore: false })
+            wx.removeStorageSync('messages')
+          } catch (e) {
+            wx.hideLoading()
+            wx.showToast({ title: '清空失败', icon: 'none' })
+            console.error(e)
+          }
         }
       }
     })

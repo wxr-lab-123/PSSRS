@@ -1,54 +1,64 @@
 <template>
   <div class="login-container">
-    <div class="login-box">
-      <div class="login-header">
-        <div class="logo">
-          <el-icon :size="40" color="#409eff"><FirstAidKit /></el-icon>
+    <div class="login-content">
+      <div class="brand-section">
+        <div class="brand-logo-wrapper">
+          <el-icon :size="48" color="#fff"><FirstAidKit /></el-icon>
         </div>
-        <h2 class="title">患者自助挂号系统</h2>
-        <p class="subtitle">后台管理中心</p>
+        <h1 class="brand-title">PSSRS 智慧医疗</h1>
+        <p class="brand-desc">高效 · 专业 · 便捷的医疗服务管理平台</p>
       </div>
-      
-      <el-form 
-        ref="formRef"
-        :model="form" 
-        :rules="rules"
-        class="login-form"
-        @keyup.enter="onSubmit"
-        size="large"
-      >
-        <el-form-item prop="username">
-          <el-input 
-            v-model="form.username" 
-            placeholder="请输入用户名" 
-            :prefix-icon="User"
-          />
-        </el-form-item>
+
+      <div class="login-box">
+        <div class="login-header">
+          <h2 class="title">欢迎登录</h2>
+          <p class="subtitle">请使用管理员或医生账号登录系统</p>
+        </div>
         
-        <el-form-item prop="password">
-          <el-input 
-            v-model="form.password" 
-            type="password" 
-            show-password 
-            placeholder="请输入密码" 
-            :prefix-icon="Lock"
-          />
-        </el-form-item>
+        <el-form 
+          ref="formRef"
+          :model="form" 
+          :rules="rules"
+          class="login-form"
+          @keyup.enter="onSubmit"
+          size="large"
+        >
+          <el-form-item prop="username">
+            <el-input 
+              v-model="form.username" 
+              placeholder="请输入用户名" 
+              :prefix-icon="User"
+              class="custom-input"
+            />
+          </el-form-item>
+          
+          <el-form-item prop="password">
+            <el-input 
+              v-model="form.password" 
+              type="password" 
+              show-password 
+              placeholder="请输入密码" 
+              :prefix-icon="Lock"
+              class="custom-input"
+            />
+          </el-form-item>
+          
+          <el-form-item>
+            <el-button 
+              type="primary" 
+              class="submit-btn" 
+              :loading="loading" 
+              @click="onSubmit"
+              auto-insert-space
+            >
+              登 录
+            </el-button>
+          </el-form-item>
+        </el-form>
         
-        <el-form-item>
-          <el-button 
-            type="primary" 
-            class="submit-btn" 
-            :loading="loading" 
-            @click="onSubmit"
-          >
-            登 录
-          </el-button>
-        </el-form-item>
-      </el-form>
-      
-      <div class="login-footer">
-        <p>&copy; 2024 PSSRS 智慧医疗</p>
+        <div class="login-footer">
+          <p>&copy; 2024 PSSRS Smart Healthcare System</p>
+        </div>
       </div>
     </div>
   </div>
@@ -143,72 +153,101 @@ async function onSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1c92d2 0%, #f2fcfe 100%);
+  background-color: #f0f2f5;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+    radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+  background-size: cover;
   position: relative;
   overflow: hidden;
 }
 
-.login-container::before {
+.login-content {
+  display: flex;
+  width: 900px;
+  height: 500px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+}
+
+.brand-section {
+  flex: 1;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: white;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-section::before {
   content: '';
   position: absolute;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 10%),
-              radial-gradient(circle, rgba(255,255,255,0.1) 10%, transparent 10%);
-  background-size: 50px 50px;
-  background-position: 0 0, 25px 25px;
-  animation: bgMove 60s linear infinite;
-  z-index: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48ZyBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTAgMzhoNDB2MmgtNDB6Ii8+PHBhdGggZD0iTTAgMTloNDB2MmgtNDB6Ii8+PHBhdGggZD0iTTAgMGg0MHYyaC00MHoiLz48cGF0aCBkPSJNMCA1OGg0MHYyaC00MHoiLz48L2c+PC9nPjwvc3ZnPg==');
 }
 
-@keyframes bgMove {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(-50px, -50px); }
-}
-
-.login-box {
-  width: 420px;
-  padding: 40px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 1;
-  transition: transform 0.3s ease;
-}
-
-.login-box:hover {
-  transform: translateY(-5px);
-}
-
-.login-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.logo {
-  width: 64px;
-  height: 64px;
-  background: #ecf5ff;
-  border-radius: 50%;
+.brand-logo-wrapper {
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 16px;
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
+  margin-bottom: 24px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.brand-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  letter-spacing: 1px;
+}
+
+.brand-desc {
+  font-size: 16px;
+  opacity: 0.9;
+  font-weight: 300;
+  max-width: 240px;
+  line-height: 1.6;
+}
+
+.login-box {
+  flex: 1;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #ffffff;
+}
+
+.login-header {
+  margin-bottom: 40px;
 }
 
 .title {
-  font-size: 24px;
-  color: #303133;
+  font-size: 28px;
+  color: #1e293b;
   margin: 0 0 8px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .subtitle {
   font-size: 14px;
-  color: #909399;
+  color: #64748b;
   margin: 0;
 }
 
@@ -216,40 +255,55 @@ async function onSubmit() {
   margin-bottom: 24px;
 }
 
+.custom-input :deep(.el-input__wrapper) {
+  padding: 8px 12px;
+  background-color: #f8fafc;
+  box-shadow: 0 0 0 1px #e2e8f0 inset !important;
+}
+
+.custom-input :deep(.el-input__wrapper.is-focus) {
+  background-color: #fff;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2), 0 0 0 1px #2563eb inset !important;
+}
+
 .submit-btn {
   width: 100%;
-  height: 44px;
+  height: 48px;
   font-size: 16px;
   border-radius: 8px;
-  background: linear-gradient(90deg, #409eff, #3a8ee6);
+  background-color: #2563eb;
   border: none;
-  transition: all 0.3s;
+  font-weight: 600;
+  margin-top: 12px;
 }
 
 .submit-btn:hover {
+  background-color: #1d4ed8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.4);
-}
-
-.submit-btn:active {
-  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .login-footer {
+  margin-top: auto;
   text-align: center;
-  color: #c0c4cc;
+  color: #94a3b8;
   font-size: 12px;
 }
 
-/* 输入框样式覆盖 */
-:deep(.el-input__wrapper) {
-  box-shadow: 0 0 0 1px #dcdfe6 inset !important;
-  background-color: #f5f7fa;
-}
-
-:deep(.el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px #409eff inset !important;
-  background-color: #fff;
+@media (max-width: 960px) {
+  .login-content {
+    width: 90%;
+    height: auto;
+    flex-direction: column;
+  }
+  
+  .brand-section {
+    padding: 32px;
+  }
+  
+  .login-box {
+    padding: 32px;
+  }
 }
 </style>
 

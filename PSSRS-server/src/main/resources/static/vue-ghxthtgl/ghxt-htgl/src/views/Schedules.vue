@@ -440,7 +440,7 @@ const batchForm = reactive({
   department_id: null,
   dateRange: [],
   timeSlots: [
-    { time_slot: '上午', start_time: '08:30:00', end_time: '11:30:00' }
+    { time_slot: '上午', start_time: '08:30:00', end_time: '12:00:00' }
   ],
   max_appointments: 20,
   room_number: '',
@@ -790,7 +790,7 @@ function onBatchAdd() {
     department_id: null,
     dateRange: [],
     timeSlots: [
-      { time_slot: '上午', start_time: '08:30:00', end_time: '11:30:00' }
+      { time_slot: '上午', start_time: '08:30:00', end_time: '12:00:00' }
     ],
     max_appointments: 20,
     room_number: '',
@@ -847,9 +847,25 @@ function onBatchSave() {
   })
 }
 
-function onTimeSlotChange() {}
+function onTimeSlotChange() {
+  if (editForm.time_slot === '上午') {
+    editForm.start_time = '08:30:00'
+    editForm.end_time = '12:00:00'
+  } else if (editForm.time_slot === '下午') {
+    editForm.start_time = '13:30:00'
+    editForm.end_time = '17:00:00'
+  }
+}
 
-function onBatchSlotChange() {}
+function onBatchSlotChange(slot) {
+  if (slot.time_slot === '上午') {
+    slot.start_time = '08:30:00'
+    slot.end_time = '12:00:00'
+  } else if (slot.time_slot === '下午') {
+    slot.start_time = '13:30:00'
+    slot.end_time = '17:00:00'
+  }
+}
 
 function onCopy(row) {
   const idNum = Number(row.id ?? row.schedule_id ?? row.scheduleId)

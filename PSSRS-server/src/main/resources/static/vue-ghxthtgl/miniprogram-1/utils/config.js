@@ -86,6 +86,7 @@ module.exports = {
     ,GET_MESSAGES: '/api/user/messages'
     ,UNREAD_COUNT: '/api/user/messages/unread-count'
     ,MARK_MESSAGE_READ: (id) => `/api/user/messages/${id}/read`
+    ,CLEAR_MESSAGES: (id) => `/api/user/messages/${id}`
     ,USER_PATIENTS: '/api/user/patients'
     ,SWITCH_PATIENT: '/api/user/switchPatient'
   }

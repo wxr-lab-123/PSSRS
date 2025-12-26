@@ -1,19 +1,20 @@
 package com.hjm.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.hjm.WebSocket.WebSocketServer;
+import com.hjm.context.BaseContext;
 import com.hjm.context.PatientContext;
 import com.hjm.mapper.AppointmentOrderMapper;
+import com.hjm.pojo.Entity.AppointmentOrder;
 import com.hjm.pojo.Entity.DoctorSchedule;
 import com.hjm.pojo.Entity.LeaveRequest;
 import com.hjm.mapper.LeaveRequestMapper;
 import com.hjm.pojo.Entity.Message;
+import com.hjm.pojo.VO.DoctorScheduleVO;
 import com.hjm.pojo.VO.LeaveRequestVO;
 import com.hjm.result.Result;
-import com.hjm.service.IDoctorScheduleService;
-import com.hjm.service.ILeaveRequestService;
+import com.hjm.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hjm.service.IMessageService;
-import com.hjm.service.IPatientMessageService;
 import com.hjm.utils.SpringUtils;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -38,11 +40,10 @@ public class LeaveRequestServiceImpl extends ServiceImpl<LeaveRequestMapper, Lea
 
     private final IDoctorScheduleService doctorScheduleService;
     private final IMessageService messageService;
-    private final AppointmentOrderMapper appointmentOrderMapper;
     private final IPatientMessageService patientMessageService;
-
-    @Resource
+    private final IAppointmentOrderService appointmentOrderService;
     private StringRedisTemplate stringRedisTemplate;
+    private AppointmentOrderMapper appointmentOrderMapper;
 
     @Override
     public List<LeaveRequestVO> getLeaveList(Long doctorId) {
@@ -71,16 +72,21 @@ public class LeaveRequestServiceImpl extends ServiceImpl<LeaveRequestMapper, Lea
         long sid = ((Number) scheduleId).longValue();
         Long approverId = null;
         try {
-            approverId = com.hjm.context.BaseContext.getCurrentId();
+            approverId = BaseContext.getCurrentId();
         } catch (Exception ignored) {
         }
         UpdateWrapper<LeaveRequest> uw = new UpdateWrapper<>();
         uw.eq("doctor_id", did).eq("schedule_id", sid)
-                .eq("status", "PENDING")
+                .in("status", Arrays.asList("REJECTED","PENDING"))
                 .set("status", "APPROVED")
                 .set(approverId != null, "approver_id", approverId)
                 .set("approval_time", java.time.LocalDateTime.now());
+        UpdateWrapper<AppointmentOrder> uw2 = new UpdateWrapper<>();
+        uw2.eq("schedule_id", sid)
+                .set("status", "2");
+        appointmentOrderService.update(uw2);
         boolean ok = update(uw);
+
 
         DoctorSchedule schedule = new DoctorSchedule();
         schedule.setId(sid);
@@ -89,7 +95,7 @@ public class LeaveRequestServiceImpl extends ServiceImpl<LeaveRequestMapper, Lea
         DoctorSchedule byId = doctorScheduleService.getById(sid);
         String key = "schedule:" + byId.getScheduleDate() + ":" + schedule.getDepartmentId();
         if (ok) {
-            com.hjm.WebSocket.WebSocketServer wss = SpringUtils.getBean(com.hjm.WebSocket.WebSocketServer.class);
+            WebSocketServer wss = SpringUtils.getBean(WebSocketServer.class);
             // 推送给医生审批结果
             String payloadDoctor = "{" +
                     "\"type\":\"LEAVE_APPROVAL_RESULT\"," +
@@ -110,7 +116,7 @@ public class LeaveRequestServiceImpl extends ServiceImpl<LeaveRequestMapper, Lea
             try {
                 com.hjm.result.Result<com.hjm.pojo.VO.DoctorScheduleVO> rs = doctorScheduleService.getXq(sid);
                 if (rs != null && rs.getCode() == 0 && rs.getData() != null) {
-                    com.hjm.pojo.VO.DoctorScheduleVO vo = rs.getData();
+                    DoctorScheduleVO vo = rs.getData();
                     doctorName = String.valueOf(vo.getDoctorName());
                     scheduleDate = String.valueOf(vo.getScheduleDate());
                     timeSlot = String.valueOf(vo.getTimeSlot());
@@ -136,7 +142,7 @@ public class LeaveRequestServiceImpl extends ServiceImpl<LeaveRequestMapper, Lea
 
             wss.sendToRelevantPatientsByScheduleId(String.valueOf(sid), payloadPatient);
             try {
-                java.util.List<Long> pids = appointmentOrderMapper.listPatientIdsByScheduleId(sid);
+                List<Long> pids = appointmentOrderMapper.listPatientIdsByScheduleId(sid);
                 patientMessageService.saveForPatients(pids, "APPOINTMENT_CANCELLED_BY_DOCTOR", payloadPatient, did);
             } catch (Exception ignored) {}
             return Result.success("批准");

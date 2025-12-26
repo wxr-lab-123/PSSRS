@@ -344,30 +344,19 @@ page { min-height: 100vh; height: 100vh; display: flex; flex-direction: column; 
 }
 .action-btn[disabled]::after { display: none; }
 
-.detail-btn {
-  background-image: linear-gradient(135deg, #722ed1 0%, #531dab 100%);
-  color: #fff;
-  border: none;
-}
+.detail-btn { background-image: linear-gradient(135deg, #1890ff 0%, #1890ff 100%); color: #fff; border: none; }
 .detail-btn:hover { filter: brightness(1.05); }
 .detail-btn:active { filter: brightness(0.95); }
+.cancel-btn { background: #fff; color: #ff4d4f; border: 1px solid #ff4d4f; }
+.cancel-btn:hover { background: #fff1f0; }
+.cancel-btn:active { background: #ffebeb; }
 
-.cancel-btn {
-  background: #fff1f0;
-  color: var(--error-color);
-  border: 1px solid #ffccc7;
-}
-
-.cancel-btn:active {
-  background: #ffebeb;
-}
-
-.pay-btn { background-image: linear-gradient(135deg, #1890ff 0%, #096dd9 100%); color: #fff; border: none; }
+.pay-btn { background-image: linear-gradient(135deg, #52c41a 0%, #389e0d 100%); color: #fff; border: none; }
 .pay-btn:hover { filter: brightness(1.05); }
 .pay-btn:active { filter: brightness(0.95); }
-.refund-btn { background-image: linear-gradient(135deg, #fa8c16 0%, #d48806 100%); color: #fff; border: none; }
-.refund-btn:hover { filter: brightness(1.05); }
-.refund-btn:active { filter: brightness(0.95); }
+.refund-btn { background: #fff; color: #faad14; border: 1px solid #faad14; }
+.refund-btn:hover { background: #fffbe6; }
+.refund-btn:active { background: #fff1b8; }
 .progress-tip { color: #faad14; font-size: var(--font-size-sm); align-self: center; }
 
 /* Empty State */

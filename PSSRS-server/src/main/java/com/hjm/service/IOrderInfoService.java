@@ -2,6 +2,7 @@ package com.hjm.service;
 
 import com.hjm.pojo.Entity.OrderInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.hjm.pojo.VO.OrderInfoVO;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 
@@ -23,7 +24,7 @@ public interface IOrderInfoService extends IService<OrderInfo> {
 
     OrderInfo getByOrderNo(String orderNo);
 
-    List<OrderInfo> listByPId(Long userPatientId, Integer status, LocalDate startDate);
+    List<OrderInfoVO> listByPId(Long userPatientId, Integer status, LocalDate startDate);
 
     Result<PageResult> listByPage(String orderNo, Integer status, LocalDate startDate, LocalDate endDate, Integer page, Integer size, String patientName);
 

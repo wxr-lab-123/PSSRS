@@ -1,31 +1,56 @@
 <template>
-  <el-card>
+  <el-card class="page-container">
     <template #header>
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>医生管理</div>
-        <el-space>
-          <el-input v-model="query.username" placeholder="姓名" clearable style="width:160px" />
-          <el-select v-model="query.departmentId" placeholder="科室" clearable style="width:200px">
-            <el-option v-for="d in flatDepts" :key="d.id" :label="d.name" :value="d.id" />
-            <template #empty>
-              <div style="padding:8px;color:#909399">无数据，接口：GET /api/admin/departments/list</div>
+      <div class="page-header">
+        <div class="header-title">
+          <div class="title-decoration"></div>
+          <span>医生管理</span>
+        </div>
+        <el-space :size="12">
+          <el-input 
+            v-model="query.username" 
+            placeholder="请输入姓名搜索" 
+            clearable 
+            style="width: 200px" 
+            @keyup.enter="onSearch"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
             </template>
+          </el-input>
+          <el-select 
+            v-model="query.departmentId" 
+            placeholder="选择科室" 
+            clearable 
+            style="width: 160px"
+          >
+            <el-option v-for="d in flatDepts" :key="d.id" :label="d.name" :value="d.id" />
           </el-select>
-          <el-button type="primary" @click="onSearch">查询</el-button>
-          <el-button @click="onReset">重置</el-button>
-          <el-button type="primary" @click="onAdd">新增医生</el-button>
+          <el-button type="primary" @click="onSearch" :icon="Search">查询</el-button>
+          <el-button @click="onReset" :icon="RefreshRight">重置</el-button>
+          <el-button type="primary" class="add-btn" @click="onAdd" :icon="Plus">新增医生</el-button>
         </el-space>
       </div>
     </template>
-    <el-table v-if="!isCardView" :data="rows" :loading="loading" style="width:100%">
-      <el-table-column label="头像" width="80">
+
+    <el-table 
+      v-if="!isCardView" 
+      :data="rows" 
+      :loading="loading" 
+      style="width:100%"
+      stripe
+      highlight-current-row
+      header-cell-class-name="table-header"
+    >
+      <el-table-column label="头像" width="100" align="center">
         <template #default="{ row }">
           <el-avatar 
             :src="row.image || row.avatar" 
-            :size="50" 
+            :size="48" 
             fit="cover"
             @click="(row.image || row.avatar) && handlePreviewImage(row.image || row.avatar)"
             :style="{ cursor: (row.image || row.avatar) ? 'pointer' : 'default' }"
+            class="table-avatar"
           >
             <template #default>
               <el-icon><User /></el-icon>
@@ -33,146 +58,196 @@
           </el-avatar>
         </template>
       </el-table-column>
-      <el-table-column prop="username" label="姓名" />
-      <el-table-column prop="title" label="职称" />
-      <el-table-column prop="departmentName" label="所属科室" />
-      <el-table-column prop="phone" label="手机号" />
-      <el-table-column prop="status" label="状态" width="120">
+      <el-table-column prop="username" label="姓名" min-width="120">
         <template #default="{ row }">
-          <el-tag :type="(row.status === 1 || row.status === '1') ? 'success' : 'info'">
+          <span class="doctor-name">{{ row.username }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="title" label="职称" min-width="120">
+        <template #default="{ row }">
+          <el-tag size="small" effect="plain">{{ row.title || '-' }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="departmentName" label="所属科室" min-width="150" />
+      <el-table-column prop="phone" label="手机号" width="150" />
+      <el-table-column prop="status" label="状态" width="100" align="center">
+        <template #default="{ row }">
+          <el-tag :type="(row.status === 1 || row.status === '1') ? 'success' : 'info'" effect="light">
             {{ (row.status === 1 || row.status === '1') ? '启用' : (row.status === 2 || row.status === '2') ? '禁用' : row.status }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180">
+      <el-table-column label="操作" width="180" align="center" fixed="right">
         <template #default="{ row }">
-          <el-button type="primary" link @click="onEdit(row)">编辑</el-button>
-          <el-button type="danger" link @click="onDelete(row)">删除</el-button>
+          <el-button type="primary" link @click="onEdit(row)" :icon="Edit">编辑</el-button>
+          <el-button type="danger" link @click="onDelete(row)" :icon="Delete">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <div v-else class="cards-grid">
       <el-card v-for="row in rows" :key="row.id" class="doctor-card" shadow="hover" @click="onEdit(row)">
-        <template #header>
-          <div class="card-header">{{ row.username }}</div>
-        </template>
-        <div class="card-body">
-          <div class="card-image">
-            <el-avatar :src="row.image || row.avatar" :size="72" fit="cover">
+        <div class="card-content-wrapper">
+          <div class="card-left">
+            <el-avatar :src="row.image || row.avatar" :size="80" fit="cover" class="card-avatar">
               <el-icon><User /></el-icon>
             </el-avatar>
+            <div class="card-status">
+              <el-tag size="small" :type="(row.status === 1 || row.status === '1') ? 'success' : 'info'" effect="dark">
+                {{ (row.status === 1 || row.status === '1') ? '启用' : '禁用' }}
+              </el-tag>
+            </div>
           </div>
-          <div class="card-content">
-            <div>职称：{{ row.title || '-' }}</div>
-            <div>科室：{{ row.departmentName || '-' }}</div>
-            <div>电话：{{ row.phone || '-' }}</div>
-            <div>状态：{{ (row.status === 1 || row.status === '1') ? '启用' : (row.status === 2 || row.status === '2') ? '禁用' : row.status }}</div>
+          <div class="card-right">
+            <div class="card-header">
+              <span class="name">{{ row.username }}</span>
+              <span class="title">{{ row.title || '-' }}</span>
+            </div>
+            <div class="card-info">
+              <div class="info-item">
+                <el-icon><OfficeBuilding /></el-icon>
+                <span>{{ row.departmentName || '-' }}</span>
+              </div>
+              <div class="info-item">
+                <el-icon><Iphone /></el-icon>
+                <span>{{ row.phone || '-' }}</span>
+              </div>
+            </div>
+            <div class="card-actions" @click.stop>
+              <el-button type="primary" size="small" @click="onEdit(row)" :icon="Edit" plain round>编辑</el-button>
+              <el-button type="danger" size="small" @click="onDelete(row)" :icon="Delete" plain round>删除</el-button>
+            </div>
           </div>
-        </div>
-        <div class="card-actions" @click.stop>
-          <el-button type="primary" size="small" @click="onEdit(row)">编辑</el-button>
-          <el-button type="danger" size="small" @click="onDelete(row)">删除</el-button>
         </div>
       </el-card>
     </div>
 
-    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+    <div class="pagination-container">
       <el-pagination
         background
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
         v-model:current-page="page"
         v-model:page-size="pageSize"
-        :page-sizes="[10,20,50,100]"
+        :page-sizes="[10, 20, 50, 100]"
         @current-change="handlePageChange"
         @size-change="handleSizeChange"
       />
     </div>
 
-    <el-dialog v-model="editVisible" :title="editForm.id ? '编辑医生' : '新增医生'" width="640px">
-      <el-form ref="editFormRef" :model="editForm" :rules="rules" label-width="100px">
-        <el-form-item label="头像" prop="image">
-          <div style="display:flex;align-items:center;gap:16px">
-            <el-avatar 
-              :src="editForm.image" 
-              :size="80" 
-              fit="cover"
-              @click="editForm.image && handlePreviewImage(editForm.image)"
-              :style="{ cursor: editForm.image ? 'pointer' : 'default' }"
-            >
-              <el-icon><User /></el-icon>
-            </el-avatar>
-            <el-upload
-              :action="''"
-              :auto-upload="true"
-              :show-file-list="false"
-              :before-upload="beforeAvatarUpload"
-              :http-request="handleAvatarUpload"
-              accept="image/*"
-            >
-              <el-button size="small" :loading="avatarUploading">上传头像</el-button>
-              <template #tip>
-                <div style="font-size:12px;color:#909399;margin-top:4px">
-                  支持 JPG/PNG 格式，大小不超过 2MB
+    <el-dialog 
+      v-model="editVisible" 
+      :title="editForm.id ? '编辑医生' : '新增医生'" 
+      width="600px"
+      align-center
+      destroy-on-close
+      class="custom-dialog"
+    >
+      <el-form 
+        ref="editFormRef" 
+        :model="editForm" 
+        :rules="rules" 
+        label-width="90px"
+        status-icon
+      >
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <el-form-item label="头像" prop="image">
+              <div class="avatar-uploader-wrapper">
+                <el-avatar 
+                  :src="editForm.image" 
+                  :size="80" 
+                  fit="cover"
+                  class="preview-avatar"
+                  @click="editForm.image && handlePreviewImage(editForm.image)"
+                >
+                  <el-icon><User /></el-icon>
+                </el-avatar>
+                <div class="upload-area">
+                  <el-upload
+                    :action="''"
+                    :auto-upload="true"
+                    :show-file-list="false"
+                    :before-upload="beforeAvatarUpload"
+                    :http-request="handleAvatarUpload"
+                    accept="image/*"
+                  >
+                    <el-button type="primary" plain size="small" :loading="avatarUploading">点击上传</el-button>
+                  </el-upload>
+                  <div class="upload-tip">支持 JPG/PNG，小于 2MB</div>
                 </div>
-              </template>
-            </el-upload>
-          </div>
-        </el-form-item>
-        <el-form-item label="姓名" prop="username">
-          <el-input v-model="editForm.username" />
-        </el-form-item>
-        <el-form-item label="手机号" prop="phone">
-          <el-input v-model="editForm.phone" />
-        </el-form-item>
-        <el-form-item label="性别" prop="gender">
-          <el-select v-model="editForm.gender" style="width:160px">
-            <el-option label="男" value="0" />
-            <el-option label="女" value="1" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="职称" prop="title">
-          <el-input v-model="editForm.title" />
-        </el-form-item>
-        <el-form-item label="所属科室" prop="departmentId">
-          <div style="display:flex;align-items:center;gap:8px">
-            <el-select v-model="editForm.departmentId" style="width:240px">
-              <el-option v-for="d in flatDepts" :key="d.id" :label="d.name" :value="d.id" />
-              <template #empty>
-                <div style="padding:8px;color:#909399">无数据，接口：GET /api/admin/departments/list</div>
-              </template>
-            </el-select>
-            <el-button size="small" @click="openDeptPicker">选择科室</el-button>
-          </div>
-        </el-form-item>
-        <el-form-item label="简介" prop="description">
-          <el-input v-model="editForm.description" type="textarea" rows="3" />
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-radio-group v-model="editForm.status">
-            <el-radio :label="1">启用</el-radio>
-            <el-radio :label="2">禁用</el-radio>
-          </el-radio-group>
-        </el-form-item>
+              </div>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="姓名" prop="username">
+              <el-input v-model="editForm.username" placeholder="请输入姓名" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="手机号" prop="phone">
+              <el-input v-model="editForm.phone" placeholder="请输入手机号" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="性别" prop="gender">
+              <el-radio-group v-model="editForm.gender">
+                <el-radio label="0">男</el-radio>
+                <el-radio label="1">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="职称" prop="title">
+              <el-select v-model="editForm.title" placeholder="选择职称" style="width: 100%">
+                <el-option label="主任医师" value="主任医师" />
+                <el-option label="副主任医师" value="副主任医师" />
+                <el-option label="主治医师" value="主治医师" />
+                <el-option label="医师" value="医师" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="所属科室" prop="departmentId">
+              <el-select 
+                v-model="editForm.departmentId" 
+                placeholder="请选择科室" 
+                style="width: 100%"
+                filterable
+              >
+                <el-option v-for="d in flatDepts" :key="d.id" :label="d.name" :value="d.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="简介" prop="description">
+              <el-input 
+                v-model="editForm.description" 
+                type="textarea" 
+                rows="3" 
+                placeholder="请输入医生简介..."
+                show-word-limit
+                maxlength="500"
+              />
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <el-form-item label="状态" prop="status">
+              <el-switch
+                v-model="editForm.status"
+                :active-value="1"
+                :inactive-value="2"
+                active-text="启用"
+                inactive-text="禁用"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="editVisible = false">取消</el-button>
           <el-button type="primary" :loading="editSubmitting" @click="onSave">保 存</el-button>
-        </span>
-      </template>
-    </el-dialog>
-
-    <!-- 科室单选弹窗 -->
-    <el-dialog v-model="deptPickerVisible" title="选择科室" width="520px">
-      <el-radio-group v-model="tempDepartmentId" class="dept-radio-group">
-        <el-radio v-for="d in flatDepts" :key="d.id" :label="d.id">{{ d.name }}</el-radio>
-      </el-radio-group>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="deptPickerVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmDeptPick">确 定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -182,12 +257,13 @@
 <script setup>
 import { ref, reactive, onMounted, nextTick, inject, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { User } from '@element-plus/icons-vue'
+import { User, Search, RefreshRight, Plus, Edit, Delete, OfficeBuilding, Iphone } from '@element-plus/icons-vue'
 import { fetchDoctors, createDoctor, updateDoctor, deleteDoctor } from '../api/doctors'
 import { fetchDepartmentsList } from '../api/departments'
 import { uploadDoctorAvatar } from '../api/upload'
 
 const loading = ref(false)
+
 const rows = ref([])
 const total = ref(0)
 const page = ref(1)
@@ -368,15 +444,179 @@ onMounted(() => { loadDepartments(); fetchList() })
 </script>
 
 <style scoped>
-.cards-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px }
-@media (max-width:1200px){ .cards-grid{ grid-template-columns:repeat(3,minmax(0,1fr)) } }
-@media (max-width:900px){ .cards-grid{ grid-template-columns:repeat(2,minmax(0,1fr)) } }
-@media (max-width:600px){ .cards-grid{ grid-template-columns:1fr } }
-.doctor-card { border-radius:8px; transition: all .2s ease }
-.doctor-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.15) }
-.card-header { font-weight:600; font-size:16px }
-.card-body { display:flex; gap:12px; padding: 0 16px }
-.card-image { display:flex; align-items:center }
-.card-content { font-size:14px; line-height:1.6; flex:1; display:flex; flex-direction:column; gap:12px }
-.card-actions { display:flex; justify-content:flex-end; gap:8px; padding: 8px 16px }
+.page-container {
+  min-height: calc(100vh - 120px);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.title-decoration {
+  width: 4px;
+  height: 18px;
+  background: var(--color-primary);
+  border-radius: 2px;
+  margin-right: 12px;
+}
+
+.table-avatar {
+  border: 2px solid var(--color-border);
+  transition: transform 0.3s;
+}
+
+.table-avatar:hover {
+  transform: scale(1.1);
+}
+
+.doctor-name {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+/* Card View */
+.cards-grid { 
+  display: grid; 
+  grid-template-columns: repeat(3, minmax(0, 1fr)); 
+  gap: 24px;
+}
+
+@media (max-width: 1400px) { .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 900px) { .cards-grid { grid-template-columns: 1fr; } }
+
+.doctor-card { 
+  border-radius: 16px; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.doctor-card:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  border-color: var(--color-primary-soft);
+}
+
+.card-content-wrapper {
+  display: flex;
+  gap: 20px;
+  padding: 8px;
+}
+
+.card-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 100px;
+}
+
+.card-avatar {
+  border: 3px solid var(--color-bg-page);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.card-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-header { 
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.card-header .name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.card-header .title {
+  font-size: 13px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.card-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 8px; 
+  margin-top: 8px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+/* Upload Styles */
+.avatar-uploader-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.preview-avatar {
+  cursor: pointer;
+  border: 2px solid var(--color-border);
+  transition: all 0.3s;
+}
+
+.preview-avatar:hover {
+  border-color: var(--color-primary);
+  opacity: 0.9;
+}
+
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-tip {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+:deep(.table-header) {
+  background-color: #f8fafc !important;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  height: 50px;
+}
 </style>

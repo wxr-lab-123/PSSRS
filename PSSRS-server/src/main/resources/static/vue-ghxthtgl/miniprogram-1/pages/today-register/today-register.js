@@ -244,6 +244,7 @@ Page({
         return orderApi.createOrder(scheduleId, this.data.selectedPatientId)
       })
       .then(res => {
+        this._submitting = false
         console.log('挂号接口成功返回，准备显示Toast', res)
         wx.hideLoading()
         
@@ -295,6 +296,7 @@ Page({
       })
       .catch(err => {
         if (err && err.message === '用户资料未完善') return
+        this._submitting = false
         wx.hideLoading()
         // 优先使用后端返回的错误信息
         const errorMessage = err?.msg || err?.data?.message || err?.message || '挂号失败'

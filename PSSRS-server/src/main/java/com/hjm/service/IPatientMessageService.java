@@ -13,4 +13,6 @@ public interface IPatientMessageService extends IService<PatientMessage> {
     PageResult listByPatient(Long userPatientId, Long page, Long size, String status);
     Result markRead(Long userPatientId, Long id);
     Result<Long> unreadCount(Long patientId, Long userPatientId);
+
+    void removeByUserId(Long id);
 }

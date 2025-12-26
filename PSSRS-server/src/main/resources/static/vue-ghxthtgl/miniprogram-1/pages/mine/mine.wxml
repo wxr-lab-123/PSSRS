@@ -44,13 +44,6 @@
         <text class="menu-arrow">›</text>
       </view>
 
-      <view class="menu-item" bindtap="changePassword">
-        <view class="menu-left">
-          <text class="menu-icon">🔒</text>
-          <text class="menu-title">修改密码</text>
-        </view>
-        <text class="menu-arrow">›</text>
-      </view>
 
       <view class="menu-item" bindtap="showComingSoon">
         <view class="menu-left">

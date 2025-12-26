@@ -6,7 +6,8 @@
     <select id="listSchedules" resultType="com.hjm.pojo.VO.DoctorScheduleVO">
         select
         ds.id,
-        ds.current_appointments,
+        ds.current_appointments as currentAppointments,
+        ds.max_appointments as maxAppointments,
         ds.status,
         ds.start_time,
         ds.end_time,
@@ -18,8 +19,8 @@
         u.name as doctorName,
         d.name as departmentName
         from doctor_schedule ds
-        join user u on ds.doctor_id = u.id
-        join department d on ds.department_id = d.id
+        left join user u on ds.doctor_id = u.id
+        left join department d on ds.department_id = d.id
         <where>
             <if test="doctorScheduleDTO.doctorId != null">
                 ds.doctor_id = #{doctorScheduleDTO.doctorId}

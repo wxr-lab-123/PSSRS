@@ -10,7 +10,12 @@ export function updateProfile(data) {
 }
 
 export function changePassword(data) {
-  return request.post('/user/password', data)
+  return request.post('/changePd', {
+    phone: data.phone,
+    code: data.code,
+    newPd: data.newPd,
+    configPd: data.configPd
+  })
 }
 
 export function bindPhone(data) {
@@ -23,4 +28,11 @@ export function updateAvatar(avatar) {
 
 export function sendPhoneCode(phone) {
   return request.post('/user/phone/sendCode', { phone })
+}
+
+export function sendPasswordChangeCode(phone) {
+  return request.post('/sms/toChangePd', null, {
+    baseURL: '/api',
+    params: { phone }
+  })
 }

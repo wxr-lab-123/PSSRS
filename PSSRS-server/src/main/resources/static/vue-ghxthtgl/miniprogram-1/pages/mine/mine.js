@@ -154,25 +154,5 @@ Page({
     })
   },
 
-  // 修改密码
-  changePassword() {
-    // 检查是否登录
-    if (!this.data.isLogin) {
-      wx.showModal({
-        title: '提示',
-        content: '请先登录',
-        success: (res) => {
-          if (res.confirm) {
-            this.goLogin()
-          }
-        }
-      })
-      return
-    }
 
-    // 跳转到修改密码页面
-    wx.navigateTo({
-      url: '/pages/change-password/change-password'
-    })
-  }
 })

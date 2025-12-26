@@ -37,6 +37,10 @@
           <text class="status {{item.statusClass}}">{{item.statusText}}</text>
         </view>
         <view class="item-info">
+          <view class="info-row" wx:if="{{item.patientName}}">
+            <text class="label">{{i18n.orders.fields.patientName}}：</text>
+            <text class="value">{{item.patientName}}</text>
+          </view>
           <view class="info-row">
             <text class="label">{{i18n.orders.fields.createTime}}：</text>
             <text class="value">{{item.createTime}}</text>

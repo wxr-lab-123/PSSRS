@@ -38,7 +38,6 @@
           <view class="actions">
             <button class="btn-action btn-edit" bindtap="openEdit" data-item="{{item}}">编辑</button>
             <button class="btn-action btn-delete" bindtap="remove" data-id="{{item.id}}">删除</button>
-            <button class="btn-action btn-primary" bindtap="choose" data-id="{{item.id}}">设为当前</button>
           </view>
         </view>
       </block>
@@ -52,7 +51,7 @@
       
       <view class="form-item">
         <text class="form-label">姓名</text>
-        <input class="input-box" placeholder="请输入真实姓名" placeholder-class="ph" value="{{form.name}}" bindinput="onInput" data-key="name"/>
+        <input class="input-box {{isEdit ? 'disabled' : ''}}" placeholder="请输入真实姓名" placeholder-class="ph" value="{{form.name}}" bindinput="onInput" data-key="name" disabled="{{isEdit}}"/>
       </view>
       
       <view class="form-item">

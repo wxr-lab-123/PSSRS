@@ -1,6 +1,7 @@
 package com.hjm.controller.admin;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.hjm.exception.AppiontmentOrderException;
 import com.hjm.pojo.DTO.BatchAddScheduleDTO;
 import com.hjm.pojo.DTO.CopyDSDTO;
 import com.hjm.pojo.DTO.DoctorScheduleDTO;
@@ -90,9 +91,13 @@ public class DoctorScheduleController {
         log.debug("{}", doctorSchedulesDTO);
         String key = SCHEDULE_+doctorSchedulesDTO.getScheduleDate()+":"+doctorSchedulesDTO.getDepartmentId();
         DoctorSchedule doctorSchedule = BeanUtil.copyProperties(doctorSchedulesDTO, DoctorSchedule.class);
-        if (doctorSchedulesDTO.getMaxAppointments() == 0){
+        DoctorSchedule byId = doctorScheduleService.getById(doctorSchedulesDTO.getId());
+        if (doctorSchedulesDTO.getMaxAppointments() == Long.valueOf(byId.getCurrentAppointments()) ){
             doctorSchedule.setStatus("FULL");
-        }else {
+        }else if (doctorSchedulesDTO.getMaxAppointments() < Long.valueOf(byId.getCurrentAppointments())){
+            throw new AppiontmentOrderException("当前排班已经约出");
+        }
+        else {
             doctorSchedule.setStatus("AVAILABLE");
         }
         doctorScheduleService.updateById(doctorSchedule);

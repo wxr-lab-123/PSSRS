@@ -2,6 +2,7 @@ package com.hjm.controller.user;
 
 import com.hjm.context.PatientContext;
 import com.hjm.context.UserPatientContext;
+import com.hjm.pojo.DTO.UserPatientDTO;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.service.IPatientMessageService;
@@ -20,7 +21,10 @@ public class MessageController {
                                    @RequestParam(required = false) Long size,
                                    @RequestParam(required = false) String status) {
         Long upid = null;
-        try { com.hjm.pojo.DTO.UserPatientDTO u = com.hjm.context.UserPatientContext.get(); if (u != null) upid = u.getId(); } catch (Exception ignored) {}
+        try {
+            UserPatientDTO u = UserPatientContext.get();
+            if (u != null) upid = u.getId();
+        } catch (Exception ignored) {}
         PageResult pr = patientMessageService.listByPatient(upid, page, size, status);
         return Result.success(pr);
     }
@@ -29,14 +33,20 @@ public class MessageController {
     public Result<Long> unreadCount() {
         Long pid = PatientContext.getPatient().getId();
         Long upid = null;
-        try { com.hjm.pojo.DTO.UserPatientDTO u = com.hjm.context.UserPatientContext.get(); if (u != null) upid = u.getId(); } catch (Exception ignored) {}
+        try { UserPatientDTO u = UserPatientContext.get(); if (u != null) upid = u.getId(); } catch (Exception ignored) {}
         return patientMessageService.unreadCount(pid, upid);
     }
 
     @PutMapping("/{id}/read")
     public Result read(@PathVariable Long id) {
         Long upid = null;
-        try { com.hjm.pojo.DTO.UserPatientDTO u = com.hjm.context.UserPatientContext.get(); if (u != null) upid = u.getId(); } catch (Exception ignored) {}
+        try { UserPatientDTO u = UserPatientContext.get(); if (u != null) upid = u.getId(); } catch (Exception ignored) {}
         return patientMessageService.markRead(upid, id);
+    }
+
+    @DeleteMapping("/{id}")
+    public Result delete(@PathVariable Long id) {
+        patientMessageService.removeByUserId(id);
+        return Result.success();
     }
 }

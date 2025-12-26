@@ -70,9 +70,9 @@ instance.interceptors.response.use(
       if (res.code === 401) {
         localStorage.removeItem('auth_token')
         window.location.href = '/login'
-        return Promise.reject({ code: 401, msg: mapMsg(401, res.msg) })
+        return Promise.reject({ code: 401, msg: res.msg || mapMsg(401, res.msg) })
       }
-      return Promise.reject({ code: res.code, msg: mapMsg(res.code, res.msg), data: res.data })
+      return Promise.reject({ code: res.code, msg: res.msg || mapMsg(res.code, res.msg), data: res.data })
     }
     return res
   },

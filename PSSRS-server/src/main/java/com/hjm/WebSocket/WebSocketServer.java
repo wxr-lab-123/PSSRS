@@ -240,9 +240,8 @@ public class WebSocketServer {
              *   - 若管理员全部不在线，则广播给所有管理员
              */
             if ("LEAVE_REQUEST".equals(type)) {
-
-                // ...（原逻辑不变）
-
+                log.info("收到医生请假申请，准备广播给管理员: {}", message);
+                broadcastToAdmins(message);
                 return;
             }
 
@@ -265,9 +264,9 @@ public class WebSocketServer {
              *   2. 推送给所有相关患者（该排班所有患者）
              */
             if ("LEAVE_STATUS_UPDATE".equals(type)) {
-
-                // ...（原逻辑不变）
-
+                String doctorId = msg.path("doctorId").asText();
+                log.info("收到请假审批结果，推送给医生: {}", doctorId);
+                sendMessage(doctorId, message, "doctor");
                 return;
             }
 

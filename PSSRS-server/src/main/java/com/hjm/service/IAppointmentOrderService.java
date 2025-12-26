@@ -12,6 +12,7 @@ import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -41,4 +42,6 @@ public interface IAppointmentOrderService extends IService<AppointmentOrder> {
     List<Long> listPatientIdsByScheduleId(Long scheduleId);
 
     Result cancel(RegistrationDTO registrationDTO);
+
+    void cleanOutTimeReg(LocalDateTime now);
 }

@@ -7,6 +7,7 @@ import com.hjm.context.BaseContext;
 import com.hjm.pojo.DTO.AppointmentOrderPageDTO;
 import com.hjm.pojo.DTO.RegistrationCancelDTO;
 import com.hjm.pojo.Entity.AppointmentOrder;
+import com.hjm.pojo.Entity.Patient;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.security.RequiresPermissions;
@@ -22,6 +23,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.hjm.constant.OrderConstant.QUEUE_STATUS_BECALLED;
 
@@ -81,13 +86,14 @@ public class AppointmentOrderController {
         Long doctorId = BaseContext.getCurrentId();
         Page<AppointmentOrder> p = new Page<>(page, size);
         QueryWrapper<AppointmentOrder> qw = new QueryWrapper<>();
-        qw.eq("doctor_id", doctorId);
+        qw.eq("doctor_id", doctorId)
+                .in("status",1);
         if (date != null && !date.isEmpty()) qw.eq("appointment_date", java.time.LocalDate.parse(date));
         if (queueStatus != null) qw.eq("queue_status", queueStatus);
         Page<AppointmentOrder> pageData = appointmentOrderService.page(p, qw);
-        java.util.List<java.util.Map<String,Object>> enriched = new java.util.ArrayList<>();
+        List<Map<String,Object>> enriched = new ArrayList<>();
         for (AppointmentOrder o : pageData.getRecords()) {
-            java.util.Map<String,Object> m = new java.util.HashMap<>();
+            Map<String,Object> m = new HashMap<>();
             m.put("id", o.getId());
             m.put("registrationNo", o.getRegistrationNo());
             m.put("patientId", o.getPatientId());
@@ -114,11 +120,11 @@ public class AppointmentOrderController {
             m.put("startTime", o.getStartTime());
             m.put("endTime", o.getEndTime());
             try {
-                com.hjm.pojo.Entity.Patient ptn = patientMapper.selectById(o.getPatientId());
+                Patient ptn = patientMapper.selectById(o.getPatientId());
                 if (ptn != null) m.put("patientName", ptn.getName());
             } catch (Exception ignored) {}
             try {
-                com.hjm.pojo.VO.DoctorScheduleVO vo = doctorScheduleMapper.getXq(o.getScheduleId());
+                DoctorScheduleVO vo = doctorScheduleMapper.getXq(o.getScheduleId());
                 if (vo != null) {
                     m.put("departmentName", String.valueOf(vo.getDepartmentName()));
                     m.put("doctorName", String.valueOf(vo.getDoctorName()));
@@ -148,8 +154,7 @@ public class AppointmentOrderController {
                 .set("call_time", now)
                 .set("called_by", doctorId)
                 .eq("id", id)
-                .eq("status",1)
-                .and(w -> w.isNull("queue_status").or().eq("queue_status", 0))
+                .in("queue_status", 0, 1)
                 .update();
         if (!ok) return Result.error("叫号失败");
         try {

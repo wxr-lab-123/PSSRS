@@ -2,11 +2,13 @@ package com.hjm.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hjm.pojo.Entity.PatientMessage;
+import com.hjm.pojo.VO.PatientMessageVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface PatientMessageMapper extends BaseMapper<PatientMessage> {
-    List<PatientMessage> listByPatientId(
+    List<PatientMessageVO> listByPatientId(
                                          @Param("userPatientId") Long userPatientId,
                                          @Param("offset") Integer offset,
                                          @Param("size") Integer size,
@@ -18,4 +20,7 @@ public interface PatientMessageMapper extends BaseMapper<PatientMessage> {
                           @Param("status") String status);
     int markRead(@Param("id") Long id,
                  @Param("userPatientId") Long userPatientId);
+
+    @Delete("delete from message where user_patient_id = #{id}")
+    void removeByUserId(Long id);
 }

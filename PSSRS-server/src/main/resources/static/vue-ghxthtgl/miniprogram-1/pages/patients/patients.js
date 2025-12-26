@@ -41,7 +41,14 @@ Page({
   openEdit(e) { 
     this.resetCountdown()
     const item = e.currentTarget.dataset.item || {}; 
-    this.setData({ showForm:true, isEdit:true, form: { id:item.id, name:item.name, idCard:item.idCard, phone:item.phone, relation:item.relation || '家属', code: '' } }) 
+    let maskedIdCard = item.idCard
+    if (maskedIdCard && maskedIdCard.length > 6) {
+      // 保留前面部分，后6位替换为 *
+      const prefix = maskedIdCard.slice(0, -6);
+      const suffix = '*'.repeat(6);
+      maskedIdCard = prefix + suffix;
+    }
+    this.setData({ showForm:true, isEdit:true, form: { id:item.id, name:item.name, idCard:maskedIdCard, phone:item.phone, relation:item.relation || '家属', code: '' } }) 
   },
   closeForm() { 
     this.setData({ showForm: false })

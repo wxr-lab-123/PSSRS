@@ -79,7 +79,7 @@ Page({
       date.setDate(date.getDate() + offset)
       const weekIndex = date.getDay()
       // 只保留工作日（周一到周五）
-      if (weekIndex !== 0 && weekIndex !== 6) {
+      // if (weekIndex !== 0 && weekIndex !== 6) {
         const month = String(date.getMonth() + 1).padStart(2, '0')
         const day = String(date.getDate()).padStart(2, '0')
         const week = weekDays[weekIndex]
@@ -93,7 +93,7 @@ Page({
           hasSlot: true
         })
         added++
-      }
+      // }
       offset++
     }
 
@@ -134,15 +134,6 @@ Page({
   // 选择日期
   selectDate(e) {
     const date = e.currentTarget.dataset.date
-    const hasSlot = e.currentTarget.dataset.hasslot
-
-    if (hasSlot === false || hasSlot === 'false') {
-      wx.showToast({
-        title: '该日期暂无可预约号源',
-        icon: 'none'
-      })
-      return
-    }
 
     this.setData({
       selectedDate: date

@@ -3,6 +3,7 @@ package com.hjm.mapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hjm.pojo.Entity.OrderInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.hjm.pojo.VO.OrderInfoVO;
 import com.hjm.pojo.VO.OrderPageVO;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Select;
@@ -29,7 +30,7 @@ public interface OrderInfoMapper extends BaseMapper<OrderInfo> {
     OrderInfo getByOrderNo(String orderNo);
 
 //    @Select("select * from order_info where patient_id = #{patientId} and status = #{status} and create_time >= #{startDate}")
-    List<OrderInfo> listByPId(Long userPatientId, Integer status, LocalDate startDate);
+    List<OrderInfoVO> listByPId(Long userPatientId, Integer status, LocalDate startDate);
 
     Long countRefundRequests();
     Page<OrderPageVO> listByPage(Page<OrderInfo> pageParam, String orderNo, Integer status, LocalDate startDate, LocalDate endDate, String patientName);

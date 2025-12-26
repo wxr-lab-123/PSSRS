@@ -2,18 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hjm.mapper.PatientMessageMapper">
 
-    <select id="listByPatientId" resultType="com.hjm.pojo.Entity.PatientMessage">
-        SELECT * FROM message
+    <select id="listByPatientId" resultType="com.hjm.pojo.VO.PatientMessageVO">
+        SELECT m.* ,
+               p.name AS patientName
+        FROM message m left join patient p ON m.patient_id = p.id
         <where>
-            AND is_deleted = 0
+            AND m.is_deleted = 0
             <if test="userPatientId != null">
-                AND user_patient_id = #{userPatientId}
+                AND m.user_patient_id = #{userPatientId}
             </if>
             <if test="status != null and status != ''">
-                AND status = #{status}
+                AND m.status = #{status}
             </if>
         </where>
-        ORDER BY create_time DESC
+        ORDER BY m.create_time DESC
         LIMIT #{offset}, #{size}
     </select>
 

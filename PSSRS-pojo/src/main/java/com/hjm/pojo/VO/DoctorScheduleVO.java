@@ -11,7 +11,8 @@ public class DoctorScheduleVO {
     private String image;
     private String startTime;
     private String endTime;
-    private Long current_appointments;
+    private Integer currentAppointments;
+    private Integer maxAppointments;
     private Long roomNumber;
     private String notes;
     private String status;

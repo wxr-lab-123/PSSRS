@@ -3,6 +3,7 @@ package com.hjm.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hjm.mapper.PatientMessageMapper;
 import com.hjm.pojo.Entity.PatientMessage;
+import com.hjm.pojo.VO.PatientMessageVO;
 import com.hjm.result.PageResult;
 import com.hjm.result.Result;
 import com.hjm.service.IPatientMessageService;
@@ -57,7 +58,7 @@ public class PatientMessageServiceImpl extends ServiceImpl<PatientMessageMapper,
         int p = page == null ? 1 : page.intValue();
         int s = size == null ? 10 : size.intValue();
         int offset = (p - 1) * s;
-        List<PatientMessage> rows = patientMessageMapper.listByPatientId( userPatientId, offset, s, status);
+        List<PatientMessageVO> rows = patientMessageMapper.listByPatientId( userPatientId, offset, s, status);
         Long total = patientMessageMapper.countByPatientId(userPatientId, status);
         return new PageResult(total == null ? 0 : total, rows);
     }
@@ -72,5 +73,10 @@ public class PatientMessageServiceImpl extends ServiceImpl<PatientMessageMapper,
     public Result<Long> unreadCount(Long patientId, Long userPatientId) {
         Long c = patientMessageMapper.countUnreadByPatientId(userPatientId);
         return Result.success(c);
+    }
+
+    @Override
+    public void removeByUserId(Long id) {
+        patientMessageMapper.removeByUserId(id);
     }
 }

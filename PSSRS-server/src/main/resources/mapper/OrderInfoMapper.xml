@@ -8,24 +8,35 @@
             FROM order_info
             WHERE patient_id = #{patientId}
             AND schedule_id = #{scheduleId}
-            AND status in (0, 1)
+            AND status = 0
         )
     </select>
-    <select id="listByPId" resultType="com.hjm.pojo.Entity.OrderInfo">
-        SELECT *
-        FROM order_info
+    <select id="listByPId" resultType="com.hjm.pojo.VO.OrderInfoVO">
+        SELECT
+            o.order_no AS orderNo,
+            o.amount AS amount,
+            o.status AS status,
+            o.pay_time AS payTime,
+            o.pay_way AS payWay,
+            o.create_time AS createTime,
+            o.expire_time AS expireTime,
+            o.remark AS remark,
+            o.schedule_id AS scheduleId,
+            o.patient_id AS patientId,
+            p.name AS patientName
+        FROM order_info o left join patient p ON o.patient_id = p.id
         <where>
-            <if test="patientId != null">
-                user_patient_id = #{userPatientId}
+            <if test="userPatientId != null">
+                o.user_patient_id = #{userPatientId}
             </if>
             <if test="status != null">
-                AND status = #{status}
+                AND o.status = #{status}
             </if>
             <if test="startDate != null">
-                AND create_time >= #{startDate}
+                AND o.create_time >= #{startDate}
             </if>
         </where>
-        ORDER BY create_time DESC
+        ORDER BY o.create_time DESC
     </select>
     <select id="listByPage" resultType="com.hjm.pojo.VO.OrderPageVO">
         SELECT
